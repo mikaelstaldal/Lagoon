@@ -57,7 +57,31 @@ public abstract class XMLStreamConsumer extends Producer
             ((Producer)prod).doDestroy();    
         }
         destroy();
-    }    
+    }
+
+    void doBeforeBuild()
+        throws java.io.IOException        
+    {
+        ProducerInterface prod = getNext();
+        if (prod instanceof Producer)
+        {
+            ((Producer)prod).doBeforeBuild();    
+        }
+        beforeBuild();
+    }
+
+
+    void doAfterBuild()
+        throws java.io.IOException        
+    {
+        ProducerInterface prod = getNext();
+        if (prod instanceof Producer)
+        {
+            ((Producer)prod).doAfterBuild();    
+        }
+        afterBuild();
+    }
+    
     
     /** 
      * Set the next producer. 

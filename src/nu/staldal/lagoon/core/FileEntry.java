@@ -123,6 +123,21 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
         if (myProducer != null)
             myProducer.doDestroy();
     }
+
+    public void beforeBuild(boolean always)
+        throws IOException
+    {
+        if (myProducer != null)
+            myProducer.doBeforeBuild();
+    }
+
+
+    public void afterBuild(boolean always)
+        throws IOException
+    {
+        if (myProducer != null)
+            myProducer.doAfterBuild();
+    }
     
 
     /**

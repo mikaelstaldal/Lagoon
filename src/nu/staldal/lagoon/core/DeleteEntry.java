@@ -77,6 +77,13 @@ class DeleteEntry implements SitemapEntry
     }
             
 
+    public void beforeBuild(boolean always)
+        throws IOException
+    {
+        // nothing to do
+    }
+    
+    
     public boolean build(boolean always)
         throws IOException
     {
@@ -85,6 +92,13 @@ class DeleteEntry implements SitemapEntry
 	    processor.getTargetLocation().deleteFile(targetURL);
 		
 		return true;
+    }
+
+
+    public void afterBuild(boolean always)
+        throws IOException
+    {
+        // nothing to do
     }
 	
 }

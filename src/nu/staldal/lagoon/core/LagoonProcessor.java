@@ -263,7 +263,17 @@ public class LagoonProcessor implements LagoonContext
         for (Enumeration e = sitemap.getEntries(); e.hasMoreElements(); )
         {
             SitemapEntry ent = (SitemapEntry)e.nextElement();
+            ent.beforeBuild(force);
+        }
+        for (Enumeration e = sitemap.getEntries(); e.hasMoreElements(); )
+        {
+            SitemapEntry ent = (SitemapEntry)e.nextElement();
             if (!ent.build(force)) success = false;
+        }
+        for (Enumeration e = sitemap.getEntries(); e.hasMoreElements(); )
+        {
+            SitemapEntry ent = (SitemapEntry)e.nextElement();
+            ent.afterBuild(force);
         }
 		return success;
     }

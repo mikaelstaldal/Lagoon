@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001, Mikael Ståldal
+ * Copyright (c) 2001-2004, Mikael Ståldal
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -54,6 +54,17 @@ interface SitemapEntry
 {
 
     /**
+     * Invoked on all entries before the building process starts.
+     *
+     * @param always  always build the entry, overriding dependency checking
+	 *
+	 * @throws IOException  if any fatal error occur
+     */
+    public abstract void beforeBuild(boolean always)
+        throws IOException;
+
+        
+    /**
      * Builds this particular entry.
      *
      * @param always  always build the entry, overriding dependency checking
@@ -64,6 +75,17 @@ interface SitemapEntry
     public abstract boolean build(boolean always)
         throws IOException;
         
+
+    /**
+     * Invoked on all entries after the building process ends.
+     *
+     * @param always  always build the entry, overriding dependency checking
+	 *
+	 * @throws IOException  if any fatal error occur
+     */
+    public abstract void afterBuild(boolean always)
+        throws IOException;
+
         
     /**
      * Clean up.

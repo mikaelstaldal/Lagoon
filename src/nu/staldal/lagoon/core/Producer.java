@@ -70,10 +70,38 @@ public abstract class Producer implements ProducerInterface
     }
     
 
+    public void beforeBuild()
+        throws java.io.IOException        
+    {
+        // empty default implementation 
+    }
+    
+
+    public void afterBuild()
+        throws java.io.IOException        
+    {
+        // empty default implementation 
+    }
+
+    
     void doDestroy()
         throws java.io.IOException        
     {
         destroy();
+    }
+    
+
+    void doBeforeBuild()
+        throws java.io.IOException        
+    {
+        beforeBuild();
+    }
+
+
+    void doAfterBuild()
+        throws java.io.IOException        
+    {
+        afterBuild();
     }
     
     
