@@ -230,6 +230,7 @@ public class LagoonCLI
 
             System.out.println("Exiting Lagoon...");
             processor.destroy();
+			System.exit(0);
         }
         catch (FileNotFoundException e)
         {

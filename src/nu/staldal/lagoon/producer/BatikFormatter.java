@@ -47,7 +47,6 @@ import org.xml.sax.*;
 import org.apache.batik.transcoder.*;
 import org.apache.batik.transcoder.image.*;
 import org.apache.batik.dom.svg.*;
-import org.apache.batik.dom.util.SAXDocumentFactory;
 
 import nu.staldal.lagoon.core.*;
 import nu.staldal.lagoon.util.*;

@@ -41,6 +41,7 @@
 package nu.staldal.lagoon.filestorage;
 
 import nu.staldal.lagoon.core.FileStorage;
+import nu.staldal.lagoon.core.OutputHandler;
 import nu.staldal.lagoon.core.LagoonProcessor;
 
 import java.io.*;
@@ -59,10 +60,6 @@ public class SSHFileStorage extends RemoteFileStorage
 	private String rootPath;
 
 	private Runtime rt;
-
-	private String currentPath = null;
-	private Process currentProc = null;
-
 
 	private Process runSSH(String[] command)
 		throws IOException
@@ -103,10 +100,18 @@ public class SSHFileStorage extends RemoteFileStorage
     {
     }
 
-    public boolean needPassword()
+    
+	public boolean needPassword()
     {
         return false;
     }
+
+    
+	public boolean isReentrant()
+    {
+        return true;
+    }	
+
 
     public void open(String url, LagoonProcessor processor, String passoword)
         throws MalformedURLException, IOException
@@ -182,65 +187,19 @@ public class SSHFileStorage extends RemoteFileStorage
      * @see #commitFile
      * @see #discardFile
      */
-    public OutputStream createFile(String path)
+    public OutputHandler createFile(String path)
         throws java.io.IOException
     {
-		currentPath = path;
-		currentProc = runSSH(new String[] { "mkdir", "-p",
+		String currentPath = path;
+		Process currentProc = runSSH(new String[] { "mkdir", "-p",
             "`dirname", rootPath+path + "`",
             "&&", "rm", "-f", rootPath+path,
             "&&", "cat", ">" + rootPath+path });
 
-		return currentProc.getOutputStream();
+		return new SSHOutputHandler(currentPath, currentProc, 
+									currentProc.getOutputStream());
 	}
 
-    /**
-     * Finishing writing to a file and commits it.
-     * Must be invoked when finished writing to the OutputStream
-     * createFile has returned.
-     *
-     * @see #createFile
-     */
-	public void commitFile()
-		// throws java.io.IOException
-	{
-		try {
-			currentProc.waitFor();
-		}
-		catch (InterruptedException e) {}
-
-        fileModified(currentPath);
-
-		currentProc = null;
-		currentPath = null;
-	}
-
-    /**
-     * Discards a new file and delete it.
-     *
-     * @see #createFile
-     */
-    public void discardFile()
-        throws java.io.IOException
-    {
-		try {
-			currentProc.waitFor();
-		}
-		catch (InterruptedException e) {}
-
-		currentProc = null;
-
-		Process proc = runSSH(new String[] {
-            "rm", "-f", rootPath+currentPath });
-
-        proc.getOutputStream().close();
-
-		try {
-			proc.waitFor();
-		} catch (InterruptedException e) {}
-
-		currentPath = null;
-	}
 
     /**
      * Deletes a file.
@@ -261,4 +220,50 @@ public class SSHFileStorage extends RemoteFileStorage
 		} catch (InterruptedException e) {}
 	}
 
+	
+	class SSHOutputHandler extends OutputHandler
+	{
+		private String currentPath;
+		private Process currentProc;
+		
+		SSHOutputHandler(String currentPath, Process currentProc, OutputStream out)
+		{
+			super(out);
+			this.currentPath = currentPath;
+			this.currentProc = currentProc;
+		}
+		
+		public void commit()
+			throws java.io.IOException
+		{
+			out.close();
+			try {
+				currentProc.waitFor();
+			}
+			catch (InterruptedException e) {}
+
+	        fileModified(currentPath);
+		}
+
+		public void discard()
+			throws java.io.IOException
+		{
+			out.close();
+			try {
+				currentProc.waitFor();
+			}
+			catch (InterruptedException e) {}
+	
+			Process proc = runSSH(new String[] {
+				"rm", "-f", rootPath+currentPath });
+	
+			proc.getOutputStream().close();
+	
+			try {
+				proc.waitFor();
+			} catch (InterruptedException e) {}
+		}
+	}	
+	
 }
+

@@ -4,6 +4,14 @@
 
 <delete target="/remove/me.txt"/>
 
+<file target="/island.html">
+	<format type="html">
+		<transform type="lsp">
+			<source/>
+		</transform>
+	</format>
+</file>
+
 <file target="/very_transformed.xml" source="/twoxsl.xml">
 	<format type="xml" indent="4">
 		<transform type="xslt" stylesheet="/style/second.xsl">

@@ -71,6 +71,8 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
 
     private String currentSourceURL;
     private String currentTargetURL;
+    private String currentTargetDir;
+    private String currentTargetName;
     private long targetLastMod;
     private String newTarget;
 
@@ -213,11 +215,11 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
         if (DEBUG) System.out.println("Building: " + currentTargetURL);
 
 		int slash = currentTargetURL.lastIndexOf('/');
-		String currentTargetDir = currentTargetURL.substring(0, slash+1);
-		String currentTargetName = currentTargetURL.substring(slash+1);
+		currentTargetDir = currentTargetURL.substring(0, slash+1);
+		currentTargetName = currentTargetURL.substring(slash+1);
 
         String thisTargetURL;
-        OutputStream out = null;
+        OutputHandler out = null;
         String exceptionType = null;
         boolean bailOut = false;
 
@@ -228,9 +230,7 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
             newTarget = null;
             try {
 	            out = targetStorage.createFile(thisTargetURL);
-                myProducer.start(out, this);
-                out.close();
-                out = null;
+                myProducer.start(out.getOutputStream(), this);
                 exceptionType = null; // no exception thrown
             }
             catch (Exception e)
@@ -244,17 +244,7 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
 				}
 				exceptionType = thisExceptionType;
 
-				try {
-					if (out != null)
-					{
-						out.close();
-						out = null;
-					}
-				}
-				finally
-				{
-                	targetStorage.discardFile();
-				}
+                out.discard();
 
 				if (e instanceof RuntimeException)
 				{
@@ -276,7 +266,7 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
             }
 
             try {
-            	targetStorage.commitFile();
+            	out.commit();
 			}
 			catch (IOException e)
 			{
@@ -351,6 +341,19 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
         this.newTarget = filename;
     }
 
+    public OutputHandler newAsyncTarget(String filename)
+		throws IOException
+	{
+		if (filename.charAt(0) != '/')
+			filename = currentTargetDir + filename;
+			
+		System.out.println("New async target: " + filename);
+			
+		return targetStorage.createFile(filename);
+		
+		// *** non-reentrant???
+	}	
+	
 	public boolean isWildcard()
     {
         return Wildcard.isWildcard(sourceURL);

@@ -50,7 +50,6 @@ import java.io.*;
 public class LocalFileStorage implements FileStorage
 {
     private File root;
-    private File currentFile;
 
     /**
      * Default constructor.
@@ -65,6 +64,10 @@ public class LocalFileStorage implements FileStorage
         return false;
     }
 
+    public boolean isReentrant()
+    {
+        return true;
+    }	
 
     public void open(String loc, LagoonProcessor processor, String password)
         throws java.io.IOException
@@ -82,7 +85,6 @@ public class LocalFileStorage implements FileStorage
                 throw new IOException(
                     "Location didn't exist and couldn't be created");
         }
-        currentFile = null;
     }
 
 
@@ -128,14 +130,8 @@ public class LocalFileStorage implements FileStorage
 
     /**
      * Create a new file, or overwrite an existing file.
-     * Use close() on the returned OutputStream when finished
-     * writing to the file.
-     *
-     * @param path  path to the file
-     *
-     * @return an OutputStream to write to
      */
-    public java.io.OutputStream createFile(String path)
+    public OutputHandler createFile(String path)
         throws java.io.IOException
     {
         File file = root;
@@ -153,42 +149,12 @@ public class LocalFileStorage implements FileStorage
                                           + file);
             oldPos = pos + 1;
         }
-        currentFile = new File(file, path.substring(oldPos));
-        return new FileOutputStream(currentFile);
-    }
+        File currentFile = new File(file, path.substring(oldPos));
 
-    /**
-     * Finishing writing to a file and commits it.
-     * Must be invoked when finished writing to the OutputStream
-     * createFile has returned.
-     *
-     * @see #createFile
-     */
-	public void commitFile()
-		// throws java.io.IOException
-	{
-		// nothing to do
+		return new LocalOutputHandler(currentFile, 
+									  new FileOutputStream(currentFile));
 	}
 
-
-    /**
-     * Discards a new file and delete it.
-     *
-     * @see #createFile
-     */
-    public void discardFile()
-        throws java.io.IOException
-    {
-        if (!currentFile.exists()) return;
-        if (currentFile.delete())
-        {
-			return;
-		}
-		else
-		{
-			throw new IOException("Unable to delete file: " + currentFile);
-		}
-	}
 
     /**
      * Deletes a file.
@@ -221,6 +187,39 @@ public class LocalFileStorage implements FileStorage
 		else
 		{
 			throw new IOException("Unable to delete file: " + file);
+		}
+	}
+	
+	
+	static class LocalOutputHandler extends OutputHandler
+	{
+		private File currentFile;
+		
+		LocalOutputHandler(File currentFile, OutputStream out)
+		{
+			super(out);
+			this.currentFile = currentFile;
+		}
+		
+		public void commit()
+			throws java.io.IOException
+		{
+			out.close();
+		}
+
+		public void discard()
+			throws java.io.IOException
+		{
+			out.close();
+			if (!currentFile.exists()) return;
+			if (currentFile.delete())
+			{
+				return;
+			}
+			else
+			{
+				throw new IOException("Unable to delete file: " + currentFile);
+			}
 		}
 	}
 }

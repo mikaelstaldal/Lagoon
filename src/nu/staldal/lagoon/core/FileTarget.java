@@ -56,11 +56,11 @@ public interface FileTarget extends Target
 
     /**
      * Open a new target file, without closing the current one.
-     * Used for splitting.
      *
-     * @param filename  filename to use, must <em>not</em> start with '/'
+     * @param filename  filename to use, may start with '/'
      */
-    public java.io.OutputStream newIndependentTarget(String filename);
+    public OutputHandler newAsyncTarget(String filename)
+		throws java.io.IOException;
 
 	
     /**

@@ -191,6 +191,12 @@ public class FTPFileStorage extends RemoteFileStorage
     }
 
 
+	public boolean isReentrant()
+    {
+        return false;
+    }	
+
+
     public void open(String url, LagoonProcessor processor, String password)
         throws MalformedURLException, UnknownHostException,
         FTPException, IOException, AuthenticationException
@@ -325,16 +331,13 @@ public class FTPFileStorage extends RemoteFileStorage
         control = null;
     }
 
+	
     /**
      * Create a new file, or overwrite an existing file.
-     * Use close() on the returned OutputStream when finished
-     * writing to the file, and then commitFile().
      *
      * @param pathname  path to the file
-     *
-     * @return an OutputStream to write to
      */
-    public OutputStream createFile(String pathname)
+    public OutputHandler createFile(String pathname)
         throws IOException
     {
         currentPathname = pathname;
@@ -449,7 +452,22 @@ public class FTPFileStorage extends RemoteFileStorage
 		sendLine("STOR " + filename);
 
 		data = new Socket(addr, port);
-		return data.getOutputStream();
+		return new OutputHandler(data.getOutputStream()) {
+			public void commit()
+				throws java.io.IOException
+			{
+				out.close();
+				commitFile();
+			}
+	
+			public void discard()
+				throws java.io.IOException
+			{
+				out.close();
+				discardFile();
+			}
+				
+		};
     }
 
     /**
@@ -459,7 +477,7 @@ public class FTPFileStorage extends RemoteFileStorage
      *
      * @see #createFile
      */
-	public void commitFile()
+	private void commitFile()
 		throws IOException
 	{
         if (currentPathname == null)
@@ -514,7 +532,7 @@ public class FTPFileStorage extends RemoteFileStorage
      *
      * @see #createFile
      */
-    public void discardFile()
+    private void discardFile()
         throws IOException
     {
         if (currentPathname == null)

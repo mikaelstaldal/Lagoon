@@ -30,18 +30,16 @@ public class TestLocalFileStorage extends TestCase
     public void testLocalFileStorage() throws Exception
     {
 
-       OutputStream os = fs.createFile("/create/this/file");
+       OutputHandler oh = fs.createFile("/create/this/file");
        byte[] ba = {45,46,47};
-       os.write(ba);
-       os.close();
-       fs.commitFile();
+       oh.getOutputStream().write(ba);
+       oh.commit();
        assert((new File("localFileStorageTest/create/this/file")).isFile());
        assert(fs.fileLastModified("/create/this/file") > 0);
 
-       OutputStream os2 = fs.createFile("/discard/this/file");
-       os2.write(ba);
-       os2.close();
-       fs.discardFile();
+       OutputHandler oh2 = fs.createFile("/discard/this/file");
+       oh2.getOutputStream().write(ba);
+       oh2.discard();
        assert(!(new File("localFileStorageTest/discard/this/file")).exists());
 
        fs.deleteFile("/create/this/file");

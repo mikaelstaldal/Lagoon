@@ -57,6 +57,13 @@ public interface FileStorage
      */
     public boolean needPassword();
 
+
+    /**
+     * Ask if this file storage is reentrant.
+     */
+    public boolean isReentrant();
+	
+	
 	/**
 	 * Open and initialize this file storage.
      *
@@ -91,40 +98,22 @@ public interface FileStorage
     public long fileLastModified(String path)
         throws java.io.IOException;
 
-    /**
+
+	/**
      * Create a new file, or overwrite an existing file.
-     * Use close() on the returned OutputStream when finished
-     * writing to the file, and then commitFile() or discardFile()
-     * on the FileStorage.
-     *
+	 *
+	 * <ol>
+	 * <li>Invoke getOutputStream() on the returned OutputHandler
+	 * <li>Write to the OutputStream
+	 * <li>Do <em>not</em> close() the OutputStream
+	 * <li>Invoke commit() or discard() on the OutputHandler
+	 * </ol>
+	 * 
      * @param path  path to the file
      *
-     * @return an OutputStream to write to
-     *
-     * @see #commitFile
-     * @see #discardFile
+     * @return an OutputHandler
      */
-    public java.io.OutputStream createFile(String path)
-        throws java.io.IOException;
-
-
-    /**
-     * Finishing writing to a file and commits it.
-     * Must be invoked when finished writing to the OutputStream
-     * createFile has returned.
-     *
-     * @see #createFile
-     */
-	public void commitFile()
-		throws java.io.IOException;
-
-		
-    /**
-     * Discards a new file and delete it.
-     *
-     * @see #createFile
-     */
-    public void discardFile()
+    public OutputHandler createFile(String path)
         throws java.io.IOException;
 
 		
@@ -137,3 +126,4 @@ public interface FileStorage
     public void deleteFile(String path)
         throws java.io.IOException;
 }
+

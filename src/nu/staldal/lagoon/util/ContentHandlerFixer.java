@@ -52,6 +52,7 @@ public class ContentHandlerFixer implements ContentHandler
     private ContentHandler ch;
     private NamespaceSupport nsSup;
     private boolean contextPushed;
+	private int prefixNum;
 
 
     public ContentHandlerFixer(ContentHandler ch)
@@ -59,9 +60,16 @@ public class ContentHandlerFixer implements ContentHandler
         this.ch = ch;
         nsSup = new NamespaceSupport();
         contextPushed = false;
+		prefixNum = 0;
+		if (DEBUG) System.out.println("New ContentHandlerFixer");
     }
 
-
+	private String genPrefix()
+	{
+		return "ns" + (++prefixNum);
+	}
+	
+	
     // ContentHandler implementation
 
     public void setDocumentLocator(Locator locator)
@@ -114,8 +122,10 @@ public class ContentHandlerFixer implements ContentHandler
 	                if ((defaultURI != null) && defaultURI.equals(namespaceURI))
 	                    prefix = ""; // default namespace
 	                else
-	                    throw new Error("no prefix for \'" + namespaceURI +
-	                    	'\'');
+					{
+	                    prefix = genPrefix();
+						nsSup.declarePrefix(prefix, namespaceURI);
+					}
 			 	}
             }
             name = ((prefix.length() == 0) ? "" : (prefix + ':')) + localName;
@@ -137,8 +147,10 @@ public class ContentHandlerFixer implements ContentHandler
                 {
                     String prefix = nsSup.getPrefix(uri);
                     if (prefix == null)
-                        throw new Error("no attribute prefix for \'"
-                            + uri + '\'');
+					{
+                       	prefix = genPrefix();
+						nsSup.declarePrefix(prefix, namespaceURI);
+					}
                     aname = prefix + ':' + alocalName;
                 }
             }
@@ -162,6 +174,13 @@ public class ContentHandlerFixer implements ContentHandler
         }
 		*/
 
+        for (Enumeration e = nsSup.getDeclaredPrefixes(); e.hasMoreElements(); )
+        {
+            String prefix = (String)e.nextElement();
+            String uri = nsSup.getURI(prefix);
+			ch.startPrefixMapping(prefix, uri);
+        }
+						
         ch.startElement(namespaceURI, localName, name, newAtts);
     }
 
@@ -190,14 +209,21 @@ public class ContentHandlerFixer implements ContentHandler
 	                if ((defaultURI != null) && defaultURI.equals(namespaceURI))
 	                    prefix = ""; // default namespace
 	                else
-	                    throw new Error("no prefix for \'" + namespaceURI +
-	                    	'\'');
+					{
+						throw new Error("No prefix for " + namespaceURI);
+					}	                    
 			 	}
             }
             name = ((prefix.length() == 0) ? "" : (prefix + ':')) + localName;
         }
 
         ch.endElement(namespaceURI, localName, name);
+
+        for (Enumeration e = nsSup.getDeclaredPrefixes(); e.hasMoreElements(); )
+        {
+            String prefix = (String)e.nextElement();
+			ch.endPrefixMapping(prefix);
+        }
 
         nsSup.popContext();
     }
@@ -214,9 +240,7 @@ public class ContentHandlerFixer implements ContentHandler
             contextPushed = true;
         }
 
-        nsSup.declarePrefix(prefix,uri);
-		
-		ch.startPrefixMapping(prefix, uri);
+        nsSup.declarePrefix(prefix, uri);
     }
 
     public void endPrefixMapping(String prefix)
@@ -224,8 +248,6 @@ public class ContentHandlerFixer implements ContentHandler
     {
 		if (DEBUG) System.out.println("endPrefixMapping("+
 			((prefix.length() == 0) ? "<default>" : prefix)+')');
-
-		ch.endPrefixMapping(prefix);
     }
 
     public void characters(char[] chars, int start, int length)
