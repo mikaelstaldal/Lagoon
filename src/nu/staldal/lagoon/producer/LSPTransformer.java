@@ -46,6 +46,7 @@ import java.util.*;
 import org.xml.sax.*;
 
 import nu.staldal.lsp.*;
+import nu.staldal.lsp.compiler.*;
 import nu.staldal.lagoon.core.*;
 import nu.staldal.util.Utils;
 
