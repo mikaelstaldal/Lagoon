@@ -32,8 +32,8 @@
 
   <property name="Name" value="Lagoon"/>
   <property name="name" value="lagoon"/>
-  <property name="version" value="1.0b15"/>
-  <property name="ver" value="10b15"/>
+  <property name="version" value="1.0b16"/>
+  <property name="ver" value="10b16"/>
 
   <property name="res.dir" value="resource"/>
   <property name="src.dir" value="src"/>
