@@ -42,7 +42,9 @@ package nu.staldal.lagoon;
 
 import java.io.*;
 
+import javax.xml.parsers.*;
 import org.xml.sax.*;
+
 
 /**
  * Small application to check for errors in XML files.
@@ -53,7 +55,8 @@ import org.xml.sax.*;
  */
 public class XMLCheck
 {
-	public static void main(String[] args)
+	public static void main(String[] args) 
+		throws ParserConfigurationException, SAXException
 	{
 		boolean validate = false;
 		String input = null;
@@ -88,9 +91,11 @@ class MyParser implements ErrorHandler
 
 	MyParser() {}
 
-	boolean parse(String input, boolean validate)
-	{
-		XMLReader parser = new org.apache.xerces.parsers.SAXParser();
+	boolean parse(String input, boolean validate) 
+		throws ParserConfigurationException, SAXException
+	{		
+		XMLReader parser = 
+			SAXParserFactory.newInstance().newSAXParser().getXMLReader(); 
 
         if (validate)
         {
