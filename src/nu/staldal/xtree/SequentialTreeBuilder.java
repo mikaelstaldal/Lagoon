@@ -75,7 +75,7 @@ public class SequentialTreeBuilder implements ContentHandler, ErrorHandler
 	private TreeBuilder subTreeBuilder;
 	private Vector nsPrefix = null;
 	private Vector nsURI = null;
-	private boolean inSubTree = false;
+	private int inSubTree = 0;
 
 
 	/**
@@ -87,13 +87,14 @@ public class SequentialTreeBuilder implements ContentHandler, ErrorHandler
 	 * @param validate  should the file be validated?
 	 * @param handler   handler to invoke for each element
 	 *
+	 * @return the root element (without any children)
+	 *
 	 * @throws SAXException  if the file doesn't contain a well-formed
 	 * (valid) XML document.
 	 * @throws IOException  if there was some I/O error while reading the input.
-	 * @throws ParserConfigurationExcpetion  if a JAXP parser is not properly
-	 * setup
+	 * @throws ParserConfigurationExcpetion  if a JAXP parser is not properly setup
 	 */
-	public static void parseXML(InputSource xmlInput, boolean validate, 
+	public static Element parseXML(InputSource xmlInput, boolean validate, 
 			ElementHandler handler)
 		throws SAXException, IOException, ParserConfigurationException
 	{
@@ -108,6 +109,8 @@ public class SequentialTreeBuilder implements ContentHandler, ErrorHandler
 		xmlReader.setErrorHandler(tb);
 
 		xmlReader.parse(xmlInput);
+		
+		return tb.getRootElement();
 	}
 
 
@@ -215,7 +218,7 @@ public class SequentialTreeBuilder implements ContentHandler, ErrorHandler
 		}
 		else
 		{
-			inSubTree = true;
+			inSubTree++;
 			subTreeBuilder.startElement(namespaceURI, localName, qName, atts);
 		}
     }
@@ -227,14 +230,19 @@ public class SequentialTreeBuilder implements ContentHandler, ErrorHandler
 		if (DEBUG) System.out.println("endElement("+namespaceURI+','
             +localName+','+qName+')');
 	
-		if (inSubTree)
+		if (inSubTree>0)
 		{
 			subTreeBuilder.endElement(namespaceURI, localName, qName);
-			Element el = subTreeBuilder.getTree();
-			el.setParent(rootElement);
-			handler.processElement(el);
-			subTreeBuilder.reset();
-			inSubTree = false;			
+			
+			if (inSubTree == 1)
+			{
+				Element el = subTreeBuilder.getTree();
+				el.setParent(rootElement);
+				handler.processElement(el);
+				subTreeBuilder.reset();
+			}
+			
+			inSubTree--;			
 		}
 		else
 		{
@@ -277,28 +285,28 @@ public class SequentialTreeBuilder implements ContentHandler, ErrorHandler
     public void characters(char ch[], int start, int length)
         throws SAXException
     {
-		if (inSubTree)
+		if (inSubTree>0)
 			subTreeBuilder.characters(ch, start, length);
     }
 
     public void ignorableWhitespace(char ch[], int start, int length)
         throws SAXException
     {
-		if (inSubTree)
+		if (inSubTree>0)
 			subTreeBuilder.ignorableWhitespace(ch, start, length);
     }
 
     public void processingInstruction(String target, String data)
         throws SAXException
     {
-		if (inSubTree)
+		if (inSubTree>0)
 			subTreeBuilder.processingInstruction(target, data);
     }
 
     public void skippedEntity(String name)
         throws SAXException
     {
-		if (inSubTree)
+		if (inSubTree>0)
 			subTreeBuilder.skippedEntity(name);
     }
 
