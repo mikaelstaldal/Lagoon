@@ -1,5 +1,3 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
-
 <!-- Ant build file for Lagoon -->
 <!-- You need Apache Ant, version 1.2 or later, to use it -->
 <!-- Get it from http://jakarta.apache.org/ant/ -->
@@ -16,8 +14,8 @@
 
   <property name="Name" value="Lagoon"/>
   <property name="name" value="lagoon"/>
-  <property name="version" value="1.0b11"/>
-  <property name="ver" value="10b11"/>
+  <property name="version" value="1.0b12"/>
+  <property name="ver" value="10b12"/>
 
   <property name="src.dir" value="src"/>
   <property name="src.testsuite" value="testsuite"/>
@@ -27,15 +25,16 @@
   <property name="build.classes" value="${build.dir}/classes"/>
   <property name="build.testsuite" value="${build.dir}/testsuite"/>
 
-  <!-- <property name="manifest" value="src/manifest"/> -->
+  <property name="manifest" value="src/lagoon.mf"/>
 
+<!--
   <taskdef name="lagoon" classname="nu.staldal.lagoon.LagoonAntTask">
     <classpath>
       <pathelement location="${dist.jars}/lagoon.jar" />
-      <pathelement location="${dist.jars}/lsp.jar" />
       <pathelement location="${dist.jars}/xtree.jar" />
     </classpath>
   </taskdef>  
+-->
 
   <target name="init">
     <tstamp/>
@@ -51,10 +50,10 @@
   </target>
 
   
-  <target name="lagoon" depends="init,xtree,lsp"
+  <target name="lagoon" depends="init,xtree,lexer"
   	description="Compiles Lagoon">
     <javac srcdir="${src.dir}"
-    	   includes="nu/staldal/lagoon/**/*"
+    	   includes="nu/staldal/lagoon/**/*,nu/staldal/lsp/**/*,nu/staldal/syntax/**/*"
            destdir="${build.classes}"
            optimize="off" debug="on">
     	<classpath>
@@ -67,7 +66,10 @@
     <copy todir="${build.classes}">
       <fileset dir="${src.dir}">
         <include name="nu/staldal/lagoon/**/*" />
+        <include name="nu/staldal/lsp/**/*" />
+        <include name="nu/staldal/syntax/**/*" />
         <exclude name="**/*.java" />
+        <exclude name="**/*.lex" />
       </fileset>
     </copy>
 
@@ -77,11 +79,13 @@
     <copy file="version.txt" todir="${build.classes}" 
           overwrite="true"
           filtering="on"/>
-    <jar jarfile="${dist.jars}/${name}.jar">
-         <!-- manifest="${manifest}" -->
+    <jar jarfile="${dist.jars}/${name}.jar"
+         manifest="${manifest}">
       <fileset dir="${build.classes}"> 
     	 <include name="*"/>
     	 <include name="nu/staldal/lagoon/**/*"/>
+    	 <include name="nu/staldal/syntax/**/*"/>
+    	 <include name="nu/staldal/lsp/**/*"/>
       </fileset>	 
     </jar>
 
@@ -111,21 +115,6 @@
   </target>
 
 
-  <target name="syntax" depends="init">
-    <javac srcdir="${src.dir}"
-    	   includes="nu/staldal/syntax/**/*"
-           destdir="${build.classes}"
-           optimize="off" debug="on"/>
-
-    <copy todir="${build.classes}">
-      <fileset dir="${src.dir}">
-        <include name="nu/staldal/syntax/**/*" />
-        <exclude name="**/*.java" />
-      </fileset>
-    </copy>
-  </target>
-
-
   <target name="lexer" unless="lexer.notRequired">
     <java classname="JLex.Main">
     	<classpath>
@@ -138,36 +127,7 @@
   </target>
 
 
-  <target name="lsp" depends="init,xtree,lexer,syntax"
-  	description="Compiles LSP">
-    <javac srcdir="${src.dir}"
-    	   includes="nu/staldal/lsp/**/*"
-           destdir="${build.classes}"
-           optimize="off" debug="on">
-    	<classpath>
-            <pathelement location="${Batik}" />
-        </classpath>
-	</javac>
-
-    <copy todir="${build.classes}">
-      <fileset dir="${src.dir}">
-        <include name="nu/staldal/lsp/**/*" />
-        <exclude name="**/*.java" />
-        <exclude name="**/*.lex" />
-      </fileset>
-    </copy>
-
-    <jar jarfile="${dist.jars}/lsp.jar">
-         <!-- manifest="${manifest}" -->
-      <fileset dir="${build.classes}"> 
-    	 <include name="nu/staldal/syntax/**/*"/>
-    	 <include name="nu/staldal/lsp/**/*"/>
-      </fileset>	 
-    </jar>
-  </target>
-
-
-  <target name="testsuite" depends="init,lsp,xtree,lagoon"
+  <target name="testsuite" depends="init,xtree,lagoon"
   	description="Compiles testsuite">
     <javac srcdir="${src.testsuite}"
     	   includes="nu/staldal/**/*"
@@ -203,10 +163,12 @@
              doctitle="${Name}" />
   </target>
 
+<!--
   <target name="site" depends="docs"
           description="Builds the Lagoon website">
     <lagoon propertyFile="website.lagoon"/>
   </target>
+-->
 
   <target name="dist" depends="lagoon,docs"
   		  description="Builds the distribution">

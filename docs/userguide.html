@@ -143,7 +143,7 @@ If you use Batik, you need to put <code>lib/batik-patch.jar</code> before Batik.
 environment variable <code>LAGOON_HOME</code> to the directory where you 
 installed Lagoon (there are scripts for Windows, OS/2 and UNIX based systems, 
 if you don't can or want to use them, you have to add the <code>.jar</code> 
-file in the <code>lib</code> directory to your <code>CLASSPATH</code> and set
+files in the <code>lib</code> directory to your <code>CLASSPATH</code> and set
 the <code>resourceDir</code> system property).</li>
 </ol>
 
@@ -196,7 +196,8 @@ relative to the local source root directory.</li>
 <p>Absolute URLs are handled by the <code>java.net.URLConnection</code>
 class in Java. It has a pluggable API and it's possible to install custom 
 handlers for any scheme (see the Java documentation for information about 
-this). However, three schemes are handled specially by Lagoon, 
+this). At least <code>http</code> and <code>ftp</code> are included in the JRE.
+However, three schemes are handled specially by Lagoon: 
 <code>file</code>, <code>res</code> and <code>part</code>.</p>
 
 <p>The <code>file</code> scheme is used to point out a file anywhere in the 
@@ -718,7 +719,6 @@ build file like this:</p>
 &lt;taskdef name="lagoon" classname="nu.staldal.lagoon.LagoonAntTask"&gt;
   &lt;classpath&gt;
     &lt;pathelement location="<em>locationOfLagoonJars</em>/lagoon.jar" /&gt;
-    &lt;pathelement location="<em>locationOfLagoonJars</em>/lsp.jar" /&gt;
     &lt;pathelement location="<em>locationOfLagoonJars</em>/xtree.jar" /&gt;
   &lt;/classpath&gt;
 &lt;/taskdef&gt;  
