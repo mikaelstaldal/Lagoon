@@ -144,7 +144,7 @@ public class LSPTransformer extends Transform
             {
 				getSourceMan().getFileAsSAX(url, ch, target);	
             }
-        }, params, target);
+        }, params, target, getSourceMan());
 
         ch.endDocument();
     }

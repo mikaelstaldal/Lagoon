@@ -347,7 +347,7 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
 		if (filename.charAt(0) != '/')
 			filename = currentTargetDir + filename;
 			
-		System.out.println("New async target: " + filename);
+		if (DEBUG) System.out.println("New async target: " + filename);
 			
 		return targetStorage.createFile(filename);
 		
