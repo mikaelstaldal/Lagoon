@@ -402,7 +402,7 @@ public class LagoonGUI extends Frame implements WindowListener
 				if (password != null)
 				{
 					YesNoQueryDialog ynDialog = 
-						new YesNoQueryDialog(this, "Save password",
+						new YesNoQueryDialog(this, "Save property file",
 							"Save password in property file?", "Yes", "No");
 					ynDialog.show(); // blocking
 					
