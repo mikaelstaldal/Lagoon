@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001, Mikael Ståldal
+ * Copyright (c) 2001-2002, Mikael Ståldal
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -44,44 +44,59 @@ import java.io.*;
 
 import org.xml.sax.*;
 import org.apache.fop.apps.*;
-import org.apache.fop.messaging.MessageHandler;
+import org.apache.log.*;
+import org.apache.log.format.*;
 
 import nu.staldal.lagoon.core.*;
 
 /**
- * Uses Apache FOP version 0.17.
+ * Uses Apache FOP version 0.20.3.
  */
 public class FOPFormatter extends Format
 {
+	private Driver driver;
+	
     public void init()
     {
-        // nothing to do
+		driver = new Driver();
+
+    	Hierarchy hierarchy = Hierarchy.getDefaultHierarchy();
+    	PatternFormatter formatter = new PatternFormatter(
+       		"[%{priority}]: %{message}\n%{throwable}" );
+
+    	LogTarget logTarget = 
+			new org.apache.log.output.io.StreamTarget(System.err, formatter);
+
+    	hierarchy.setDefaultLogTarget(logTarget);
+    	Logger log = hierarchy.getLoggerFor("fop");
+    	log.setPriority(Priority.ERROR);
+    	driver.setLogger(log);
     }
 
     public void start(OutputStream out, Target target)
         throws IOException, SAXException
     {
-		MessageHandler.setOutputMethod(MessageHandler.NONE);
-
-		Driver driver = new Driver();
-		driver.setRenderer("org.apache.fop.render.pdf.PDFRenderer",
-						   Version.getVersion());
-		driver.addElementMapping("org.apache.fop.fo.StandardElementMapping");
-		driver.addElementMapping("org.apache.fop.svg.SVGElementMapping");
-        driver.addPropertyList("org.apache.fop.fo.StandardPropertyListMapping");
-        driver.addPropertyList("org.apache.fop.svg.SVGPropertyListMapping");
+ 		driver.reset();
+		driver.setRenderer(Driver.RENDER_PDF);
 		driver.setOutputStream(out);
 
 		getNext().start(driver.getContentHandler(), target);
 
-		try {
-			driver.format();
-    		driver.render();
-		}
-		catch (FOPException e)
+/*
+		catch (SAXException e)
 		{
-			throw new SAXException(e);
+			System.err.println("SAXException: " + e.toString());
+			Exception ee = e.getException();
+			if (ee != null)
+				ee.printStackTrace();
+			else
+				e.printStackTrace();
 		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+*/
 	}
 
     public boolean hasBeenUpdated(long when)

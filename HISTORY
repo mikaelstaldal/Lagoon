@@ -40,6 +40,7 @@
 1.0 beta 14
 -----------
 * Updated support for Apache Batik 1.1.1.
+* Updated support for Apache FOP 0.20.3.
 * Updated LSP.
 * Checks for broken FTP connection (timeout) and reconnect.
 * Fixed display bug in GUI for Java2 1.4.

@@ -16,12 +16,14 @@
   	   or override with -D command line options -->
   <property name="JLex" value="C:\javaInstall\JLex"/>
   <property name="FOP" value="C:\javaInstall\fop\fop.jar"/>
+  <property name="LogKit" value="C:\javaInstall\fop\lib\logkit-1.0.jar"/>
   <property name="Batik" value="C:\javaInstall\batik\lib"/>
   <property name="JAF" value="C:\javaInstall\jaf\activation.jar"/>
   <property name="JARV" value="C:\javaInstall\iso-relax.jar"/>
 
   <path id="lagoon.class.path">
     <pathelement location="${FOP}" />
+    <pathelement location="${LogKit}" />
     <fileset dir="${Batik}">
         <include name="*.jar"/>
     </fileset>
