@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
-<Information xmlns="foo"><Distributor>SIX</Distributor><News Id="350929" xmlns="bar"><Time>2000-4-20 13:57.0.0</Time><Source>DIREKT</Source><Type>Al</Type><Subject>***BRISTOL-MYERS 1 KV: RESULTAT 0:61 USD/AKTIE (0:53)</Subject><Text>sixp:/rt/newsart?Id=&quot;350929&quot;</Text><Newsart>
+<Information xmlns="foo"><Distributor xmlns="bar">SIX</Distributor><News Id="350929"><Time>2000-4-20 13:57.0.0</Time><Source>DIREKT</Source><Type>Al</Type><Subject>***BRISTOL-MYERS 1 KV: RESULTAT 0:61 USD/AKTIE (0:53)</Subject><Text>sixp:/rt/newsart?Id=&quot;350929&quot;</Text><Newsart>
 Currently AFX Copenhagen is not updating due to communications problem
 
 In case of questions, please contact SIX Helpdesk on 08-637 5110.

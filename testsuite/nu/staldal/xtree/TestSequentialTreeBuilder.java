@@ -21,9 +21,9 @@ public class TestSequentialTreeBuilder extends TestCase
 				public void processElement(Element el) throws SAXException
 				{
 					if (el.getLocalName().equals("Distributor"))
-						assertEquals("foo", el.getNamespaceURI());
-					else if (el.getLocalName().equals("News"))
 						assertEquals("bar", el.getNamespaceURI());
+					else if (el.getLocalName().equals("News"))
+						assertEquals("foo", el.getNamespaceURI());
 					else
 						fail("localName should be Distributor or News");
 					
