@@ -43,8 +43,6 @@ package nu.staldal.lagoon.core;
 import java.io.*;
 import java.util.*;
 
-// import org.xml.sax.SAXException;
-
 import nu.staldal.xtree.*;
 import nu.staldal.lagoon.util.LagoonUtil;
 
