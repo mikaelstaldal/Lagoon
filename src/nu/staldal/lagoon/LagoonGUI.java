@@ -63,6 +63,7 @@ public class LagoonGUI extends Frame implements WindowListener
 
 	private Panel buttonPanel;
 	private Panel inputPanel;
+	private Panel centerPanel;
 	private Button loadButton;	
 	private Button saveButton;	
 	private Button buildButton;	
@@ -73,6 +74,7 @@ public class LagoonGUI extends Frame implements WindowListener
 	private InputComponent targetURL;
 	private String password;
 	private Label statusLabel;
+	private TextArea progressArea;
 
 	private LagoonProcessor processor = null;	  
 
@@ -94,13 +96,21 @@ public class LagoonGUI extends Frame implements WindowListener
 		add(inputPanel = new Panel(), BorderLayout.NORTH);
 		inputPanel.setLayout(new GridLayout(0,1));
 		inputPanel.add(
-			sitemapFile = new InputComponent(this, "Sitemap file", "", true));
+			sitemapFile = 
+				new InputComponent(this, "Sitemap file", "", true));
 		inputPanel.add(
 			sourceDir = new InputComponent(this, "Source directory", "."));
 		inputPanel.add(
 			targetURL = new InputComponent(this, "Target URL", "."));
-			
-		add(statusLabel = new Label("Not initialized"), BorderLayout.CENTER);
+		
+		add(centerPanel = new Panel(), BorderLayout.CENTER);
+		centerPanel.setLayout(new BorderLayout());
+		centerPanel.add(progressArea = 
+			new TextArea(null, 5, 50, TextArea.SCROLLBARS_VERTICAL_ONLY), 
+			BorderLayout.NORTH);
+		progressArea.setEditable(false);
+		centerPanel.add(statusLabel = new Label("Not initialized"), 
+			BorderLayout.SOUTH);
 		
 		add(buttonPanel = new Panel(), BorderLayout.SOUTH);
 
@@ -178,19 +188,35 @@ public class LagoonGUI extends Frame implements WindowListener
 		
 		if (processor != null)
 		{
+			long timeBefore = System.currentTimeMillis();
+			progressArea.setText("--- Start build ---\n");
 			statusLabel.setText("Building...");
             try {
-				processor.build(force);
+				boolean success = processor.build(force);
+                long timeElapsed = System.currentTimeMillis()-timeBefore;
+				if (!success)
+				{
+					progressArea.append("--- Build finished with error(s) " 
+						+ showTime(timeElapsed) + " ---");
+					MessageDialog ed = new MessageDialog(this, "Building error",
+						"Error(s) occured while building");
+					ed.show();
+				}
+				else
+				{
+					progressArea.append("--- Build finished successfully " 
+						+ showTime(timeElapsed) + " ---");	
+				}
 			}
 			catch (FileNotFoundException e)
 			{
-				ErrorDialog ed = new ErrorDialog(this, "Building error",
+				MessageDialog ed = new MessageDialog(this, "Fatal Building error",
 					"File not found: " + e.getMessage());
 				ed.show();
 			}
 			catch (IOException e)
 			{
-				ErrorDialog ed = new ErrorDialog(this, "Building error",
+				MessageDialog ed = new MessageDialog(this, "Fatal Building error",
 					e.toString());
 				ed.show();
 			}
@@ -267,11 +293,13 @@ public class LagoonGUI extends Frame implements WindowListener
 				}
 			}				
 
+			PrintWriter pw = 
+				new PrintWriter(new TextAreaWriter(progressArea), true); 
+			
             processor = new LagoonProcessor(
 				targetURL.getValue(), sitemapTree, 
 				new File(sourceDir.getValue()), password,
-				new PrintWriter(System.out, true), 
-				new PrintWriter(System.err, true));
+				pw, pw); 
         }
         catch (AuthenticationMissingException e)
         {
@@ -291,25 +319,25 @@ public class LagoonGUI extends Frame implements WindowListener
         }
         catch (FileNotFoundException e)
         {
-			ErrorDialog ed = new ErrorDialog(this, "Initializing error",
+			MessageDialog ed = new MessageDialog(this, "Initializing error",
             	"File not found: " + e.getMessage());
 			ed.show();
         }
         catch (IOException e)
         {
-			ErrorDialog ed = new ErrorDialog(this, "Initializing error",
+			MessageDialog ed = new MessageDialog(this, "Initializing error",
             	e.toString());
 			ed.show();
         }
         catch (LagoonException e)
         {
-			ErrorDialog ed = new ErrorDialog(this, "Initializing error",
+			MessageDialog ed = new MessageDialog(this, "Initializing error",
             	e.getMessage());
 			ed.show();
         }
         catch (javax.xml.parsers.ParserConfigurationException e)
         {
-			ErrorDialog ed = new ErrorDialog(this, "Initializing error",
+			MessageDialog ed = new MessageDialog(this, "Initializing error",
             	e.getMessage());
 			ed.show();
         }
@@ -346,12 +374,12 @@ public class LagoonGUI extends Frame implements WindowListener
 		}
 		catch (LagoonException e)
 		{
-			ErrorDialog ed = new ErrorDialog(this, "Error in propertry file", e.getMessage());
+			MessageDialog ed = new MessageDialog(this, "Error in propertry file", e.getMessage());
 			ed.show(); // blocking
 		}
 		catch (IOException e)
 		{
-			ErrorDialog ed = new ErrorDialog(this, "Error reading property file",
+			MessageDialog ed = new MessageDialog(this, "Error reading property file",
 				e.toString());
 			ed.show(); // blocking
 		}
@@ -385,7 +413,7 @@ public class LagoonGUI extends Frame implements WindowListener
 			}
 			catch (IOException e)
 			{
-				ErrorDialog ed = new ErrorDialog(this, "Error writing property file",
+				MessageDialog ed = new MessageDialog(this, "Error writing property file",
 					e.toString());
 				ed.show(); // blocking
 			}
@@ -393,7 +421,7 @@ public class LagoonGUI extends Frame implements WindowListener
 	}
 	
 
-    private String getProperty(Properties prop, String name)
+    private static String getProperty(Properties prop, String name)
         throws LagoonException
     {
         String value = prop.getProperty(name);
@@ -402,6 +430,15 @@ public class LagoonGUI extends Frame implements WindowListener
 
         return value.trim();
     }
+
+
+	private static String showTime(long ms)
+	{
+		if (ms < 10000)
+			return "in " + ms + " ms";
+		else
+			return "in " + ms/1000 + " s";
+	}
 
 }
 
@@ -512,6 +549,8 @@ class PasswordDialog extends Dialog
 			}
 		});
 		pack();
+		Point pl = parent.getLocation();
+		setLocation(pl.x+50, pl.y+50);
 	}
 	
 	public String getPassword()
@@ -521,13 +560,13 @@ class PasswordDialog extends Dialog
 }
 
 
-class ErrorDialog extends Dialog
+class MessageDialog extends Dialog
 {
 	private Label theLabel;
 	private Panel buttonPanel;
 	private Button okButton;
 	
-	public ErrorDialog(Frame parent, String title, String msg)
+	public MessageDialog(Frame parent, String title, String msg)
 	{
 		super(parent, title, true);
 		add(theLabel = new Label(msg), BorderLayout.NORTH);
@@ -539,6 +578,43 @@ class ErrorDialog extends Dialog
 			}
 		});
 		pack();
+		Point pl = parent.getLocation();
+		setLocation(pl.x+50, pl.y+50);
 	}
 }
 
+
+class TextAreaWriter extends Writer
+{
+	private StringBuffer sb;
+	private TextArea ta;
+
+	public TextAreaWriter(TextArea ta)
+	{
+		this.ta = ta;
+		sb = new StringBuffer();
+	}
+	
+	public void write(char[] cbuf, int off, int len)
+	{
+		sb.append(cbuf, off, len);	
+	}
+	
+	public void write(int ch)
+	{
+		sb.append((char)ch);	
+	}
+	
+	public void flush()
+	{
+		ta.append(sb.toString());
+		sb.setLength(0); // clear buffer
+	}
+	
+	public void close()
+	{
+		flush();
+		// no more to do
+	}
+	
+}
