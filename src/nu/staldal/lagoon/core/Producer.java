@@ -126,7 +126,7 @@ public abstract class Producer implements ProducerInterface
      * Get a parameter.
      *
      * @param name  the name of the parameter to get
-     * @returns  the value of the requested parameter,
+     * @return  the value of the requested parameter,
      *           or null if the parameter doesn't exitst
      */
     public String getParam(String name)

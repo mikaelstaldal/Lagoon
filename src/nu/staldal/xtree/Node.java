@@ -209,7 +209,7 @@ public abstract class Node implements java.io.Serializable, Locator
 	/**
 	 * Returns the absolute base URI of this node.
 	 *
-	 * @returns  the absolute base URI of this node,
+	 * @return  the absolute base URI of this node,
 	 * or <code>null</code> if unknown.
 	 */
 	public URL getBaseURI()

@@ -209,7 +209,7 @@
     <javadoc packagenames="nu.staldal.lagoon.core,nu.staldal.lagoon.util,nu.staldal.xtree,nu.staldal.lsp,nu.staldal.syntax,nu.staldal.xmlutil,nu.staldal.ftp,nu.staldal.util"
     	     sourcepath="${src.dir}"
              classpathref="lagoon.class.path"
-             classpath="${JAF}"
+             classpath="${JAF};${JARV}"
              destdir="${dist.dir}/docs/javadoc"
              author="true"
              version="true"
