@@ -62,7 +62,7 @@ import nu.staldal.lagoon.util.*;
  */
 class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
 {
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
     private ByteStreamProducer myProducer;
 
@@ -123,28 +123,20 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
     }
 
 
-    /**
-     * Builds this particular file.
-     *
-     * @param always  always build the file, overriding dependency checking
-     */
-    public void build(boolean always)
+    public boolean build(boolean always)
         throws IOException
     {
-        // System.out.println("Building " + target + " from " + source +
-        //                   (always ? " always" : ""));
-
 		if (sourceURL == null)
         {   // no main source
 	        currentSourceURL = null;
             currentTargetURL = targetURL;
-            buildFile(always);
+            return buildFile(always);
         }
-        if (LagoonUtil.absoluteURL(sourceURL))
+        else if (LagoonUtil.absoluteURL(sourceURL))
         {   // absolute URL
 	        currentSourceURL = sourceURL;
             currentTargetURL = targetURL;
-            buildFile(always);
+            return buildFile(always);
         }
         else if (Wildcard.isWildcard(sourceURL))
         {   // main source is a wildcard pattern
@@ -159,6 +151,7 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
 				throw new FileNotFoundException(
 					sourceDir.getAbsolutePath() + " (directory not found)");	
 			}
+			boolean success = true;
             for (int i = 0; i < files.length; i++)
             {				
                 File currentSourceFile = new File(sourceDir, files[i]);
@@ -171,31 +164,32 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
 
                 currentTargetURL =
                     Wildcard.instantiateWildcard(targetURL, part);
-                buildFile(always);
+                if (!buildFile(always)) success = false;
             }
+			return success;
         }
         else
         {   // main source is a regular file
 	        currentSourceURL = sourceURL;
             currentTargetURL = targetURL;
-            buildFile(always);
+            return buildFile(always);
         }
     }
 	
 
-    private void buildFile(boolean always)
+    private boolean buildFile(boolean always)
         throws IOException
     {
-        // System.out.println("buildFile: " + currentTargetURL);
+        if (DEBUG) System.out.println("buildFile: " + currentTargetURL);
 
         targetLastMod = targetStorage.fileLastModified(currentTargetURL);
 
         if (always || (targetLastMod <= 0))
         {
-            buildAlways();
-            return;
+            return buildAlways();
         }
 
+		boolean success = true;
         boolean updated = false;
         try {
             updated = myProducer.hasBeenUpdated(targetLastMod);
@@ -203,16 +197,19 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
         catch (LagoonException e)
         {
             reportException(e);
+			success = false;
         }
         catch (IOException e)
         {
             reportException(e);
+			success = false;
         }
 
         if (updated)
         {
-            buildAlways();
+            if (!buildAlways()) success = false;
         }
+		return success;
     }
 	
 
@@ -220,10 +217,10 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
      * The actual building of this file.
      * Used after any dependency checking indicates the file needs rebuilding.
      */
-    private void buildAlways()
+    private boolean buildAlways()
         throws IOException
     {
-        if (DEBUG) System.out.println("Building: " + currentTargetURL);
+        processor.log.println("Building: " + currentTargetURL);
 
 		int slash = currentTargetURL.lastIndexOf('/');
 		currentTargetDir = currentTargetURL.substring(0, slash+1);
@@ -233,6 +230,7 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
         OutputHandler out = null;
         String exceptionType = null;
         boolean bailOut = false;
+		boolean success = true;
 
 		tempFiles = new Vector();
 		
@@ -249,7 +247,8 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
             }
             catch (Exception e)
             {
-				// if (DEBUG) e.printStackTrace();	
+				success = false;
+				if (DEBUG) e.printStackTrace();	
 				
 				String thisExceptionType = e.getClass().getName();
 
@@ -271,7 +270,7 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
 
                 if (bailOut)
                 {
-					System.out.println("Error building " + currentTargetURL
+					processor.err.println("Error building " + currentTargetURL
 						+ ": Too many exceptions, bailing out");
 					break;
 				}
@@ -306,12 +305,14 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
 			}
 			catch (IOException e)
 			{
+				success = false;
 				reportException(e);
 				oh.discard();
 				break;
 			}
 			oh.commit();			
 		}
+		return success;
     }
 
 
@@ -322,7 +323,7 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
 			SAXParseException spe = (SAXParseException)e;
 			String sysId = (spe.getSystemId() == null)
 				? ("(" + currentTargetURL + ")"): spe.getSystemId();
-			System.out.println(sysId + ":" + spe.getLineNumber()
+			processor.err.println(sysId + ":" + spe.getLineNumber()
 				+ ":" + spe.getColumnNumber() + ": " + spe.getMessage());
 		}
 		else if (e instanceof SAXException)
@@ -331,27 +332,27 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
 			Exception ee = se.getException();
 			if (ee != null)
 			{
-				System.out.println("Error building " + currentTargetURL
+				processor.err.println("Error building " + currentTargetURL
 					+ ": " + ee.toString());
 			    if (DEBUG) ee.printStackTrace(System.out);
 			}
 			else
 			{
-				System.out.println("Error building " + currentTargetURL
+				processor.err.println("Error building " + currentTargetURL
 					+ ": " + se.getMessage());
     			if (DEBUG) se.printStackTrace(System.out);
 			}
 		}
 		else if (e instanceof IOException)
 		{
-			System.out.println("Error building " + currentTargetURL
+			processor.err.println("Error building " + currentTargetURL
 					+ ": " + e.toString());
 			if (DEBUG) e.printStackTrace(System.out);
 		}
 		else
 		{
-			System.out.println("Error building " + currentTargetURL + ":");
-			e.printStackTrace(System.out);
+			processor.err.println("Error building " + currentTargetURL + ":");
+			e.printStackTrace(processor.err);
 		}
 	}
 

@@ -157,7 +157,10 @@ public class LagoonCLI
 			}				
 
             processor = 
-				new LagoonProcessor(targetURL, sitemapTree, sourceDir, password);
+				new LagoonProcessor(
+					targetURL, sitemapTree, sourceDir, password, 
+					new PrintWriter(System.out, true), 
+					new PrintWriter(System.err, true));
         }
         catch (AuthenticationMissingException e)
         {
@@ -203,7 +206,8 @@ public class LagoonCLI
             {
                 System.out.println("Building website...");
                 long timeBefore = System.currentTimeMillis();
-                processor.build(false);
+                if (!processor.build(false))
+					System.out.println("...with errors...");
                 long timeElapsed = System.currentTimeMillis()-timeBefore;
                 showTime(timeElapsed);
             }
@@ -211,7 +215,8 @@ public class LagoonCLI
             {
                 System.out.println("Force building website...");
                 long timeBefore = System.currentTimeMillis();
-                processor.build(true);
+                if (!processor.build(true))
+					System.out.println("...with errors...");
                 long timeElapsed = System.currentTimeMillis()-timeBefore;
                 showTime(timeElapsed);
             }
@@ -221,7 +226,8 @@ public class LagoonCLI
                 {
                     System.out.println("Building website...");
                     long timeBefore = System.currentTimeMillis();
-                    processor.build(false);
+    	            if (!processor.build(false))
+						System.out.println("...with errors...");
                     long timeElapsed = System.currentTimeMillis()-timeBefore;
 	                showTime(timeElapsed);
                     if (timeElapsed < interval)
@@ -240,7 +246,8 @@ public class LagoonCLI
                     {
                         System.out.println("Building website...");
                         long timeBefore = System.currentTimeMillis();
-                        processor.build(false);
+	    	            if (!processor.build(false))
+							System.out.println("...with errors...");
                         long timeElapsed = System.currentTimeMillis()-timeBefore;
 	                	showTime(timeElapsed);
                     }
@@ -248,7 +255,8 @@ public class LagoonCLI
                     {
                         System.out.println("Force building website...");
                         long timeBefore = System.currentTimeMillis();
-                        processor.build(true);
+	    	            if (!processor.build(true))
+							System.out.println("...with errors...");
                         long timeElapsed = System.currentTimeMillis()-timeBefore;
 	                	showTime(timeElapsed);
                     }

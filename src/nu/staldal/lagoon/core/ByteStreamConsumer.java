@@ -46,7 +46,7 @@ package nu.staldal.lagoon.core;
 public abstract class ByteStreamConsumer extends Producer
 {
     // Associations
-    protected ByteStreamProducer nextProducer;
+    private ByteStreamProducer nextProducer;
 
     /** 
      * Set the next producer. 

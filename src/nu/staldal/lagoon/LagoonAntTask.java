@@ -162,7 +162,10 @@ public class LagoonAntTask extends Task
 			}				
 
             processor = 
-				new LagoonProcessor(targetURL, sitemapTree, sourceDir, password);
+				new LagoonProcessor(
+					targetURL, sitemapTree, sourceDir, password,
+					new PrintWriter(System.out, true), 
+					new PrintWriter(System.err, true));
         }
         catch (AuthenticationMissingException e)
         {
@@ -190,7 +193,7 @@ public class LagoonAntTask extends Task
         }
 
         try {
-            processor.build(force);
+            if (!processor.build(force)) throw new BuildException();
             processor.destroy();
         }
         catch (FileNotFoundException e)

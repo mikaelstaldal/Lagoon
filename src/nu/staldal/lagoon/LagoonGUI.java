@@ -269,7 +269,9 @@ public class LagoonGUI extends Frame implements WindowListener
 
             processor = new LagoonProcessor(
 				targetURL.getValue(), sitemapTree, 
-				new File(sourceDir.getValue()), password);
+				new File(sourceDir.getValue()), password,
+				new PrintWriter(System.out, true), 
+				new PrintWriter(System.err, true));
         }
         catch (AuthenticationMissingException e)
         {

@@ -56,8 +56,8 @@ import nu.staldal.xtree.*;
 class Sitemap
 {
     // Associations
-    protected Hashtable entries;
-    protected Hashtable parts;
+    private Hashtable entries;
+    private Hashtable parts;
 
     // Attributes
     private LagoonProcessor processor;

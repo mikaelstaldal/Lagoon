@@ -57,8 +57,11 @@ interface SitemapEntry
      * Builds this particular entry.
      *
      * @param always  always build the entry, overriding dependency checking
+	 *
+	 * @return true if successful, false if any non-fatal error occured
+	 * @throws IOException  if any fatal error occur
      */
-    public abstract void build(boolean always)
+    public abstract boolean build(boolean always)
         throws IOException;
 }
 

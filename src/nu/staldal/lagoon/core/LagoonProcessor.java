@@ -71,7 +71,10 @@ public class LagoonProcessor
     private final Hashtable paramDict;
     private final Hashtable filestorageDict;
 
-    protected Sitemap sitemap;
+    private Sitemap sitemap;
+	
+	PrintWriter log;
+	PrintWriter err;
 
 
     /**
@@ -83,13 +86,18 @@ public class LagoonProcessor
      * @param sourceDir  where the source files are
      * @param password  password to access the target storage, or
      *                  <code>null</code> if not nessesary.
+	 * @param log  where to write progress messages.
+	 * @param err  where to write error messages.
      */
     public LagoonProcessor(String targetURL, Element sitemapTree, 
-						   File sourceDir, String password)
+						   File sourceDir, String password, 
+						   PrintWriter log, PrintWriter err)
         throws IOException, LagoonException, AuthenticationException, 
 			AuthenticationMissingException
     {
         this.targetURL = targetURL;
+		this.log = log;
+		this.err = err;
 
         classDict = new Hashtable();
         paramDict = new Hashtable();
@@ -183,15 +191,20 @@ public class LagoonProcessor
      *
      * @param force force a rebuild of all files, otherwise dependency
      *        checking is used to check which files that needs rebuilding.
+	 *
+	 * @return true if successful, false if any non-fatal error occured
+	 * @throws IOException  if any fatal error occur
      */
-    public void build(boolean force)
+    public boolean build(boolean force)
         throws IOException
     {
+		boolean success = true;
         for (Enumeration e = sitemap.getEntries(); e.hasMoreElements(); )
         {
             SitemapEntry ent = (SitemapEntry)e.nextElement();
-            ent.build(force);
+            if (!ent.build(force)) success = false;
         }
+		return success;
     }
 
 	/**

@@ -60,7 +60,7 @@ import nu.staldal.lagoon.util.*;
  */
 abstract class EntryWithSource implements SourceManager
 {
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
 	protected final LagoonProcessor processor;
 	protected final Sitemap sitemap;

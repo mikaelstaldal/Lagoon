@@ -46,7 +46,7 @@ package nu.staldal.lagoon.core;
 public abstract class XMLStreamConsumer extends Producer
 {
     // Associations
-    protected XMLStreamProducer nextProducer;
+    private XMLStreamProducer nextProducer;
 
     /** 
      * Set the next producer. 

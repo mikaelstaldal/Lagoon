@@ -50,9 +50,10 @@ import java.io.*;
  */
 class DeleteEntry implements SitemapEntry
 {
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
     private final FileStorage targetStorage;
+	private final LagoonProcessor processor;
 
     private final String targetURL;
 
@@ -63,24 +64,23 @@ class DeleteEntry implements SitemapEntry
      *                   must be pseudo-absolute.
      * @param targetStorage  where to store generated files
      */
-    public DeleteEntry(String targetURL, FileStorage targetStorage)
+    public DeleteEntry(LagoonProcessor processor, 
+		String targetURL, FileStorage targetStorage)
     {
+		this.processor = processor;
         this.targetURL = targetURL;
         this.targetStorage = targetStorage;
     }
 
 
-    /**
-     * Builds this particular file.
-     *
-     * @param always  always build the file, overriding dependency checking
-     */
-    public void build(boolean always)
+    public boolean build(boolean always)
         throws IOException
     {
-        if (DEBUG) System.out.println("Deleting: " + targetURL);
+		processor.log.println("Deleting: " + targetURL);
 
 	    targetStorage.deleteFile(targetURL);
+		
+		return true;
     }
 	
 }
