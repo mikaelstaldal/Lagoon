@@ -11,48 +11,49 @@
   <!-- Build the main structure of the produced XSL:FO -->
   <fo:root>
      <fo:layout-master-set>
-      <fo:simple-page-master page-master-name="one" margin-left="3cm" 
-                                                    margin-right="3cm" 
-                                                    margin-top="2cm" 
-                                                    margin-bottom="2cm">
+      <fo:simple-page-master master-name="one" margin-left="3cm" 
+                                               margin-right="3cm" 
+                                               margin-top="2cm" 
+                                               margin-bottom="2cm">
        <fo:region-before extent="12pt"/>
        <fo:region-body margin-top="20pt" margin-bottom="20pt"/>
        <fo:region-after extent="12pt"/>
       </fo:simple-page-master>
      </fo:layout-master-set>
-    <fo:page-sequence>
-    <fo:sequence-specification>
-    <fo:sequence-specifier-single page-master-name="one"/>
-    </fo:sequence-specification>
-        <fo:flow>
-        <fo:block font-size="24pt" text-align="centered" space-after="6pt">
+
+    <fo:page-sequence master-reference="one">
+<!--    <fo:sequence-specification>
+    <fo:sequence-specifier-single master-name="one"/>
+    </fo:sequence-specification> -->
+        <fo:flow flow-name="xsl-region-body">
+        <fo:block font-size="24pt" text-align="center" space-after="6pt">
             <xsl:value-of select="report/front/title"/>
         </fo:block>
-        <fo:block text-align="centered">
+        <fo:block text-align="center">
             by <xsl:value-of select="report/front/author"/>
         </fo:block>
         </fo:flow>
     </fo:page-sequence>
 
-    <fo:page-sequence>
-        <fo:sequence-specification>
+    <fo:page-sequence master-reference="one">
+<!--        <fo:sequence-specification>
         <fo:sequence-specifier-repeating page-master-first="one"
                                          page-master-repeating="one"/>
-        </fo:sequence-specification>
+        </fo:sequence-specification> -->
 
-        <fo:static-content flow-name="xsl-before">
+        <fo:static-content flow-name="xsl-region-before">
             <fo:block font-size="10pt">
                 <xsl:value-of select="report/front/title"/>
             </fo:block>
         </fo:static-content>
 
-        <fo:static-content flow-name="xsl-after">
-            <fo:block font-size="10pt" text-align="centered">
+        <fo:static-content flow-name="xsl-region-after">
+            <fo:block font-size="10pt" text-align="center">
                 <fo:page-number/>
             </fo:block>
         </fo:static-content>
 
-        <fo:flow font-size="12pt" font-family="serif">
+        <fo:flow flow-name="xsl-region-body" font-size="12pt" font-family="serif">
         <fo:block font-size="20pt" space-after="24pt">Table of Contents
         </fo:block>
         <!-- Build a TOC from chapters, sections and subsections,
@@ -150,9 +151,9 @@
 </xsl:template>
 
 <xsl:template match="em">
-    <fo:inline-sequence font-style="italic">
+    <fo:inline font-style="italic">
         <xsl:apply-templates/>
-    </fo:inline-sequence>
+    </fo:inline>
 </xsl:template>
 
 <!-- Insert footnote reference and text
@@ -161,12 +162,12 @@
     <xsl:variable name="footnotenum">
         <xsl:number count="footnote" level="any"/>
     </xsl:variable>
-    <fo:footnote>
-    <fo:footnote-citation><xsl:value-of select="$footnotenum"/>
-    </fo:footnote-citation>
+    <fo:footnote><fo:inline>
+    <xsl:value-of select="$footnotenum"/>
+    </fo:inline><fo:footnote-body>
     <fo:block><xsl:value-of select="$footnotenum"/> <xsl:apply-templates/>
     </fo:block>
-    </fo:footnote>
+    </fo:footnote-body></fo:footnote>
 </xsl:template>
 
 <xsl:template match="title"/>

@@ -60,27 +60,25 @@
 
 <file target="/report.html" source="/work/report.xml">
 	<format type="html" html="strict" indent="yes">
-   		<transform type="xslt" stylesheet="/style/report_html.xsl"
-				   myparam="Orangejuice"
-				   theparam="Kalle">
+   		<transform type="xslt" stylesheet="/style/report_html.xsl">
     	    <source/>
     	</transform>
 	</format>
 </file>
 
-<!--
-<file target="/report.pdf" source="/work/report.xml">
-	<format type="fo">
+<file target="/report.fo" source="/work/report.xml">
+	<format type="xml">
 	   	<transform type="xslt" stylesheet="/style/report_print.xsl">
     	    <source/>
 		</transform>
     </format>
 </file>
--->
 
-<file target="/picture.jpeg" source="/test.svg">
-	<format type="svg" format="jpeg" quality="0.5">
-    	<source/>
+<file target="/report.pdf" source="/work/report.xml">
+	<format type="fo">
+	   	<transform type="xslt" stylesheet="/style/report_print.xsl">
+    	    <source/>
+		</transform>
     </format>
 </file>
 
