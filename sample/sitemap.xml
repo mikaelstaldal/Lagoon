@@ -5,7 +5,7 @@
 <delete target="/remove/me.txt"/>
 
 <file target="/island.html">
-	<format type="html">
+	<format type="xml">
 		<transform type="lsp">
 			<source/>
 		</transform>
