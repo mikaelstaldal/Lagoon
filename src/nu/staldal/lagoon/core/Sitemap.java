@@ -157,6 +157,23 @@ class Sitemap
 	            currentTargetName = null;
 	            currentFile = null;
 			}
+			else if (entry.getLocalName().equals("delete"))
+			{
+				currentTargetName = entry.getAttrValue("target");
+				if (currentTargetName == null
+						|| currentTargetName.length() < 1
+						|| currentTargetName.charAt(0) != '/')
+				{
+					throw new LagoonException(
+						"invalid target specification: " + currentTargetName);
+				}
+				
+				DeleteEntry currentEnt = new DeleteEntry(currentTargetName,
+														 targetLocation);
+				
+	            entries.put(currentTargetName, currentEnt);
+	            currentTargetName = null;
+			}
 		}
     }
 
@@ -196,9 +213,9 @@ class Sitemap
      * @returns the entry for the specified target,
      *  or <code>null</code> if not found.
      */
-    public FileEntry lookupEntry(String target)
+    public SitemapEntry lookupEntry(String target)
     {
-        return (FileEntry)entries.get(target);
+        return (SitemapEntry)entries.get(target);
     }
 
 	

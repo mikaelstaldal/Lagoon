@@ -118,6 +118,7 @@ public interface FileStorage
 	public void commitFile()
 		throws java.io.IOException;
 
+		
     /**
      * Discards a new file and delete it.
      *
@@ -126,6 +127,7 @@ public interface FileStorage
     public void discardFile()
         throws java.io.IOException;
 
+		
     /**
      * Deletes a file.
      * Does not signal any error if the file doesn't exist.

@@ -58,7 +58,7 @@ import nu.staldal.lagoon.util.*;
  *
  * @see nu.staldal.lagoon.core.Sitemap
  */
-class FileEntry implements SourceManager, FileTarget
+class FileEntry extends SitemapEntry implements SourceManager, FileTarget
 {
     private static final boolean DEBUG = true;
 

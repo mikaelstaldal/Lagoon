@@ -2,6 +2,8 @@
 
 <sitemap name="LagoonSample">
 
+<delete target="/remove/me.txt"/>
+
 <file target="/very_transformed.xml" source="/twoxsl.xml">
 	<format type="xml" indent="4">
 		<transform type="xslt" stylesheet="/style/second.xsl">

@@ -195,11 +195,11 @@ public class LagoonProcessor
      *        checking is used to check which files that needs rebuilding.
      */
     public void build(boolean force)
-        throws IOException, org.xml.sax.SAXException
+        throws IOException
     {
         for (Enumeration e = sitemap.getEntries(); e.hasMoreElements(); )
         {
-            FileEntry ent = (FileEntry)e.nextElement();
+            SitemapEntry ent = (SitemapEntry)e.nextElement();
             ent.build(force);
         }
     }
