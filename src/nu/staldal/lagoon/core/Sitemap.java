@@ -59,6 +59,8 @@ class Sitemap
     private Hashtable entries;
 	private Vector entryVector;
     private Hashtable parts;
+	private Hashtable inputs;
+	private Hashtable outputs;
 
     // Attributes
     private LagoonProcessor processor;
@@ -68,17 +70,20 @@ class Sitemap
     // Work attributes
     private String currentTargetName;
     private EntryWithSource currentFile;
-    private FileStorage targetLocation;
 	private int depth;
 
 	
     /**
      * The constructor
      *
+     * @param processor  the processor
      * @param input  XTree representation of the sitemap
+     * @param sourceDir  where the source files are
 	 */
-	public Sitemap(Element sitemapTree)
-		throws LagoonException
+	public Sitemap(LagoonProcessor processor,
+                   Element sitemapTree,
+                   java.io.File sourceDir)
+        throws java.io.IOException, LagoonException
 	{
         if (!sitemapTree.getLocalName().equals("sitemap"))
 		{
@@ -90,25 +95,8 @@ class Sitemap
 		{
 			throw new LagoonException("no site name found in sitemap");
 		}
-	}
-	
-	
-    /**
-     * Initialize this sitemap.
-     *
-     * @param processor  the processor
-     * @param input  XTree representation of the sitemap
-     * @param sourceDir  where the source files are
-     * @param targetLoc  where to store generated files
-     */
-    public void init(LagoonProcessor processor,
-                     Element sitemapTree,
-                     java.io.File sourceDir,
-				     FileStorage targetLoc)
-        throws java.io.IOException, LagoonException
-    {
+
         this.processor = processor;
-		this.targetLocation = targetLoc;
 
         this.sourceDir = sourceDir;
         entries = new Hashtable();
@@ -140,7 +128,7 @@ class Sitemap
 					
 				currentFile = new FileEntry(processor, this, 
 											currentTargetName, theSource,
-											sourceDir, targetLocation,
+											sourceDir,
 											processor.getTempDir());
 
 				if (entry.numberOfChildren() == 0)
@@ -207,8 +195,8 @@ class Sitemap
 						"invalid target specification: " + currentTargetName);
 				}
 				
-				DeleteEntry currentEnt = new DeleteEntry(processor, currentTargetName,
-														 targetLocation);
+				DeleteEntry currentEnt = new DeleteEntry(processor, 
+														 currentTargetName);
 				
 	            entries.put(currentTargetName, currentEnt);
 				entryVector.addElement(currentEnt);

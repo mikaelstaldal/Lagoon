@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001, Mikael Ståldal
+ * Copyright (c) 2001-2002, Mikael Ståldal
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -89,17 +89,16 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
      * @param sourceURL  the file to use, may contain wildcard in filename,
 	 *                  must absolute or pseudo-absolute, may be <code>null</code>.
      * @param sourceRootDir  absolute path to the source directory
-     * @param targetStorage  where to store generated files
 	 * @param tempDir	where to store temporary files
      */
     public FileEntry(LagoonProcessor processor, Sitemap sitemap, 
 					 String targetURL, String sourceURL,
-                     File sourceRootDir, FileStorage targetStorage, File tempDir)
+                     File sourceRootDir, File tempDir)
         throws LagoonException
     {
 		super(processor, sitemap, sourceURL, sourceRootDir);	
 		
-        this.targetStorage = targetStorage;
+        this.targetStorage = processor.getTargetLocation();
 		this.tempDir = tempDir;
 		this.targetURL = targetURL;
 		

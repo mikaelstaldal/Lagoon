@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001, Mikael Ståldal
+ * Copyright (c) 2001-2002, Mikael Ståldal
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -52,7 +52,6 @@ class DeleteEntry implements SitemapEntry
 {
     private static final boolean DEBUG = false;
 
-    private final FileStorage targetStorage;
 	private final LagoonProcessor processor;
 
     private final String targetURL;
@@ -64,12 +63,10 @@ class DeleteEntry implements SitemapEntry
      *                   must be pseudo-absolute.
      * @param targetStorage  where to store generated files
      */
-    public DeleteEntry(LagoonProcessor processor, 
-		String targetURL, FileStorage targetStorage)
+    public DeleteEntry(LagoonProcessor processor, String targetURL)
     {
 		this.processor = processor;
         this.targetURL = targetURL;
-        this.targetStorage = targetStorage;
     }
 
 
@@ -78,7 +75,7 @@ class DeleteEntry implements SitemapEntry
     {
 		processor.log.println("Deleting: " + targetURL);
 
-	    targetStorage.deleteFile(targetURL);
+	    processor.getTargetLocation().deleteFile(targetURL);
 		
 		return true;
     }

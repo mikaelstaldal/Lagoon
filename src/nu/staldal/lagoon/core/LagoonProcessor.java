@@ -114,17 +114,7 @@ public class LagoonProcessor
 			throw new AuthenticationMissingException();	
 		}
 		
-		init(sitemapTree, sourceDir, password);
-    }
-
-		
-    /**
-     * Initialize this processor.
-     */
-    private void init(Element sitemapTree, File sourceDir, String password)
-        throws IOException, LagoonException, AuthenticationException			
-    {
-   		sitemap = new Sitemap(sitemapTree);
+   		sitemap = new Sitemap(this, sitemapTree, sourceDir);
 
 		File workDir = new File(System.getProperty("user.home"), ".lagoon");
 		
@@ -179,11 +169,31 @@ public class LagoonProcessor
 		}
 				
         targetLocation.open(targetURL, this, password);
-
-   		sitemap.init(this, sitemapTree, sourceDir, targetLocation);
     }
 
+	
+	/**
+	 * Get the Sitemap.
+	 *
+	 * @return the Sitemap.
+	 */
+	Sitemap getSitemap()
+	{
+		return sitemap;
+	}
 
+
+	/**
+	 * Get the target location.
+	 *
+	 * @return the target location.
+	 */
+	FileStorage getTargetLocation()
+	{
+		return targetLocation;
+	}
+
+	
     /**
      * Perform the building of the website.
      * May be invoked multiple times.
