@@ -56,7 +56,7 @@ public class LSPTransformer extends Transform
 
     private LSPCompiler compiler;
     private LSPPage theCompiledPage;
-    private Hashtable params;
+    private HashMap params;
 		
     public void init()
         throws LagoonException, IOException
@@ -68,7 +68,7 @@ public class LSPTransformer extends Transform
             if (theCompiledPage == null)
                 System.out.println("No compiled page found");
 
-        params = new Hashtable();
+        params = new HashMap();
        	for (Enumeration e = getParamNames(); e.hasMoreElements(); )
        	{
 			String paramName = (String)e.nextElement();
