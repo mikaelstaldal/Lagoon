@@ -27,14 +27,12 @@
 
   <property name="manifest" value="src/lagoon.mf"/>
 
-<!--
   <taskdef name="lagoon" classname="nu.staldal.lagoon.LagoonAntTask">
     <classpath>
       <pathelement location="${dist.jars}/lagoon.jar" />
       <pathelement location="${dist.jars}/xtree.jar" />
     </classpath>
   </taskdef>  
--->
 
   <target name="init">
     <tstamp/>
@@ -163,12 +161,12 @@
              doctitle="${Name}" />
   </target>
 
-<!--
+
   <target name="site" depends="docs"
           description="Builds the Lagoon website">
     <lagoon propertyFile="website.lagoon"/>
   </target>
--->
+
 
   <target name="dist" depends="lagoon,docs"
   		  description="Builds the distribution">
