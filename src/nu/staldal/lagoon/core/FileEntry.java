@@ -154,10 +154,8 @@ class FileEntry implements SourceManager, FileTarget
         else if (Wildcard.isWildcard(sourceURL))
         {   // main source is a wildcard pattern
 			int slash = sourceURL.lastIndexOf('/');
-			String sourceDirURL = sourceURL.substring(0, slash);
-			String sourceMask = sourceURL.substring(slash);
-			System.out.println("Wildcard dir: " + sourceDirURL);
-			System.out.println("Wildcard mask: " + sourceMask);
+			String sourceDirURL = sourceURL.substring(0, slash+1);
+			String sourceMask = sourceURL.substring(slash+1);
 			File sourceDir = new File(sourceRootDir, sourceDirURL); 
             
 			String[] files = sourceDir.list();
