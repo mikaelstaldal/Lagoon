@@ -56,14 +56,11 @@ public class FTPFileStorage extends RemoteFileStorage
 	private static final boolean DEBUG = false;
 
     private Socket control;
-    private Socket data = null;
     private InputStream controlIn;
     private OutputStream controlOut;
-    private String respString;
+   	private String respString;
     private String lastPath = "";
     private int lastPathLen = 0;
-    private String filename;
-    private String currentPathname;
 
 
 	private void sendLine(String str)
@@ -75,6 +72,7 @@ public class FTPFileStorage extends RemoteFileStorage
 		controlOut.flush();
 	}
 
+	
 	private String recvLine()
 		throws EOFException, IOException
 	{
@@ -91,6 +89,7 @@ public class FTPFileStorage extends RemoteFileStorage
 
 		return sb.toString();
 	}
+
 
 	private int recvResponse()
 		throws EOFException, IOException
@@ -132,6 +131,7 @@ public class FTPFileStorage extends RemoteFileStorage
 		}
 	}
 
+	
 	private boolean cdup()
 		throws FTPException, IOException
 	{
@@ -154,6 +154,7 @@ public class FTPFileStorage extends RemoteFileStorage
 				throw new FTPException("Unexpected response from FTP server: " + respString);
 		}
 	}
+
 
 	private boolean mkdir(String dir)
 		throws FTPException, IOException
@@ -197,7 +198,7 @@ public class FTPFileStorage extends RemoteFileStorage
     }	
 
 
-    public void open(String url, LagoonProcessor processor, String password)
+    public synchronized void open(String url, LagoonProcessor processor, String password)
         throws MalformedURLException, UnknownHostException,
         FTPException, IOException, AuthenticationException
     {
@@ -309,8 +310,6 @@ public class FTPFileStorage extends RemoteFileStorage
             oldPos = pos + 1;
         }
 
-        filename = null;
-
         openDateFile(processor);
     }
 
@@ -320,7 +319,7 @@ public class FTPFileStorage extends RemoteFileStorage
      *
      * After this method has been invoked, no other method may be invoked.
      */
-    public void close()
+    public synchronized void close()
     	throws IOException
     {
         closeDateFile();
@@ -337,15 +336,14 @@ public class FTPFileStorage extends RemoteFileStorage
      *
      * @param pathname  path to the file
      */
-    public OutputHandler createFile(String pathname)
+    public synchronized OutputHandler createFile(String pathname)
         throws IOException
     {
-        currentPathname = pathname;
 		int resp;
 		String path;
 		int pos = pathname.lastIndexOf('/');
 	    path = pathname.substring(0, pos+1);
-	    filename = pathname.substring(pos+1);
+	    String filename = pathname.substring(pos+1);
 
 		if (!path.equals(lastPath))
 		{
@@ -451,135 +449,21 @@ public class FTPFileStorage extends RemoteFileStorage
 
 		sendLine("STOR " + filename);
 
-		data = new Socket(addr, port);
-		return new OutputHandler(data.getOutputStream()) {
-			public void commit()
-				throws java.io.IOException
-			{
-				out.close();
-				commitFile();
-			}
-	
-			public void discard()
-				throws java.io.IOException
-			{
-				out.close();
-				discardFile();
-			}
-				
-		};
+		Socket data = new Socket(addr, port);
+		return new FTPOutputHandler(
+			pathname, filename,	data, data.getOutputStream());
     }
 
-    /**
-     * Finishing writing to a file and commits it.
-     * Must be invoked when finished writing to the OutputStream
-     * createFile has returned.
-     *
-     * @see #createFile
-     */
-	private void commitFile()
-		throws IOException
-	{
-        if (currentPathname == null)
-            throw new IllegalStateException("No file to commit");
-
-        if (data != null)
-		{
-			data.close();
-			data = null;
-		}
-
-        theLoop: while (true)
-        {
-            int resp = recvResponse();
-            switch (resp)
-            {
-                case 125:
-                case 150:
-                    //commitFile();
-                    //break;
-                    continue theLoop;
-
-                case 226:
-                case 250:
-                    break;
-
-                case 425:
-                case 426:
-                case 451:
-                case 551:
-                case 552:
-                    throw new FTPException("Error in file transfer (" + resp + ")");
-
-                case 421:
-                    throw new FTPException("FTP server not avaliable (421)");
-
-                default:
-                    throw new FTPException("Unexpected response from FTP server: " + respString);
-            }
-            break;
-        }
-
-        fileModified(currentPathname);
-
-		filename = null;
-        currentPathname = null;
-	}
-
-
-    /**
-     * Discards a new file and delete it.
-     *
-     * @see #createFile
-     */
-    private void discardFile()
-        throws IOException
-    {
-        if (currentPathname == null)
-            throw new IllegalStateException("No file to discard");
-
-		String fn = filename;
-		try {
-			commitFile();
-		}
-		catch (FTPException e)
-		{
-			// ignore exception
-		}
-
-		sendLine("DELE " + fn);
-		int resp = recvResponse();
-		switch (resp)
-		{
-			case 250:
-			case 550:
-				break;
-
-			case 450:
-				throw new FTPException("Unable to delete file: " + respString);
-
-			case 421:
-				throw new FTPException("FTP server not avaliable (421)");
-
-			default:
-				throw new FTPException("Unexpected response from FTP server: " + respString);
-		}
-
-		filename = null;
-        currentPathname = null;
-	}
-
-
+	
     /**
      * Deletes a file.
      * Does not signal any error if the file doesn't exist.
 	 *
      * @param pathname  path to the file
      */
-    public void deleteFile(String pathname)
+    public synchronized void deleteFile(String pathname)
         throws java.io.IOException
     {
-        currentPathname = pathname;
 		String path;
 		String fn;
 		int pos = pathname.lastIndexOf('/');
@@ -629,4 +513,101 @@ public class FTPFileStorage extends RemoteFileStorage
 		}
 	}
 
+
+	class FTPOutputHandler extends OutputHandler
+	{
+		private Socket data;
+    	private String currentPathname;
+    	private String filename;
+		
+
+		FTPOutputHandler(String currentPathname, String filename, 
+			Socket data, OutputStream out)
+		{
+			super(out);
+			this.currentPathname = currentPathname;
+			this.filename = filename;
+			this.data = data;
+		}
+
+		
+		public void commit()
+			throws java.io.IOException
+		{
+			out.close();
+
+			if (data != null)
+			{
+				data.close();
+				data = null;
+			}
+	
+			theLoop: while (true)
+			{
+				int resp = recvResponse();
+				switch (resp)
+				{
+					case 125:
+					case 150:
+						//commitFile();
+						//break;
+						continue theLoop;
+	
+					case 226:
+					case 250:
+						break;
+	
+					case 425:
+					case 426:
+					case 451:
+					case 551:
+					case 552:
+						throw new FTPException("Error in file transfer (" + resp + ")");
+	
+					case 421:
+						throw new FTPException("FTP server not avaliable (421)");
+	
+					default:
+						throw new FTPException("Unexpected response from FTP server: " + respString);
+				}
+				break;
+			}
+	
+			fileModified(currentPathname);
+		}
+		
+
+		public void discard()
+			throws java.io.IOException
+		{
+			try {
+				commit();
+			}
+			catch (FTPException e)
+			{
+				// ignore exception
+			}
+	
+			sendLine("DELE " + filename);
+			int resp = recvResponse();
+			switch (resp)
+			{
+				case 250:
+				case 550:
+					break;
+	
+				case 450:
+					throw new FTPException("Unable to delete file: " + respString);
+	
+				case 421:
+					throw new FTPException("FTP server not avaliable (421)");
+	
+				default:
+					throw new FTPException("Unexpected response from FTP server: " + respString);
+			}
+		}
+			
+	}	
+	
 }
+
