@@ -138,7 +138,8 @@ class Sitemap
 					
 				currentFile = new FileEntry(this, currentTargetName,
 											theSource,
-											sourceDir, targetLocation);
+											sourceDir, targetLocation,
+											processor.getTempDir());
 				
 				depth = 0;
 				Object o = handleProducer(entry);

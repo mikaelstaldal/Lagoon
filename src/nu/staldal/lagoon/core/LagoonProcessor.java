@@ -67,6 +67,7 @@ public class LagoonProcessor
     private final String targetURL;
     private final FileStorage targetLocation;
     private File repositoryDir;
+	private File tempDir;
 
     private final Hashtable classDict;
     private final Hashtable paramDict;
@@ -150,6 +151,23 @@ public class LagoonProcessor
 			}
 		}
 
+		tempDir = new File(repositoryDir, "temp");
+		if (!tempDir.exists())
+		{
+			if (!tempDir.mkdir())
+				throw new IOException("Unable to create directory: "
+					+ tempDir);
+		}
+		else
+		{
+			if (!tempDir.isDirectory())
+			{
+				throw new IOException(
+					"Unable to create directory (a file with that name exists): "
+					+ tempDir);
+			}
+		}
+				
         targetLocation.open(targetURL, this, password);
 
    		sitemap.init(this, sitemapTree, sourceDir, targetLocation);
@@ -183,6 +201,15 @@ public class LagoonProcessor
 		targetLocation.close();
 	}
 
+	
+	/**
+	 * Get the temp directory.
+	 */
+	public File getTempDir()
+	{
+		return tempDir;
+	}
+	
 
     /**
      * Read from a file in the repository.

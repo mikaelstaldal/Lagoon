@@ -67,6 +67,7 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
     private ByteStreamProducer myProducer;
 
     private final FileStorage targetStorage;
+	private final File tempDir;
 	private final String targetURL;
 
     private String currentSourceURL;
@@ -75,6 +76,7 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
     private String currentTargetName;
     private long targetLastMod;
     private String newTarget;
+	private Vector tempFiles;
 
 	
     /**
@@ -87,14 +89,16 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
 	 *                  must absolute or pseudo-absolute, may be <code>null</code>.
      * @param sourceRootDir  absolute path to the source directory
      * @param targetStorage  where to store generated files
+	 * @param tempDir	where to store temporary files
      */
     public FileEntry(Sitemap sitemap, String targetURL, String sourceURL,
-                     File sourceRootDir, FileStorage targetStorage)
+                     File sourceRootDir, FileStorage targetStorage, File tempDir)
         throws LagoonException
     {
 		super(sitemap, sourceURL, sourceRootDir);	
 		
         this.targetStorage = targetStorage;
+		this.tempDir = tempDir;
 		this.targetURL = targetURL;
 		
         this.myProducer = null;
@@ -223,6 +227,8 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
         String exceptionType = null;
         boolean bailOut = false;
 
+		tempFiles = new Vector();
+		
 		newTarget = currentTargetName;
 
         do {
@@ -270,6 +276,35 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
 
             out.commit();
         } while (newTarget != null);
+
+        byte[] buf = new byte[8192];
+		
+		for (int i = 0; i<tempFiles.size(); i++)
+		{
+			String path = (String)tempFiles.elementAt(i);
+			File tempFile = new File(tempDir, "temp" + i);
+			FileInputStream fis = new FileInputStream(tempFile);
+			
+			OutputHandler oh = targetStorage.createFile(path);
+	
+			try {
+    	    	while (true)
+        		{
+            		int bytesRead = fis.read(buf);
+            		if (bytesRead < 1) break;
+            		oh.getOutputStream().write(buf, 0, bytesRead);
+        		}
+	        	fis.close();
+				tempFile.delete();
+			}
+			catch (IOException e)
+			{
+				reportException(e);
+				oh.discard();
+				break;
+			}
+			oh.commit();			
+		}
     }
 
 
@@ -365,9 +400,10 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
 		}
 		else
 		{
-			// *** handle non-reentrant FileStorage
-			throw new Error(
-				"Support for non-reentrant filestorage not implemented");
+			tempFiles.addElement(filename);			
+			File currentFile = new File(tempDir, "temp" + (tempFiles.size()-1));	
+			return new TempOutputHandler(currentFile,
+				new FileOutputStream(currentFile));
 		}
 	}	
 	
@@ -376,5 +412,38 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
         return Wildcard.isWildcard(sourceURL);
 	}
 
+
+	static class TempOutputHandler extends OutputHandler
+	{
+		private File currentFile;
+		
+		TempOutputHandler(File currentFile, OutputStream out)
+		{
+			super(out);
+			this.currentFile = currentFile;
+		}
+		
+		public void commit()
+			throws java.io.IOException
+		{
+			out.close();
+		}
+
+		public void discard()
+			throws java.io.IOException
+		{
+			out.close();
+			if (!currentFile.exists()) return;
+			if (currentFile.delete())
+			{
+				return;
+			}
+			else
+			{
+				throw new IOException("Unable to delete file: " + currentFile);
+			}
+		}
+	}
+	
 }
 
