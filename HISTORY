@@ -11,3 +11,8 @@
 1.0 beta 9
 ----------
 * Support for XML islands, primary for SVG.
+
+
+1.0 beta 10
+-----------
+* General support for XML islands

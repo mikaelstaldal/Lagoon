@@ -5,12 +5,19 @@
 <delete target="/remove/me.txt"/>
 
 <file target="/island.html">
-	<format type="html">
+	<format type="xml">
 		<transform type="lsp">
 			<source/>
 		</transform>
 	</format>
 </file>
+
+<file target="/island.xml" source="/island.html">
+	<format type="xml">
+		<source/>
+	</format>
+</file>
+
 
 <file target="/very_transformed.xml" source="/twoxsl.xml">
 	<format type="xml" indent="4">

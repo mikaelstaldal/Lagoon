@@ -15,8 +15,8 @@
 
   <property name="Name" value="Lagoon"/>
   <property name="name" value="lagoon"/>
-  <property name="version" value="1.0b9"/>
-  <property name="ver" value="10b9"/>
+  <property name="version" value="1.0b10"/>
+  <property name="ver" value="10b10"/>
 
   <property name="src.dir" value="src"/>
   <property name="src.testsuite" value="testsuite"/>
