@@ -307,7 +307,7 @@
       <fileset dir="docs" includes="lspuser.html,lsp-servlet.html,manual.css"/>
     </copy>
     <mkdir dir="dist-lsp/docs/javadoc"/>
-    <javadoc packagenames="nu.staldal.lsp,nu.staldal.lsp.servlet,nu.staldal.xtree,nu.staldal.xmlutil"
+    <javadoc packagenames="nu.staldal.lsp,nu.staldal.lsp.compiler,nu.staldal.lsp.servlet"
     	     sourcepath="${src.dir}"
              classpath="${Ant};${BCEL};${JAF};${JARV};${Servlet}"
              destdir="dist-lsp/docs/javadoc"
