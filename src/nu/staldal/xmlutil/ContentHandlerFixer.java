@@ -139,7 +139,9 @@ public class ContentHandlerFixer implements ContentHandler
             String prefix = nsSup.getPrefix(namespaceURI);
             if (prefix == null)
             {
-				if ((namespaceURI == null) || (namespaceURI.length() < 1))
+				String nullURI = nsSup.getURI("");
+				if (((namespaceURI == null) || (namespaceURI.length() < 1))
+					&& ((nullURI == null) || (nullURI.length() < 1)))
 				{
 					prefix = "";
 				}
@@ -230,7 +232,9 @@ public class ContentHandlerFixer implements ContentHandler
             String prefix = nsSup.getPrefix(namespaceURI);
             if (prefix == null)
             {
-				if ((namespaceURI == null) || (namespaceURI.length() < 1))
+				String nullURI = nsSup.getURI("");
+				if (((namespaceURI == null) || (namespaceURI.length() < 1))
+					&& ((nullURI == null) || (nullURI.length() < 1)))
 				{
 					prefix = "";
 				}
