@@ -401,4 +401,22 @@ public class Element extends NodeWithChildren
 		return null;
     }
 
+	
+    /**
+     * Shortcut method for getting the first Element children with any name.
+     *
+     * @return  the first child Element
+     *          or <code>null</code> if no child Element exists.
+     */
+    public Element getFirstChildElement()
+    {
+		for (int i = 0; i < numberOfChildren(); i++)
+		if (getChild(i) instanceof Element)
+		{
+			return (Element)getChild(i);
+		}
+
+		return null;
+    }
+	
 }
