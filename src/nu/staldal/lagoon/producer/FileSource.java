@@ -42,15 +42,20 @@ package nu.staldal.lagoon.producer;
 
 import java.io.*;
 
+import javax.xml.parsers.*;
 import org.xml.sax.*;
 
 import nu.staldal.lagoon.core.*;
 
 public class FileSource extends Source
 {
-    public void init()
+	SAXParserFactory spf;	
+	
+    public void init() throws LagoonException
     {
-        // nothing to do
+		spf = SAXParserFactory.newInstance();
+		spf.setNamespaceAware(true);
+		spf.setValidating(false);
     }
 
     public void start(ContentHandler sax, Target target)
@@ -58,23 +63,17 @@ public class FileSource extends Source
     {
         InputStream fis = getSourceMan().openFile(getSourceMan().getSourceURL());
 
-        XMLReader parser =
-			new org.apache.xerces.parsers.SAXParser();
+		try {
+			XMLReader parser = spf.newSAXParser().getXMLReader(); 
 
-        parser.setFeature("http://xml.org/sax/features/validation",
-            false);
-        parser.setFeature("http://xml.org/sax/features/external-general-entities",
-            true);
-        // parser.setFeature("http://xml.org/sax/features/external-parameter-entities",
-        //   false); // not supported by Xerces
-        parser.setFeature("http://xml.org/sax/features/namespaces",
-            true);
-        parser.setFeature("http://xml.org/sax/features/namespace-prefixes",
-            false);
+        	parser.setContentHandler(sax);
 
-        parser.setContentHandler(sax);
-
-        parser.parse(new InputSource(fis));
+        	parser.parse(new InputSource(fis));
+		}
+		catch (ParserConfigurationException e)
+		{
+			throw new LagoonException(e.getMessage());
+		}		
 
         fis.close();
 	}
