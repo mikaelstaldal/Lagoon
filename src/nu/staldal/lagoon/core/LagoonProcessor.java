@@ -105,9 +105,6 @@ public class LagoonProcessor
     /**
      * Initialize this processor.
 	 *
-	 * The InputStream for the sitemap is not used after
-	 * this method returns.
-     *
      * @param sitemapTree  the Sitemap as an XTree
      * @param sourceDir  where the source files are
      * @param password  password to access the target storage, or

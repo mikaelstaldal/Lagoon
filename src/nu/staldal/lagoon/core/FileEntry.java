@@ -228,13 +228,16 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
         do {
 			thisTargetURL = currentTargetDir + newTarget;
             newTarget = null;
-            try {
-	            out = targetStorage.createFile(thisTargetURL);
+	        out = targetStorage.createFile(thisTargetURL);
+			
+			try {
                 myProducer.start(out.getOutputStream(), this);
                 exceptionType = null; // no exception thrown
             }
             catch (Exception e)
             {
+				// if (DEBUG) e.printStackTrace();	
+				
 				String thisExceptionType = e.getClass().getName();
 
 				// the same type of exception thrown twice in a row
@@ -244,14 +247,14 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
 				}
 				exceptionType = thisExceptionType;
 
-                out.discard();
+                reportException(e);
+
+				if (out != null) out.discard();				
 
 				if (e instanceof RuntimeException)
 				{
 					throw (RuntimeException)e;
 				}
-
-                reportException(e);
 
                 if (bailOut)
                 {
@@ -265,13 +268,7 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
 				}
             }
 
-            try {
-            	out.commit();
-			}
-			catch (IOException e)
-			{
-				reportException(e);
-			}
+            out.commit();
         } while (newTarget != null);
     }
 
