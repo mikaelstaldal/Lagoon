@@ -361,10 +361,17 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
 		}
 			
 		if (DEBUG) System.out.println("New async target: " + filename);
-			
-		return targetStorage.createFile(filename);
 		
-		// *** non-reentrant???
+		if (targetStorage.isReentrant())
+		{
+			return targetStorage.createFile(filename);
+		}
+		else
+		{
+			// *** handle non-reentrant FileStorage
+			throw new Error(
+				"Support for non-reentrant filestorage not implemented");
+		}
 	}	
 	
 	public boolean isWildcard()
