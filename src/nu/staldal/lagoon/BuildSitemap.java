@@ -46,12 +46,14 @@ import org.apache.xml.serialize.*;
 import org.xml.sax.*;
 import org.xml.sax.helpers.AttributesImpl;
 
-import nu.staldal.lagoon.util.DocumentHandlerAdapter;
+import nu.staldal.lagoon.util.LagoonUtil;
 
 public class BuildSitemap
 {
     private static final String syntaxMsg =
         "Syntax: nu.staldal.lagoon.BuildSitemap <source_dir> <sitemap_file>";
+		
+	static File baseDir;
 
 	public static void main(String args[]) throws Exception
 	{
@@ -68,13 +70,16 @@ public class BuildSitemap
 
 		FileOutputStream fos = new FileOutputStream(args[1]);
 		XMLSerializer ser = new XMLSerializer(fos, of);
-		ContentHandler ch = new DocumentHandlerAdapter(ser.asDocumentHandler());
+		ContentHandler ch = ser.asContentHandler();
 
+		baseDir = new File(args[0]);		
+		
 		ch.startDocument();
 		AttributesImpl atts = new AttributesImpl();
+		atts.addAttribute("","name","","CDATA", LagoonUtil.encodePath(args[0]));
 		ch.startElement("", "sitemap", "", atts);
 
-		processDirectory(new File(args[0]), ch);
+		processDirectory(null, ch);
 
 		ch.endElement("", "sitemap", "");
 		ch.endDocument();
@@ -85,16 +90,22 @@ public class BuildSitemap
 	public static void processDirectory(File dir, ContentHandler ch)
 		throws SAXException
 	{
-		String[] dirList = dir.list();
+		File thisDir = (dir == null) ? baseDir : new File(baseDir, dir.getPath());
+		String[] dirList = thisDir.list();
 		for (int i = 0; i<dirList.length; i++)
 		{
-			File ent = (dir == null) ? new File(dirList[i]) : new File(dir, dirList[i]);
+			File ent = new File(thisDir, dirList[i]);
+			File thisEnt = (dir == null) 
+									? new File(dirList[i])
+									: new File(dir, dirList[i]);
 			if (ent.isDirectory())
-				processDirectory(ent, ch);
+			{
+				processDirectory(thisEnt, ch);
+			}
 			else if (ent.isFile())
 			{
 				AttributesImpl atts = new AttributesImpl();
-                String url = "/" + ent.getPath().replace(
+                String url = "/" + thisEnt.getPath().replace(
                     File.separatorChar, '/');
 
 				atts.addAttribute("","target","","CDATA", url);
