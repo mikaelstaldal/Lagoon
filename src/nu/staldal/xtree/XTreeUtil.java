@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2003, Mikael Ståldal
+ * Copyright (c) 2002-2004, Mikael Ståldal
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -45,9 +45,14 @@ import java.io.*;
 import java.net.URL;
 
 import javax.xml.parsers.*;
+import javax.xml.transform.*;
+import javax.xml.transform.sax.*;
+import javax.xml.transform.stream.StreamResult;
 
 import org.xml.sax.*;
 import org.iso_relax.verifier.*; 
+
+import nu.staldal.xmlutil.ContentHandlerFixer;
 
 
 /**
@@ -186,6 +191,73 @@ public final class XTreeUtil
 		catch (VerifierConfigurationException e)
 		{
 			throw new Error("XML verifier configuration error: " + e.getMessage());	
+		}
+	}
+
+	/**
+	 * Serialize an XTree into an OutputStream.
+	 *
+	 * @param tree      the XTree to serialize
+	 * @param os        the OutputStream to write to
+	 *
+	 * @throws IOException if any error occurs
+	 */
+	public static void serialize(Node tree, OutputStream os)
+        throws IOException
+	{
+		Properties prop = new Properties();
+
+		prop.setProperty(OutputKeys.METHOD, "xml");
+		prop.setProperty(OutputKeys.ENCODING, "utf-8");
+		prop.setProperty(OutputKeys.INDENT, "no");
+
+		serialize(tree, os, prop);
+	}
+	
+
+	/**
+	 * Serialize an XTree into an OutputStream.
+	 *
+	 * @param tree      the XTree to serialize
+	 * @param os        the OutputStream to write to
+	 * @param prop  	output properties
+	 *
+	 * @throws IOException if any error occurs
+	 */
+	public static void serialize(Node tree, OutputStream os, Properties prop)
+        throws IOException
+	{
+		try {
+			TransformerFactory tf = TransformerFactory.newInstance();
+			if (!(tf.getFeature(SAXTransformerFactory.FEATURE)
+					&& tf.getFeature(StreamResult.FEATURE)))
+			{
+				throw new Error("The transformer factory "
+					+ tf.getClass().getName() + " doesn't support SAX");
+			}
+				
+			SAXTransformerFactory tfactory = (SAXTransformerFactory)tf;
+			TransformerHandler th = tfactory.newTransformerHandler();
+			th.setResult(new StreamResult(os));
+			
+			Transformer trans = th.getTransformer();
+			trans.setOutputProperties(prop);
+			
+			ContentHandler ch = new ContentHandlerFixer(th, true);
+			
+			try {
+				ch.startDocument();
+				tree.toSAX(ch);
+				ch.endDocument();
+			}
+			catch (SAXException e)
+			{
+				throw new IOException(e.toString());	
+			}
+		}
+		catch (TransformerConfigurationException e)
+		{
+			throw new Error(e.toString());	
 		}
 	}
 
