@@ -54,7 +54,7 @@ import nu.staldal.lagoon.core.LagoonContext;
  */
 public class SSHFileStorage extends RemoteFileStorage
 {
-	private static final boolean DEBUG = true;
+	private static final boolean DEBUG = false;
 
 	private String host;
     private int port;
