@@ -25,8 +25,8 @@
 
   <property name="Name" value="Lagoon"/>
   <property name="name" value="lagoon"/>
-  <property name="version" value="1.0b17"/>
-  <property name="ver" value="10b17"/>
+  <property name="version" value="1.0b18"/>
+  <property name="ver" value="10b18"/>
 
   <property name="res.dir" value="resource"/>
   <property name="src.dir" value="src"/>
@@ -226,7 +226,7 @@
     <javadoc packagenames="nu.staldal.lagoon.core,nu.staldal.lagoon.util,nu.staldal.xtree,nu.staldal.lsp,nu.staldal.syntax,nu.staldal.xmlutil,nu.staldal.ftp,nu.staldal.util"
     	     sourcepath="${src.dir}"
              classpathref="lagoon.class.path"
-             classpath="${JAF};${JARV}"
+             classpath="${JAF};${JARV};${BCEL}"
              destdir="${dist.dir}/docs/javadoc"
              author="true"
              version="true"
