@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001, Mikael Ståldal
+ * Copyright (c) 2001-2002, Mikael Ståldal
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -67,18 +67,19 @@ public class TreeBuilder implements ContentHandler, ErrorHandler
 
 	private Element rootElement = null;
 	private Stack elementStack;
-	private URL baseURI;
 	private Vector nsPrefix = null;
 	private Vector nsURI = null;
     private StringBuffer textBuffer = null;
-    private Locator locator = null;
     private String textSystemId = null;
     private int textLine = -1;
     private int textColumn = -1;
 
+    private Locator locator = null;
+	private URL baseURI;
 
+	
 	/**
-	 * Parse an XML file into an XTree.
+	 * Parse an XML document in a file into an XTree.
 	 * Uses JAXP to find a parser.
 	 * Will not support xml:base.
 	 *
@@ -110,7 +111,7 @@ public class TreeBuilder implements ContentHandler, ErrorHandler
 
 
 	/**
-	 * Parse XML into an XTree.
+	 * Parse an XML document into an XTree.
 	 * Uses JAXP to find a parser.
 	 * Will not support xml:base.
 	 *
@@ -192,8 +193,7 @@ public class TreeBuilder implements ContentHandler, ErrorHandler
 	 */
 	public TreeBuilder()
 	{
-		elementStack = new Stack();
-		baseURI = null;
+		this(null);
 	}
 
 
@@ -225,6 +225,19 @@ public class TreeBuilder implements ContentHandler, ErrorHandler
 			throw new IllegalStateException("No root element");
 
 		return rootElement;
+	}
+	
+	
+	void reset()
+	{
+		rootElement = null;
+		elementStack = new Stack();
+	 	nsPrefix = null;
+	 	nsURI = null;
+     	textBuffer = null;
+     	textSystemId = null;
+     	textLine = -1;
+     	textColumn = -1;
 	}
 
 
