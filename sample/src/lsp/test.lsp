@@ -116,6 +116,17 @@ in output like this</lsp:processing-instruction>
 <p>$a.b: "{$a.b}"</p>
 
 <hr/>
+<h2>for-each</h2>
+
+<ul>
+
+<h4>A list of {count($foo)} elements</h4>
+<!-- <lsp:for-each select="$foo" var="i">
+<li>{$i}</li>
+</lsp:for-each> -->
+</ul>
+
+<hr/>
 <h2>include</h2>
 
 <lsp:include file="includehere.xml"/>
