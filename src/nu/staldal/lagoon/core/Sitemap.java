@@ -84,7 +84,7 @@ class Sitemap
 			throw new LagoonException("root element must be <sitemap>");	
 		}
 						
-		siteName = sitemapTree.getAttrValue("name");
+		siteName = sitemapTree.getAttrValueOrNull("name");
 		if (siteName == null || siteName.length() < 1)
 		{
 			throw new LagoonException("no site name found in sitemap");
@@ -123,7 +123,7 @@ class Sitemap
 				
 			if (entry.getLocalName().equals("file"))
 			{
-				currentTargetName = entry.getAttrValue("target");
+				currentTargetName = entry.getAttrValueOrNull("target");
 				if (currentTargetName == null
 						|| currentTargetName.length() < 1
 						|| currentTargetName.charAt(0) != '/')
@@ -132,7 +132,7 @@ class Sitemap
 						"invalid target specification: " + currentTargetName);
 				}
 				
-				String theSource = entry.getAttrValue("source");
+				String theSource = entry.getAttrValueOrNull("source");
 				if (theSource == null || theSource.length() < 1)
 					theSource = currentTargetName;
 					
@@ -161,7 +161,7 @@ class Sitemap
 			}
 			else if (entry.getLocalName().equals("part"))
 			{
-				currentTargetName = entry.getAttrValue("name");
+				currentTargetName = entry.getAttrValueOrNull("name");
 				if (currentTargetName == null
 						|| currentTargetName.length() < 1)
 				{
@@ -170,7 +170,7 @@ class Sitemap
 				}
 				
 				currentFile = new PartEntry(processor, this, 
-					entry.getAttrValue("source"), sourceDir);
+					entry.getAttrValueOrNull("source"), sourceDir);
 				
 				depth = 0;
 				Object o = handleProducer(entry);
@@ -192,7 +192,7 @@ class Sitemap
 			}
 			else if (entry.getLocalName().equals("delete"))
 			{
-				currentTargetName = entry.getAttrValue("target");
+				currentTargetName = entry.getAttrValueOrNull("target");
 				if (currentTargetName == null
 						|| currentTargetName.length() < 1
 						|| currentTargetName.charAt(0) != '/')
@@ -269,9 +269,9 @@ class Sitemap
 	private Object handleProducer(Element parentEl)
 		throws LagoonException, java.io.IOException
     {
-		Element el = parentEl.getFirstChildElement();
+		Element el = parentEl.getFirstChildElementOrNull();
 		if (el == null)
-			return parentEl.getTextContent();
+			return parentEl.getTextContentOrNull();
 		
 		if (el.getLocalName().equals("format") 
 				|| el.getLocalName().equals("transform") 
@@ -280,7 +280,7 @@ class Sitemap
 				|| el.getLocalName().equals("parse") 
 				|| el.getLocalName().equals("process"))
 		{
-			String type = el.getAttrValue("type");
+			String type = el.getAttrValueOrNull("type");
 			if (type == null) type = "";
 
 			String prodName = el.getLocalName() + '-' +

@@ -537,12 +537,10 @@ public class Element extends NodeWithChildren
      *
      * @return if there is a single Text child, return its value,
      *         if there is no children, return "",
-     *         never <code>null</code>.
-	 * @throws SAXParseException 
+     *         or <code>null</code> 
 	 *         if there are more than one children or one non-Text child
      */
-    public String getTextContent()
-		throws SAXParseException
+    public String getTextContentOrNull()
     {
         if (numberOfChildren() == 0)
         {
@@ -550,16 +548,37 @@ public class Element extends NodeWithChildren
         }
         else if (numberOfChildren() > 1)
         {
-			throw new SAXParseException("No text content", this);
+			return null;
         }
         else
         {
             Node node = getChild(0);
             if (!(node instanceof Text))
-			throw new SAXParseException("No text content", this);
+				return null;
 
             return ((Text)node).getValue();
         }
+    }
+
+
+    /**
+     * Shortcut method for getting the text content of an Element.
+     *
+     * @return if there is a single Text child, return its value,
+     *         if there is no children, return "",
+     *         never <code>null</code>.
+	 * @throws SAXParseException 
+	 *         if there are more than one children or one non-Text child
+     */
+    public String getTextContent()
+		throws SAXParseException
+    {
+		String s = getTextContentOrNull();
+		
+		if (s == null)
+			throw new SAXParseException("No text content", this);
+		else
+			return s;
     }
 
 
