@@ -93,7 +93,7 @@ to the web server.</p>
 
 <p>To make use of Lagoon, you need to know XML (including namespaces).
 Many usage patterns require knowledge of XSLT too. See <a
-href="http://www.w3.org/">http://www.w3.org/</a> for more information
+href="http://www.w3.org/xml/">http://www.w3.org/xml/</a> for more information
 of XML, XSLT and related technologies.</p>
 
 <p>You don't need to know the Java programming language to make use of
@@ -111,7 +111,7 @@ have a JDK. The GUI part of Lagoon requires Java2.</li>
 
 <li>An XML parser and an XSLT processor with JAXP 1.1 interface.
 Lagoon has been tested with Apache Xerces version 1.4.1 and Apache Xalan 
-(XSLT processor) version 2.2D9 or later. You can download Xerces and Xalan
+(XSLT processor) version 2.2D9. You can download Xerces and Xalan
 from <a href="http://xml.apache.org/dist/">http://xml.apache.org/dist/</a>.
 The simplest way is to download Xalan only, it includes a suitable version
 of Xerces. Alternativly, you can download the Java XML Pack from 
@@ -141,12 +141,11 @@ CVS.</li>
 Batik and FOP to your Java <code>CLASSPATH</code>. You should put Batik
 before FOP. If you use Batik, you need to put
 <code>batik-patch.jar</code> before Batik.</li> 
-<li>Add the <code>bin</code> directory to your <code>PATH</code> and set an
+<li>Add the <code>bin</code> directory (which contains scripts for Windows, 
+OS/2 and UNIX based systems) to your <code>PATH</code> and set an
 environment variable <code>LAGOON_HOME</code> to the directory where you
-installed Lagoon (there are scripts for Windows, OS/2 and UNIX based
-systems, if you don't can or want to use them, you have to add the
-<code>.jar</code> files in the Lagoon distribution to your Java 
-<code>CLASSPATH</code>).</li> 
+installed Lagoon. Alternativly, you can add the <code>.jar</code> files in 
+the Lagoon distribution to your Java <code>CLASSPATH</code>).</li> 
 </ol>
 
 
@@ -686,18 +685,16 @@ The directory will be created if it doesn't exist.</p>
 The path is relative to your home directory on the remote machine 
 (to start from root, do like <code>ftp://joe@foo.bar.com//abs/path/</code>). 
 Note that this will send everything, including your password, 
-in clear-text over the network. If
-security is important, use SSH instead. This requires you to
-specify the password in the property file.</p>
+in clear-text over the network. If security is important, use SSH instead. 
+This requires you to specify the password in the property file.</p>
 
 <p>To use SSH, specify an absolute URL in the form
 <code>ssh://<em>login</em>@<em>host</em>/<em>path</em>/</code>. The
 path is relative to your home directory on the remote machine
 (to start from root, do like <code>ftp://joe@foo.bar.com//abs/path/</code>). 
-You need to have an RSA key
-properly setup before using this (you should be able to login without
-entering any password), do not specify the password in the property
-file.</p>
+You need to have an RSA key properly setup before using this (you should 
+be able to login without entering any password), do not specify the 
+password in the property file.</p>
 
 
 <h3>The working directory</h3>
