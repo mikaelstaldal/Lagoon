@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<html>
+<head>
+<title>Lagoon Resource Guide</title>
+<link rel="stylesheet" type="text/css" href="manual.css" />
+</head>
+<body>
+<h1>Lagoon Resource Guide</h1>
+
+<p>Lagoon comes with a number of useful resources which you can use. You 
+access these resources in the sitemap with <code>res:</code> URLs.</p>
+
+<h2>res:/style/imageindex.xsl</h2>
+
+<p>An XSLT stylesheet to generate an HTML index page with thumbnails for a set
+of images. It's used in conjunction with the 
+<code>&lt;source type="dir"&gt;</code> producer. It requires you to put all 
+images in a directory <code>images</code> and thumbnails for them (with the 
+same filename as the corresponding image) in a directory 
+<code>thumbnails</code> (at the same level as the <code>images</code> directory).
+(Lagoon does not generate thumbnails for you.) It needs
+two parameters, <code>title</code> for the title of the page and 
+<code>rowlen</code> for the number of thumbnails to put on one row.</p>
+
+<p>Example of usage in sitemap:</p>
+<pre>
+&lt;file target="/index.html" source="/images/"&gt;
+  &lt;format type="html"&gt;
+    &lt;transform type="xslt" stylesheet="res:/style/imageindex.xsl" title="My pictures" rowlen="8"&gt; 
+      &lt;source type="dir"/&gt;
+    &lt;/transform&gt;
+  &lt;/format&gt;
+&lt;/file&gt;
+</pre>
+
+</body>
+</html>
+

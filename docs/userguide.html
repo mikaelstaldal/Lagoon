@@ -133,11 +133,12 @@ CVS.</li>
 <li>Add the distribution JAR files from Xerces, Xalan and (if you use it) FOP 
 (you need both <code>fop.jar</code> and <code>w3c.jar</code>) to your Java
 <code>CLASSPATH</code>.</li>
-<li>Add all the <code>.jar</code> files in the <code>lib</code> directory
-to your Java <code>CLASSPATH</code>. Or, add the <code>bin</code> directory 
-to your <code>PATH</code> and set an environment variable 
-<code>LAGOON_HOME</code> to the directory where you installed Lagoon (there are
-scripts for Windows, OS/2 and UNIX based systems).</li>
+<li>Add the <code>bin</code> directory to your <code>PATH</code> and set an 
+environment variable <code>LAGOON_HOME</code> to the directory where you 
+installed Lagoon (there are scripts for Windows, OS/2 and UNIX based systems, 
+if you don't can or want to use them, you have to add the <code>.jar</code> 
+file in the <code>lib</code> directory to your <code>CLASSPATH</code> and set
+the <code>resourceDir</code> system property).</li>
 </ol>
 
 
@@ -148,13 +149,15 @@ the structure of the website. The sitemap is in XML format, see
 the <a href="sitemap.rng">schema</a> Each sitemap must have a name which 
 unique identifies it on the system.</p>
 
-<p>The sitemap has entries for files, each file entry describes how that file 
-should be created. The target is the request URL for the web server, 
+<p>The sitemap has entries for files, each <code>&lt;file&gt;</code>
+entry describes how that file should be created. 
+The target is the request URL for the web server, 
 and must be specified as a pseudo-absolute URL. The source URL must be specified 
-as an absolute or pseudo-absolute URL. A pseudo-absolute source URL is
-relative to the local source root directory. If source is omitted, 
+as an absolute or pseudo-absolute URL. If source is omitted, 
 it's set to the same string as target (including any wildcard).</p>
 
+<p>The sitemap may also contain <code>&lt;delete&gt;</code> entries, which are
+used to delete the target.</p>
 
 <h3>URLs</h3>
 
@@ -170,7 +173,8 @@ first colon is called the <em>scheme</em>. E.g.
 (the scheme here is <code>html</code>).</li>
 
 <li>An <em>pseudo-absolute</em> URL starts with a slash. 
-E.g. <code>/foo/bar.xml</code>.</li> 
+E.g. <code>/foo/bar.xml</code>. When used as source, it is searched for
+relative to the local source root directory.</li> 
 
 <li>A <em>relative</em> URL meets non of these two criteria. E.g. 
 <code>pic/photo.jpeg</code>.
@@ -192,8 +196,10 @@ in several versions of Java is broken. These URLs must be written in the form
 <code>file</code> URLs in RFC 1738.)</p>
 
 <p>The <code>res</code> scheme is used to point out a file in the 
-<em>resource directory</em> (see below). 
-E.g. <code>res:/style/photoindex.xsl</code></p>
+<code>resource</code> directory in the Lagoon distribution. You can add your 
+own files to this directory. See the <a href="resource.html">Resource Guide</a>
+for information about the included resources.
+E.g. <code>res:/style/imageindex.xsl</code></p>
 
 <p>Dependency checking of sources works for relative, pesudo-absolute and 
 absolute URLs with <code>file</code> or <code>res</code> schemes. However, 
@@ -332,16 +338,13 @@ in the directory is updated.</p>
 <p>Applies an XSLT stylesheet to the XML stream.</p>
 
 <p>The mandatory parameter "stylesheet" specifies the location of the
-stylesheet, as an URL. If this URL starts with '/', it is searched for 
-relative to the local source root directory, if it is not absolute and 
-not starts with '/', it's searched for relative to the
-source file. Any non-absolute URL imported or included from the
-stylesheet is searched for relative to the stylesheet (or to the
-local source root directory if it starts with '/').</p>
+stylesheet, as an URL. If this URL is relative, 
+it's searched for relative to the source file. Any relative URL 
+imported or included from the stylesheet is searched for relative to 
+the stylesheet.</p>
 
-<p>Any non-absolute URL refeered to by the <code>document()</code> function
-is searched for relative to the source file (or to the local source
-root directory if it starts with '/').</p>
+<p>Any relative URL refeered to by the <code>document()</code> function
+is searched for relative to the source file.</p>
 
 <p>This producer will check if the stylesheet, or any file imported or
 included from it has been updated, and in that case signal the need for
@@ -391,7 +394,7 @@ literal brace in the filename, use a double brace.</p>
 <p>will result in the file <code>first.xml</code> being created.</p>
 
 <p>The output name must be a relative URL, and is relative to the main
-target file. It must <em>not</em> start with '/'.</p>
+target file. It must <em>not</em> be pseudo-absolute.</p>
 
 <h3>&lt;transform type="lsp"&gt;</h3>
 
@@ -402,12 +405,10 @@ Guide</a>.</p>
 page.</p>
 
 <p>Any relative URL imported from the LSP page is searched for relative
-to the source file (or to the local source root directory if it starts
-with '/').</p>
+to the source file.</p>
 
 <p>Any relative URL included from the LSP page is searched for relative
-to the source file (or to the local source root directory if it starts
-with '/').</p>
+to the source file.</p>
 
 <p>This producer will check all files (and other resources) the LSP
 page depends on, and signal the need for rebuilding if any of them are
@@ -554,20 +555,16 @@ to the LSP page):</p>
 &lt;/file&gt;
 </pre>
 
+<p>Delete an old file:</p>
+<pre>
+&lt;delete target="/oldstuff/outdated.html"/&gt;
+</pre>
+
 
 <h2>Running Lagoon</h2>
 
 <p>Lagoon is invoked by the application class
 <code>nu.staldal.lagoon.LagoonCLI</code>. The syntax is one of:</p>
-<pre>
-<em>java</em> -DresourceDir=<em>resourceDir</em> nu.staldal.lagoon.LagoonCLI <em>property_file</em> <em>how_to_run</em>
-<em>java</em> -DresourceDir=<em>resourceDir</em> nu.staldal.lagoon.LagoonCLI <em>sitemap_file</em> <em>how_to_run</em>
-</pre>
-
-<p><em>java</em> is your Java interpreter, usually just "java". It's
-not recommended to use "javaw" in Sun JDK for Windows, since Lagoon
-will write error messages and other information to standard out. If you have 
-setup a script for running Lagoon, you can use the syntax (the resourceDir is handled by the script):</p>
 <pre>
 lagoon <em>property_file</em> <em>how_to_run</em>
 lagoon <em>sitemap_file</em> <em>how_to_run</em>
@@ -592,9 +589,6 @@ a command (write something on the keyboard and press [ENTER]), 'b' will
 cause normal build, 'f' will cause a force build and just pressing
 [ENTER] will cause it to exit.</p>
 
-<p>The <em>resourceDir</em> specifies the directory where absolute URLs with the
-<code>res</code> scheme are searched for. It's optional, but without it no URL
-with <code>res</code> scheme will work.</p> 
 
 <h3>The property file</h3>
 
@@ -655,8 +649,8 @@ file.</p>
 <p>Lagoon will create a working directory that is used to store cached data 
 and dependency information. This directory is named ".lagoon" and is created 
 in the user's home directory (as pointed out by the Java system property 
-"user.home", you can change this by passing "-Duser.home=<em>/some/other/dir</em>" 
-on the <em>java</em> command line).</p>
+"user.home", you can change this by modify the <code>lagoon</code> script to 
+pass "-Duser.home=<em>/some/other/dir</em>" on the java command line).</p>
 
 <p>It's safe to remove the working directory when Lagoon is not running, it will
 be recreated next time Lagoon is run. If Lagoon suddenly start giving 
@@ -678,7 +672,6 @@ well-formedness, and reports any errors. The syntax for this tool
 is:</p>
 
 <pre>
-<em>java</em> nu.staldal.lagoon.XMLCheck [-v] <em>xml_file</em>
 xmlcheck [-v] <em>xml_file</em>
 </pre>
 
@@ -692,7 +685,6 @@ comes with a tool which creates a sitemap from an existing directory
 structure. The syntax for this tool is:</p>
 
 <pre>
-<em>java</em> nu.staldal.lagoon.BuildSitemap <em>source_dir</em> <em>sitemap_file</em>
 buildsitemap <em>source_dir</em> <em>sitemap_file</em>
 </pre>
 

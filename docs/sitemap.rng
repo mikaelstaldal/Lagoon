@@ -9,10 +9,20 @@
   <element name="sitemap">
     <attribute name="name"/>
     <zeroOrMore>
+      <choice>
+      <ref name="deleteEntry"/>
       <ref name="fileEntry"/>
+      </choice>
     </zeroOrMore>
   </element>
 </start>
+
+<define name="deleteEntry">
+  <element name="delete">
+    <attribute name="target"/>
+    <empty/>  
+  </element>
+</define>
 
 <define name="fileEntry">
   <element name="file">
