@@ -3,9 +3,8 @@
 <!-- Lagoon Server Page -->
 
 <html xmlns:lsp="http://staldal.nu/LSP/core" 
-	  xmlns:svg="java:nu.staldal.lsp.ext.BatikSVGExtension"
-	  xmlns:test="java:nu.staldal.lsp.ext.TestExtension"
-	  xmlns:stringtest="java:nu.staldal.lsp.ext.StringExtension">
+	  xmlns:test="http://staldal.nu/LSP/test"
+	  xmlns:stringtest="http://staldal.nu/LSP/string">
 <head>
 <title>LSP test</title>
 </head>
@@ -151,11 +150,22 @@ in output like this</lsp:processing-instruction>
 
 <h2>ExtElement</h2>
 
+<p>
 <test:foo>
 	<lsp:if test="5 &gt; 3"><bar>apa</bar></lsp:if>
 </test:foo>
+</p>
 
+<p>
 <stringtest:hej>apa</stringtest:hej>
+</p>
+
+<h2>ExtFunc</h2>
+
+<p>{test:func(1, 2, 3, 'one', 'two', 'three')}</p>
+<p>{test:foo(1)}</p>
+<p>{test:bar()}</p>
+<!-- <p>{stringtest:func(1, 2, 3, 'one', 'two', 'three')}</p> -->
 
 <p>---End of LSP Test---</p>
 

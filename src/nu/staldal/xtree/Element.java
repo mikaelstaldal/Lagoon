@@ -194,7 +194,7 @@ public class Element extends NodeWithChildren
 		{
 			if ((parent != null) && (parent instanceof Element))
 			{
-				return ((Element)parent).lookupNamespaceURI(prefix);
+				return parent.lookupNamespaceURI(prefix);
 			}
 			else
 			{

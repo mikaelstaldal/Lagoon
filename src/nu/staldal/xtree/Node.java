@@ -111,4 +111,12 @@ public abstract class Node implements java.io.Serializable
 		return column;
 	}
 
+	public String lookupNamespaceURI(String prefix)
+	{
+		if (parent == null)
+			return null;
+		else
+			return parent.lookupNamespaceURI(prefix);
+	}
+	
 }
