@@ -56,6 +56,24 @@ public class TestXTree extends TestCase
     }
     
 
+    public void testXmlLang() throws Exception
+    {
+		Element el = TreeBuilder.parseXML(
+			new InputSource(getClass().getResourceAsStream("xmllang.xml")), false);
+        
+        Element el2 = el.getFirstChildElement();
+        Element el3 = el2.getFirstChildElement();
+        Element el4 = el3.getFirstChildElement();
+        Element el5 = el4.getFirstChildElement();
+        
+        assertNull(el.getInheritedAttribute(Node.XML_NS, "lang"));
+        assertEquals("en", el2.getInheritedAttribute(Node.XML_NS, "lang"));
+        assertEquals("en", el3.getInheritedAttribute(Node.XML_NS, "lang"));
+        assertEquals("sv", el4.getInheritedAttribute(Node.XML_NS, "lang"));
+        assertEquals("sv", el5.getInheritedAttribute(Node.XML_NS, "lang"));
+    }
+
+
 	public void tearDown()
 	{
 		new File("xtree.ser").delete();	

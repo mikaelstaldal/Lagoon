@@ -193,7 +193,7 @@ public class Element extends NodeWithChildren
                 xmlSpaceAttribute = 'd';
         }
 	}
-
+   
 
 	/**
 	 * Remove an attribute at the specified index. 
@@ -443,7 +443,20 @@ public class Element extends NodeWithChildren
 			}
 		}
 	}
+    
 
+	public String getInheritedAttribute(String namespaceURI, 
+                                             String localName)
+	{
+		String val = getAttrValueOrNull(namespaceURI, localName);
+        if (val != null)
+            return val;        
+        else if (parent == null)
+			return null;
+		else
+			return parent.getInheritedAttribute(namespaceURI, localName);
+	}
+    
 
 	/**
 	 * Fire the startElement event to the given SAX2 ContentHandler.

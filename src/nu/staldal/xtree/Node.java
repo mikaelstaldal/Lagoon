@@ -50,7 +50,10 @@ import org.xml.sax.*;
  */
 public abstract class Node implements java.io.Serializable, Locator
 {
-    static final String XML_NS = "http://www.w3.org/XML/1998/namespace";
+    /**
+     * Namespace URI for the implicitly defined "xml" namespace.
+     */
+    public static final String XML_NS = "http://www.w3.org/XML/1998/namespace";
 
     private String publicId = null;
     private String systemId = null;
@@ -234,6 +237,26 @@ public abstract class Node implements java.io.Serializable, Locator
 			return false;
 		else
 			return parent.getPreserveSpace();
+	}
+
+
+	/**
+	 * Return the value of an inherited attribute. If the given attribute 
+     * occurs on this node, return its value, otherwise recursivley search
+     * the parent of this node (return <code>null</code> if the root is 
+     * reached without finding the attribute). Useful for e.g. xml:lang.
+     *
+	 * @param namespaceURI  the namespace URI, may be the empty string
+	 * @param localName  the attribute name
+	 *
+	 * @return  <code>null</code> if no such attribute is found
+	 */
+	public String getInheritedAttribute(String namespaceURI, String localName)
+	{
+		if (parent == null)
+			return null;
+		else
+			return parent.getInheritedAttribute(namespaceURI, localName);
 	}
 }
 
