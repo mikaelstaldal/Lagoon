@@ -118,10 +118,18 @@ public class LagoonProcessor
                      String password)
         throws IOException, LagoonException, AuthenticationException
     {
-        if (!repositoryDir.isDirectory())
-            throw new LagoonException(
-                "repositoryDir must be an existing directory: "
-                + repositoryDir);
+        if (!repositoryDir.exists())
+		{
+			if (!repositoryDir.mkdir())
+				throw new IOException("Unable to create repository directory: "
+					+ repositoryDir);
+		}
+		else
+		{
+			if (!repositoryDir.isDirectory())
+        	    throw new LagoonException("repositoryDir must be a directory: "
+        	        + repositoryDir);
+		}
         this.repositoryDir = repositoryDir;
 
         targetLocation.open(targetURL, this, password);
