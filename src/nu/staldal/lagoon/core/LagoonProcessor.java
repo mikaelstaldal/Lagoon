@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2002, Mikael Ståldal
+ * Copyright (c) 2001-2004, Mikael Ståldal
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -275,6 +275,8 @@ public class LagoonProcessor implements LagoonContext
 	public void destroy()
         throws IOException
 	{
+        sitemap.destroy();
+        
 		targetLocation.close();
 		
 		repositoryClassLoader = null;

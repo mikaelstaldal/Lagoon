@@ -63,5 +63,14 @@ interface SitemapEntry
      */
     public abstract boolean build(boolean always)
         throws IOException;
+        
+        
+    /**
+     * Clean up.
+     *
+	 * @throws IOException  if any fatal error occur
+     */
+    public abstract void destroy()
+        throws IOException;
 }
 

@@ -62,6 +62,21 @@ public abstract class Producer implements ProducerInterface
     private LagoonProcessor processor = null;
     private int position = 0;
 
+    
+    public void destroy()
+        throws java.io.IOException        
+    {
+        // empty default implementation 
+    }
+    
+
+    void doDestroy()
+        throws java.io.IOException        
+    {
+        destroy();
+    }
+    
+    
 	/**
 	 * Set the name of the sitemap entry this producer is associated with.
 	 * Used during initialization.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2002, Mikael Ståldal
+ * Copyright (c) 2001-2004, Mikael Ståldal
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -69,6 +69,13 @@ class DeleteEntry implements SitemapEntry
         this.targetURL = targetURL;
     }
 
+
+    public void destroy()
+        throws IOException
+    {
+        // nothing to do
+    }
+            
 
     public boolean build(boolean always)
         throws IOException

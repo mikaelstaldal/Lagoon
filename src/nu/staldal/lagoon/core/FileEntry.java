@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2002, Mikael Ståldal
+ * Copyright (c) 2001-2004, Mikael Ståldal
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -117,6 +117,13 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
 		this.targetThreads = new Vector();
     }
 
+    public void destroy()
+        throws IOException
+    {
+        if (myProducer != null)
+            myProducer.doDestroy();
+    }
+    
 
     /**
      * Set the ByteStreamProducer that produces the final output for this
@@ -127,7 +134,7 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
     {
         myProducer = prod;
     }
-
+    
 
     void setMyOutput(OutputEntry outputEntry)
     {
@@ -192,10 +199,8 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
     private boolean buildFile(boolean always)
         throws IOException
     {
-        if (DEBUG) System.out.println("buildFile: " + currentTargetURL);
-
         targetLastMod = targetStorage.fileLastModified(currentTargetURL);
-
+        
         if (always || (targetLastMod <= 0))
         {
             return buildAlways();
@@ -506,6 +511,11 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
 			}
 			
 			public void init()
+			{
+				throw new RuntimeException("Invalid context");	
+			}
+
+			public void destroy()
 			{
 				throw new RuntimeException("Invalid context");	
 			}

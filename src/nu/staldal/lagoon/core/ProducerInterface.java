@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001, Mikael Ståldal
+ * Copyright (c) 2001-2004, Mikael Ståldal
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without 
@@ -55,7 +55,19 @@ public interface ProducerInterface
      */
     public void init()
         throws LagoonException, java.io.IOException;
-    
+
+
+    /** 
+     * Destroy the producer. This method is invoked once 
+     * after the start() method is invoked the last time.
+     *
+     * This method may use the getParam(), getParamNames(), and
+     * getContext() methods.
+     */
+    public void destroy()
+        throws java.io.IOException;
+        
+        
     /** 
      * Check if something has been updated so a rebuild is nessesary.
      *

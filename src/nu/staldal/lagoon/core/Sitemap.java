@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2002, Mikael Ståldal
+ * Copyright (c) 2001-2004, Mikael Ståldal
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -285,6 +285,17 @@ class Sitemap
     }
 
 
+	public void destroy()
+        throws java.io.IOException
+    {
+        for (Enumeration e = getEntries(); e.hasMoreElements(); )
+        {
+            SitemapEntry ent = (SitemapEntry)e.nextElement();
+            ent.destroy();    
+        }
+    }
+    
+    
     /**
      * Get the site name. Or <code>null</code> if no name is defined.
      */

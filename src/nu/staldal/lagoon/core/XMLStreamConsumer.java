@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001, Mikael Ståldal
+ * Copyright (c) 2001-2004, Mikael Ståldal
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without 
@@ -48,6 +48,17 @@ public abstract class XMLStreamConsumer extends Producer
     // Associations
     private XMLStreamProducer nextProducer;
 
+    void doDestroy()
+        throws java.io.IOException        
+    {
+        ProducerInterface prod = getNext();
+        if (prod instanceof Producer)
+        {
+            ((Producer)prod).doDestroy();    
+        }
+        destroy();
+    }    
+    
     /** 
      * Set the next producer. 
      * Used during initialization.
@@ -65,6 +76,6 @@ public abstract class XMLStreamConsumer extends Producer
     public XMLStreamProducer getNext()
     {
         return nextProducer;
-    }
+    }        
     
 }
