@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001, Mikael Ståldal
+ * Copyright (c) 2002, Mikael Ståldal
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,21 +38,21 @@
  * http://www.gnu.org/philosophy/license-list.html
  */
 
-package nu.staldal.lagoon.filestorage;
-
-import nu.staldal.lagoon.core.*;
-import nu.staldal.ftp.*;
+package nu.staldal.ftp;
 
 import java.io.*;
 import java.net.*;
 
 /**
- * A FileStorage which transfers files to a remote site using FTP.
+ * An FTP client. See RFC-959.
+ *
+ * Pathnames must be specified using '/' for directory separator.
+ * Passive mode will be used for all transfers. 
  *
  * <strong>Note:</strong> This class will transmit password in clear text over
  * the network.
  */
-public class FTPFileStorage extends RemoteFileStorage
+public class FTPClient
 {
 	private static final boolean DEBUG = false;
 
@@ -60,6 +60,7 @@ public class FTPFileStorage extends RemoteFileStorage
     private InputStream controlIn;
     private OutputStream controlOut;
    	private String respString;
+
     private String lastPath = "";
     private int lastPathLen = 0;
 
@@ -110,98 +111,23 @@ public class FTPFileStorage extends RemoteFileStorage
 		return Integer.parseInt(code);
 	}
 
-	private boolean chdir(String dir)
-		throws FTPException, IOException
-	{
-		if (DEBUG) System.out.println("CWD " + dir);
-		sendLine("CWD " + dir);
-		int resp = recvResponse();
-		switch (resp)
-		{
-			case 250:
-				return true;
-
-			case 550:
-				return false;
-
-			case 421:
-				throw new FTPException("FTP server not avaliable (421)");
-
-			default:
-				throw new FTPException("Unexpected response from FTP server: " + respString);
-		}
-	}
-
 	
-	private boolean cdup()
-		throws FTPException, IOException
-	{
-		if (DEBUG) System.out.println("CDUP");
-		sendLine("CDUP");
-		int resp = recvResponse();
-		switch (resp)
-		{
-			case 200:
-			case 250:
-				return true;
-
-			case 550:
-				return false;
-
-			case 421:
-				throw new FTPException("FTP server not avaliable (421)");
-
-			default:
-				throw new FTPException("Unexpected response from FTP server: " + respString);
-		}
-	}
-
-
-	private boolean mkdir(String dir)
-		throws FTPException, IOException
-	{
-		if (DEBUG) System.out.println("MKD " + dir);
-		sendLine("MKD " + dir);
-		int resp = recvResponse();
-		switch (resp)
-		{
-			case 257:
-				return true;
-
-			case 550:
-				return false;
-
-			case 421:
-				throw new FTPException("FTP server not avaliable (421)");
-
-			default:
-				throw new FTPException("Unexpected response from FTP server: " + respString);
-		}
-	}
-
-    /**
-     * Default constructor.
-     */
-    public FTPFileStorage()
-    {
-        control = null;
-    }
-
-    public boolean needPassword()
-    {
-        return true;
-    }
-
-
-	public boolean isReentrant()
-    {
-        return false;
-    }	
-
-
-    public void open(String url, LagoonProcessor processor, String password)
-        throws MalformedURLException, UnknownHostException,
-        FTPException, IOException, AuthenticationException
+	/**
+	 * Connect to an FTP server and login.
+	 *
+	 * @param url  an URL specifying host, port, username and optionally
+	 *             an initial path to change to
+	 * @param password  the password to use for logging in
+	 *
+	 * @throws MalformedURLException  if there are any syntactic error in the URL
+	 * @throws UnknownHostException  if the hostname specified doesn't exist
+	 * @throws FTPAuthenticationException  if the password is wrong
+	 * @throws FTPException if any FTP protocol error occurs
+	 * @throws IOException if any other IO error occurs
+	 */
+    public FTPClient(String url, String password)
+	    throws MalformedURLException, UnknownHostException,
+        	FTPAuthenticationException, FTPException, IOException 
     {
 		if (!url.startsWith("ftp://"))
 			throw new MalformedURLException(url);
@@ -235,7 +161,40 @@ public class FTPFileStorage extends RemoteFileStorage
 			host.length() < 1 ||
 			(path.length() > 0 && path.charAt(path.length()-1) != '/'))
 			throw new MalformedURLException(url);
+			
+		connect(host, port, username, password);
+		initialDir(path);				
+	}
 
+		
+	/**
+	 * Connect to an FTP server and login.
+	 *
+	 * @param host  the host to connect to, may be a domain name or IP address
+	 * @param post  the control channel port (default 21)
+	 * @param username  the username to use for logging in
+	 * @param password  the password to use for logging in
+	 * @param path  initial path, realtive to home directory unless starting with '/',
+	 *              may be <code>null</code> to use home directory
+	 *
+	 * @throws UnknownHostException  if the hostname specified doesn't exist
+	 * @throws FTPAuthenticationException  if the password is wrong
+	 * @throws FTPException if any FTP protocol error occurs
+	 * @throws IOException if any other IO error occurs
+	 */
+	public FTPClient(String host, int port, String username, String password, String path)
+	    throws UnknownHostException, FTPAuthenticationException, FTPException, IOException 
+	{
+		connect(host, port, username, password);
+		initialDir(path);
+	}
+	
+
+	private void connect(String host, int port, String username, String password)
+	    throws UnknownHostException, FTPAuthenticationException, FTPException, IOException 
+	{
+		if (port < 0 || port > 65535) port = 21;
+			
 		control = new Socket(host, port);
 		controlIn = control.getInputStream();
 		controlOut = control.getOutputStream();
@@ -278,7 +237,7 @@ public class FTPFileStorage extends RemoteFileStorage
 						break;
 
 					case 530:
-                        throw new AuthenticationException();
+                        throw new FTPAuthenticationException();
 
 					case 421:
 						throw new FTPException("FTP server not avaliable (421)");
@@ -286,7 +245,6 @@ public class FTPFileStorage extends RemoteFileStorage
 					default:
 						throw new FTPException("Unexpected response from FTP server: " + respString);
 				}
-
 				break;
 
 			case 530:
@@ -298,8 +256,13 @@ public class FTPFileStorage extends RemoteFileStorage
 			default:
 				throw new FTPException("Unexpected response from FTP server: " + respString);
 		}
+	}
+	
 
-		// change directory
+	private void initialDir(String path)
+		throws FTPException, IOException	
+	{
+		if (path == null) return;
 		int pos, oldPos = 0;
         while (true)
         {
@@ -309,22 +272,18 @@ public class FTPFileStorage extends RemoteFileStorage
             if (!chdir(comp))
 				throw new FTPException("Path not found: " + path);
             oldPos = pos + 1;
-        }
-
-        openDateFile(processor);
-    }
-
+        }	
+	}
+	
 
     /**
-     * Close the file system and release any resources it holds.
+     * Logout and disconnect from the FTP server.
      *
      * After this method has been invoked, no other method may be invoked.
      */
     public void close()
     	throws IOException
     {
-        closeDateFile();
-
 		sendLine("QUIT");
 		int resp = recvResponse();
 		control.close();
@@ -332,29 +291,177 @@ public class FTPFileStorage extends RemoteFileStorage
     }
 
 	
+	/**
+	 * Change the current directory.
+	 * 
+	 * @param dir  the directory to change into
+	 * 
+	 * @return true if successful, false otherwise
+	 * @throws FTPException if any FTP protocol error occurs
+	 * @throws IOException if any other IO error occurs
+	 */
+	private boolean chdir(String dir)
+		throws FTPException, IOException
+	{
+		if (DEBUG) System.out.println("CWD " + dir);
+		sendLine("CWD " + dir);
+		int resp = recvResponse();
+		switch (resp)
+		{
+			case 250:
+				return true;
+
+			case 550:
+				return false;
+
+			case 421:
+				throw new FTPException("FTP server not avaliable (421)");
+
+			default:
+				throw new FTPException("Unexpected response from FTP server: " + respString);
+		}
+	}
+
+	
+	/**
+	 * Change the current directory to the parent directory.
+	 * 
+	 * @return true if successful, false otherwise
+	 * @throws FTPException if any FTP protocol error occurs
+	 * @throws IOException if any other IO error occurs
+	 */
+	private boolean cdup()
+		throws FTPException, IOException
+	{
+		if (DEBUG) System.out.println("CDUP");
+		sendLine("CDUP");
+		int resp = recvResponse();
+		switch (resp)
+		{
+			case 200:
+			case 250:
+				return true;
+
+			case 550:
+				return false;
+
+			case 421:
+				throw new FTPException("FTP server not avaliable (421)");
+
+			default:
+				throw new FTPException("Unexpected response from FTP server: " + respString);
+		}
+	}
+
+
+	/**
+	 * Create a new directory.
+	 *
+	 * @param dir  the directory to create
+	 * 
+	 * @return true if successful, false otherwise
+	 * @throws FTPException if any FTP protocol error occurs
+	 * @throws IOException if any other IO error occurs
+	 */
+	private boolean mkdir(String dir)
+		throws FTPException, IOException
+	{
+		if (DEBUG) System.out.println("MKD " + dir);
+		sendLine("MKD " + dir);
+		int resp = recvResponse();
+		switch (resp)
+		{
+			case 257:
+				return true;
+
+			case 550:
+				return false;
+
+			case 421:
+				throw new FTPException("FTP server not avaliable (421)");
+
+			default:
+				throw new FTPException("Unexpected response from FTP server: " + respString);
+		}
+	}
+
+
     /**
-     * Create a new file, or overwrite an existing file.
+     * Create a new file, or overwrite an existing file. 
+	 * Will create directories as nessesary.
      *
      * @param pathname  path to the file
+	 *
+	 * @return an OutputStream to write to, close() it when finished
+	 * @throws FTPException if any FTP protocol error occurs
+	 * @throws IOException if any other IO error occurs
      */
-    public OutputHandler createFile(String pathname)
-        throws IOException
-    {
-		int resp;
-		String path;
+    public OutputStream store(String pathname)
+        throws FTPException, IOException
+	{
 		int pos = pathname.lastIndexOf('/');
-	    path = pathname.substring(0, pos+1);
+	    String path = pathname.substring(0, pos+1);
 	    String filename = pathname.substring(pos+1);
 
+		changeDir(path);
+		return upload("STOR", filename);		
+	}
+    
+
+    /**
+     * Create a new file, or append to an existing file. 
+	 * Will create directories as nessesary.
+     *
+     * @param pathname  path to the file
+	 *
+	 * @return an OutputStream to write to, close() it when finished
+	 * @throws FTPException if any FTP protocol error occurs
+	 * @throws IOException if any other IO error occurs
+     */
+    public OutputStream append(String pathname)
+        throws FTPException, IOException
+	{
+		int pos = pathname.lastIndexOf('/');
+	    String path = pathname.substring(0, pos+1);
+	    String filename = pathname.substring(pos+1);
+
+		changeDir(path);
+		return upload("APPE", filename);		
+	}
+
+
+    /**
+     * Create a new file with an unique name. 
+	 * Will create directories as nessesary.
+     *
+     * @param path  path to the file, must end with '/' or be empty
+	 *
+	 * @return an OutputStream to write to, close() it when finished
+	 * @throws FTPException if any FTP protocol error occurs
+	 * @throws IOException if any other IO error occurs
+     */
+    public OutputStream storeUnique(String path)
+        throws FTPException, IOException
+	{
+		changeDir(path);
+		return upload("STOU", null);		
+	}
+
+
+	private void changeDir(String path)
+        throws FTPException, IOException
+	{
 		if (!path.equals(lastPath))
 		{
+			if (path.length() > 0 && path.charAt(0) != '/') path = '/' + path; 
+			
 			// change directory
 			for (int i = 0; i < lastPathLen; i++)
 				if (!cdup())
 					throw new FTPException("Unable to change to parent directory");
 
 			lastPathLen = 0;
-			int oldPos = 1;
+			int pos, oldPos = 1;
 			boolean mkd = false;
 			while (true)
 			{
@@ -383,7 +490,14 @@ public class FTPFileStorage extends RemoteFileStorage
 				oldPos = pos + 1;
 			}
 		}
-		lastPath = path;
+		lastPath = path;		
+	}
+	
+	
+	private OutputStream upload(String cmd, String filename)
+        throws FTPException, IOException
+	{
+		int resp;
 
 		sendLine("TYPE I");
 		resp = recvResponse();
@@ -448,7 +562,11 @@ public class FTPFileStorage extends RemoteFileStorage
 			throw new FTPException("invalid response to PASV command");
 		}
 
-		sendLine("STOR " + filename);
+		if (cmd == null) 
+			sendLine(cmd); 
+		else
+			sendLine(cmd + " " + filename);
+			
 		Socket data = new Socket(addr, port);
 		resp = recvResponse();
 		switch (resp)
@@ -464,19 +582,21 @@ public class FTPFileStorage extends RemoteFileStorage
 				throw new FTPException("Unexpected response from FTP server: " + respString);
 		}
 
-		return new FTPOutputHandler(
-			pathname, filename,	data, data.getOutputStream());
+		return new FTPOutputStream(data.getOutputStream(), data);
     }
 
 	
     /**
      * Deletes a file.
-     * Does not signal any error if the file doesn't exist.
 	 *
      * @param pathname  path to the file
+	 *
+	 * @return true if successful, false otherwise (file didn't exsist)
+	 * @throws FTPException if any FTP protocol error occurs
+	 * @throws IOException if any other IO error occurs
      */
-    public void deleteFile(String pathname)
-        throws java.io.IOException
+    public boolean deleteFile(String pathname)
+        throws FTPException, IOException
     {
 		String path;
 		String fn;
@@ -501,7 +621,7 @@ public class FTPFileStorage extends RemoteFileStorage
 				String comp = path.substring(oldPos, pos);
 				if (!chdir(comp))
 				{
-					return; // file doesn't exist
+					return false; // file doesn't exist
 				}
 				oldPos = pos + 1;
 			}
@@ -513,8 +633,10 @@ public class FTPFileStorage extends RemoteFileStorage
 		switch (resp)
 		{
 			case 250:
+				return true;
+			
 			case 550:
-				break;
+				return false;
 
 			case 450:
 				throw new FTPException("Unable to delete file: " + respString);
@@ -528,25 +650,51 @@ public class FTPFileStorage extends RemoteFileStorage
 	}
 
 
-	class FTPOutputHandler extends OutputHandler
+	class FTPOutputStream extends OutputStream
 	{
 		private Socket data;
-    	private String currentPathname;
-    	private String filename;
-		
+		private OutputStream out;
 
-		FTPOutputHandler(String currentPathname, String filename, 
-			Socket data, OutputStream out)
+		
+		FTPOutputStream(OutputStream out, Socket data)
 		{
-			super(out);
-			this.currentPathname = currentPathname;
-			this.filename = filename;
+			this.out = out;
 			this.data = data;
 		}
 
+
+		public void write(int b)
+            throws IOException
+		{
+			out.write(b);	
+		}
+
+					
+		public void write(byte[] b)
+            throws IOException
+		{
+			out.write(b);	
+		}
+
+		   
+		public void write(byte[] b,
+                  int off,
+                  int len)
+            throws IOException
+		{
+			out.write(b, off, len);	
+		}
+
+		   
+		public void flush()
+        	throws IOException
+		{
+			out.flush();	
+		}
+
 		
-		public void commit()
-			throws java.io.IOException
+		public void close()
+			throws IOException
 		{
 			out.close();
 
@@ -580,41 +728,7 @@ public class FTPFileStorage extends RemoteFileStorage
 				}
 				break;
 			}
-	
-			fileModified(currentPathname);
-		}
-		
-
-		public void discard()
-			throws java.io.IOException
-		{
-			try {
-				commit();
-			}
-			catch (FTPException e)
-			{
-				// ignore exception
-			}
-	
-			sendLine("DELE " + filename);
-			int resp = recvResponse();
-			switch (resp)
-			{
-				case 250:
-				case 550:
-					break;
-	
-				case 450:
-					throw new FTPException("Unable to delete file: " + respString);
-	
-				case 421:
-					throw new FTPException("FTP server not avaliable (421)");
-	
-				default:
-					throw new FTPException("Unexpected response from FTP server: " + respString);
-			}
-		}
-			
+		}				
 	}	
 	
 }

@@ -78,7 +78,6 @@
     <filter token="VERSION" value="${version}" />
     <filter token="DATE" value="${DSTAMP}" />
     <copy file="version.txt" todir="${build.classes}" 
-          overwrite="true"
           filtering="on"/>
     <jar jarfile="${dist.jars}/${name}.jar"
          manifest="${manifest}">
@@ -97,7 +96,7 @@
   <target name="xmlutil" depends="init"
   	description="Compiles XML Utils">
     <javac srcdir="${src.dir}"
-    	   includes="nu/staldal/xtree/**/*,nu/staldal/xmlutil/**/*"
+    	   includes="nu/staldal/xtree/**/*,nu/staldal/xmlutil/**/*,nu/staldal/ftp/**/*"
            destdir="${build.classes}"
            optimize="off" debug="on">
     	<classpath>
@@ -109,6 +108,7 @@
       <fileset dir="${src.dir}">
         <include name="nu/staldal/xtree/**/*" />
         <include name="nu/staldal/xmlutil/**/*" />
+        <include name="nu/staldal/ftp/**/*" />
         <exclude name="**/*.java" />
       </fileset>
     </copy>
@@ -118,6 +118,7 @@
       <fileset dir="${build.classes}"> 
     	 <include name="nu/staldal/xtree/**/*"/>
     	 <include name="nu/staldal/xmlutil/**/*"/>
+    	 <include name="nu/staldal/ftp/**/*"/>
       </fileset>	 
     </jar>
   </target>
@@ -162,7 +163,7 @@
       <fileset dir="docs"/>
     </copy>
     <mkdir dir="${dist.dir}/docs/javadoc"/>
-    <javadoc packagenames="nu.staldal.lagoon.core,nu.staldal.lagoon.util,nu.staldal.xtree,nu.staldal.lsp,nu.staldal.syntax,nu.staldal.xmlutil"
+    <javadoc packagenames="nu.staldal.lagoon.core,nu.staldal.lagoon.util,nu.staldal.xtree,nu.staldal.lsp,nu.staldal.syntax,nu.staldal.xmlutil,nu.staldal.ftp"
     	     sourcepath="${src.dir}"
              destdir="${dist.dir}/docs/javadoc"
              author="true"
