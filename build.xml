@@ -150,6 +150,7 @@
     	   includes="nu/staldal/lsp/**/*,nu/staldal/syntax/**/*"
            destdir="${build.classes}"
            optimize="off" debug="on">
+       <classpath location="${Ant}" />
 	</javac>
 
     <copy todir="${build.classes}">
