@@ -28,8 +28,8 @@
   <property name="version" value="1.0b20"/>
   <property name="ver" value="10b20"/>
 
-  <property name="version.lsp" value="1.0b5"/>
-  <property name="ver.lsp" value="10b5"/>
+  <property name="version.lsp" value="1.0b6"/>
+  <property name="ver.lsp" value="10b6"/>
 
   <property name="res.dir" value="resource"/>
   <property name="src.dir" value="src"/>
