@@ -47,7 +47,9 @@ import java.net.*;
  * An FTP client. See RFC-959.
  *
  * Pathnames must be specified using '/' for directory separator.
- * Passive mode will be used for all transfers. 
+ * Passive mode will be used for all transfers.
+ * <em>Not</em> thread-safe, i.e. you cannot start a new file while another one is in
+ * progress. 
  *
  * <strong>Note:</strong> This class will transmit password in clear text over
  * the network.
@@ -399,12 +401,30 @@ public class FTPClient
     public OutputStream store(String pathname)
         throws FTPException, IOException
 	{
+		return store(pathname, false);
+	}
+
+
+    /**
+     * Create a new file, or overwrite an existing file. 
+	 * Will create directories as nessesary.
+     *
+     * @param pathname  path to the file
+	 * @param last  close the FTPClient after transferring this file
+	 *
+	 * @return an OutputStream to write to, close() it when finished
+	 * @throws FTPException if any FTP protocol error occurs
+	 * @throws IOException if any other IO error occurs
+     */
+    public OutputStream store(String pathname, boolean last)
+        throws FTPException, IOException
+	{
 		int pos = pathname.lastIndexOf('/');
 	    String path = pathname.substring(0, pos+1);
 	    String filename = pathname.substring(pos+1);
 
 		changeDir(path);
-		return upload("STOR", filename);		
+		return upload("STOR", filename, last);		
 	}
     
 
@@ -421,12 +441,30 @@ public class FTPClient
     public OutputStream append(String pathname)
         throws FTPException, IOException
 	{
+		return append(pathname, false);
+	}
+
+
+    /**
+     * Create a new file, or append to an existing file. 
+	 * Will create directories as nessesary.
+     *
+     * @param pathname  path to the file
+	 * @param last  close the FTPClient after transferring this file
+	 *
+	 * @return an OutputStream to write to, close() it when finished
+	 * @throws FTPException if any FTP protocol error occurs
+	 * @throws IOException if any other IO error occurs
+     */
+    public OutputStream append(String pathname, boolean last)
+        throws FTPException, IOException
+	{
 		int pos = pathname.lastIndexOf('/');
 	    String path = pathname.substring(0, pos+1);
 	    String filename = pathname.substring(pos+1);
 
 		changeDir(path);
-		return upload("APPE", filename);		
+		return upload("APPE", filename, last);		
 	}
 
 
@@ -443,8 +481,26 @@ public class FTPClient
     public OutputStream storeUnique(String path)
         throws FTPException, IOException
 	{
+		return storeUnique(path, false);		
+	}
+
+
+    /**
+     * Create a new file with an unique name. 
+	 * Will create directories as nessesary.
+     *
+     * @param path  path to the file, must end with '/' or be empty
+	 * @param last  close the FTPClient after transferring this file
+	 *
+	 * @return an OutputStream to write to, close() it when finished
+	 * @throws FTPException if any FTP protocol error occurs
+	 * @throws IOException if any other IO error occurs
+     */
+    public OutputStream storeUnique(String path, boolean last)
+        throws FTPException, IOException
+	{
 		changeDir(path);
-		return upload("STOU", null);		
+		return upload("STOU", null, last);		
 	}
 
 
@@ -494,7 +550,7 @@ public class FTPClient
 	}
 	
 	
-	private OutputStream upload(String cmd, String filename)
+	private OutputStream upload(String cmd, String filename, boolean last)
         throws FTPException, IOException
 	{
 		int resp;
@@ -582,7 +638,7 @@ public class FTPClient
 				throw new FTPException("Unexpected response from FTP server: " + respString);
 		}
 
-		return new FTPOutputStream(data.getOutputStream(), data);
+		return new FTPOutputStream(data.getOutputStream(), data, last ? this : null);
     }
 
 	
@@ -654,12 +710,14 @@ public class FTPClient
 	{
 		private Socket data;
 		private OutputStream out;
+		private FTPClient ftp;
 
 		
-		FTPOutputStream(OutputStream out, Socket data)
+		FTPOutputStream(OutputStream out, Socket data, FTPClient ftp)
 		{
 			this.out = out;
 			this.data = data;
+			this.ftp = ftp;
 		}
 
 
@@ -677,9 +735,7 @@ public class FTPClient
 		}
 
 		   
-		public void write(byte[] b,
-                  int off,
-                  int len)
+		public void write(byte[] b, int off, int len)
             throws IOException
 		{
 			out.write(b, off, len);	
@@ -728,6 +784,8 @@ public class FTPClient
 				}
 				break;
 			}
+			
+			if (ftp != null) ftp.close(); 
 		}				
 	}	
 	
