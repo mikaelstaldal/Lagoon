@@ -27,14 +27,14 @@
 
   <property name="manifest" value="src/lagoon.mf"/>
 
-<!--
+
   <taskdef name="lagoon" classname="nu.staldal.lagoon.LagoonAntTask">
     <classpath>
       <pathelement location="${dist.jars}/lagoon.jar" />
       <pathelement location="${dist.jars}/xmlutil.jar" />
     </classpath>
   </taskdef>  
--->
+
   <target name="init">
     <tstamp/>
     <mkdir dir="${build.classes}"/>
