@@ -32,8 +32,8 @@
 
   <property name="Name" value="Lagoon"/>
   <property name="name" value="lagoon"/>
-  <property name="version" value="1.0b16"/>
-  <property name="ver" value="10b16"/>
+  <property name="version" value="1.0b17"/>
+  <property name="ver" value="10b17"/>
 
   <property name="res.dir" value="resource"/>
   <property name="src.dir" value="src"/>
@@ -69,8 +69,6 @@
       <srcfiles dir="${build.classes}"> 
     	 <include name="*"/>
     	 <include name="nu/staldal/lagoon/**/*"/>
-    	 <include name="nu/staldal/syntax/**/*"/>
-    	 <include name="nu/staldal/lsp/**/*"/>
       </srcfiles>
       <srcfiles dir="${res.dir}"/>
     </uptodate>
@@ -87,7 +85,7 @@
   
   <target name="lagoon_compile" depends="init">
     <javac srcdir="${src.dir}"
-    	   includes="nu/staldal/lagoon/**/*,nu/staldal/lsp/**/*,nu/staldal/syntax/**/*"
+    	   includes="nu/staldal/lagoon/**/*"
            destdir="${build.classes}"
            optimize="off" debug="on">
     	<classpath refid="lagoon.class.path"/>
@@ -96,8 +94,6 @@
     <copy todir="${build.classes}">
       <fileset dir="${src.dir}">
         <include name="nu/staldal/lagoon/**/*" />
-        <include name="nu/staldal/lsp/**/*" />
-        <include name="nu/staldal/syntax/**/*" />
         <exclude name="**/*.java" />
         <exclude name="**/*.lex" />
       </fileset>
@@ -105,7 +101,7 @@
   </target>
 
   <target name="lagoon" 
-    depends="init,xmlutil,lexer,lagoon_compile,lagoon_version"
+    depends="init,xmlutil,lsp,lexer,lagoon_compile,lagoon_version"
   	description="Compiles Lagoon">
  
     <jar jarfile="${dist.jars}/${name}.jar"
@@ -113,8 +109,6 @@
       <fileset dir="${build.classes}"> 
     	 <include name="*"/>
     	 <include name="nu/staldal/lagoon/**/*"/>
-    	 <include name="nu/staldal/syntax/**/*"/>
-    	 <include name="nu/staldal/lsp/**/*"/>
       </fileset>
       <fileset dir="${res.dir}"/>
     </jar>
@@ -141,6 +135,7 @@
         <include name="nu/staldal/ftp/**/*" />
         <include name="nu/staldal/util/**/*" />
         <exclude name="**/*.java" />
+        <exclude name="**/*.lex" />
       </fileset>
     </copy>
 
@@ -151,6 +146,33 @@
     	 <include name="nu/staldal/xmlutil/**/*"/>
     	 <include name="nu/staldal/ftp/**/*"/>
     	 <include name="nu/staldal/util/**/*"/>
+      </fileset>	 
+    </jar>
+  </target>
+
+
+  <target name="lsp" depends="init,xmlutil"
+  	description="Compiles LSP">
+    <javac srcdir="${src.dir}"
+    	   includes="nu/staldal/lsp/**/*,nu/staldal/syntax/**/*"
+           destdir="${build.classes}"
+           optimize="off" debug="on">
+	</javac>
+
+    <copy todir="${build.classes}">
+      <fileset dir="${src.dir}">
+        <include name="nu/staldal/lsp/**/*" />
+        <include name="nu/staldal/syntax/**/*" />
+        <exclude name="**/*.java" />
+        <exclude name="**/*.lex" />
+      </fileset>
+    </copy>
+
+    <jar jarfile="${dist.jars}/lsp.jar">
+         <!-- manifest="${manifest}" -->
+      <fileset dir="${build.classes}"> 
+         <include name="nu/staldal/lsp/**/*" />
+         <include name="nu/staldal/syntax/**/*" />
       </fileset>	 
     </jar>
   </target>
@@ -167,7 +189,7 @@
     	  tofile="${basedir}/${src.dir}/nu/staldal/lsp/expr/LSPExprLexer.java"/>
   </target>
 
-  <target name="testsuite" depends="init,xmlutil,lagoon"
+  <target name="testsuite" depends="init,xmlutil,lsp,lagoon"
   	description="Compiles testsuite">
     <javac srcdir="${src.testsuite}"
     	   includes="nu/staldal/**/*"

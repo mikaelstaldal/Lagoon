@@ -58,3 +58,7 @@
 * Project properties in sitemap.
 * LSP will let processing instructions through. Useful for PHP.
 * <lsp:element> and <lsp:attribute>.
+
+
+1.0 beta 17
+-----------
