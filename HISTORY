@@ -91,3 +91,8 @@
 * Fixed problem with updated stylesheet not triggering update of multiple 
   dependent files.
 
+1.0 beta 22
+-----------
+* Can be compiled and used with both Java 1.4 and 
+  Java 1.5 (also known as 5.0).
+* XML formatter supports omit-xml-declaration.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2003, Mikael Ståldal
+ * Copyright (c) 2001-2005, Mikael Ståldal
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without 
@@ -174,6 +174,13 @@ public class XMLFormatter extends Format
 			outputProperties.setProperty(OutputKeys.INDENT, "yes");
 		else
 			outputProperties.setProperty(OutputKeys.INDENT, "no");
+        
+        String omitXmlDeclaration = getParam("omit-xml-declaration");
+        if (omitXmlDeclaration != null)
+			outputProperties.setProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+		else
+			outputProperties.setProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+            
     }
 
     public void start(OutputStream bytes, Target target)
