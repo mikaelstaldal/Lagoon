@@ -323,7 +323,13 @@ class FileEntry implements SourceManager, FileTarget
 				}
             }
 
-            targetStorage.commitFile();
+            try {
+            	targetStorage.commitFile();
+			}
+			catch (IOException e)
+			{
+				reportException(e);
+			}
         } while (newTarget != null);
     }
 

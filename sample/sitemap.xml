@@ -77,6 +77,24 @@
 	</format>
 </file>
 
+<file target="/htmltest.html" source="/htmltest.html">
+	<format type="html">
+		<source/>
+	</format>
+</file>
+
+<file target="/htmltest.xml" source="/htmltest.html">
+	<format type="xml">
+		<source/>
+	</format>
+</file>
+
+<file target="/htmltest.xhtml" source="/htmltest.html">
+	<format type="xhtml">
+		<source/>
+	</format>
+</file>
+
 <!--
 <file target="/my_notes/*.html" source="/notes/*.xml">
 	<format type="html">
