@@ -3,7 +3,7 @@
 <!-- RELAX NG schema for Lagoon sitemap -->
 <!-- http://www.oasis-open.org/committees/relax-ng/ -->
 
-<grammar xmlns="http://relaxng.org/ns/structure/0.9">
+<grammar xmlns="http://relaxng.org/ns/structure/1.0">
 
 <start>
   <element name="sitemap">
@@ -46,27 +46,27 @@
 <define name="byteProducer">
   <choice>
     <element name="read">
-      <optional>
-        <attribute name="type"/>  <!-- Ommitting uses default -->
-      </optional>
+<!--  <optional>
+        <attribute name="type"/>  Ommitting uses default
+      </optional> -->
       <zeroOrMore>
         <attribute><anyName/></attribute>
       </zeroOrMore>
       <text/> <!-- any non-whitespace content is taken as a parameter with name "name" -->
     </element>
     <element name="process">
-      <optional>
-        <attribute name="type"/>  <!-- Ommitting uses default -->
-      </optional>
+<!--  <optional>
+        <attribute name="type"/>  Ommitting uses default
+      </optional> -->
       <zeroOrMore>
         <attribute><anyName/></attribute>
       </zeroOrMore>
       <ref name="byteProducer"/>  
     </element>      
     <element name="format">
-      <optional>
-        <attribute name="type"/>  <!-- Ommitting uses default -->
-      </optional>
+<!--  <optional>
+        <attribute name="type"/>  Ommitting uses default
+      </optional> -->
       <zeroOrMore>
         <attribute><anyName/></attribute>
       </zeroOrMore>
@@ -78,27 +78,27 @@
 <define name="xmlProducer">
   <choice>
     <element name="source">
-      <optional>
-        <attribute name="type"/>  <!-- Ommitting uses default -->
-      </optional>
+<!--  <optional>
+        <attribute name="type"/>  Ommitting uses default
+      </optional> -->
       <zeroOrMore>
         <attribute><anyName/></attribute>
       </zeroOrMore>
       <text/> <!-- any non-whitespace content is taken as a parameter with name "name" -->
     </element>
     <element name="parse">
-      <optional>
-        <attribute name="type"/>  <!-- Ommitting uses default -->
-      </optional>
+<!--  <optional>
+        <attribute name="type"/>
+      </optional> -->
       <zeroOrMore>
         <attribute><anyName/></attribute>
       </zeroOrMore>
       <ref name="byteProducer"/>  
     </element>
     <element name="transform">
-      <optional>
-        <attribute name="type"/>  <!-- Ommitting uses default -->
-      </optional>
+<!--  <optional>
+        <attribute name="type"/>
+      </optional> -->
       <zeroOrMore>
         <attribute><anyName/></attribute>
       </zeroOrMore>
@@ -108,4 +108,3 @@
 </define>
 
 </grammar>
-
