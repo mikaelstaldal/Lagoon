@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001, Mikael Ståldal
+ * Copyright (c) 2001-2005, Mikael Ståldal
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without 
@@ -150,9 +150,9 @@ public class DirSource extends Source
             }
         }
 
-        for (Enumeration enum = dirlist.keys(); enum.hasMoreElements(); )
+        for (Enumeration en = dirlist.keys(); en.hasMoreElements(); )
         {
-            Object o = enum.nextElement();
+            Object o = en.nextElement();
             if (dirlist.get(o) != "ishere")
             {
                 return true; // file removed

@@ -357,10 +357,10 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
 			oh.commit();			
 		}
 		
-		for (Enumeration enum = targetThreads.elements(); 
-			 enum.hasMoreElements(); )
+		for (Enumeration en = targetThreads.elements(); 
+			 en.hasMoreElements(); )
 		{
-			Thread t = (Thread)enum.nextElement();
+			Thread t = (Thread)en.nextElement();
 			try {
 				if (t != null) t.join();
 			}
