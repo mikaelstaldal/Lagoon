@@ -12,14 +12,7 @@
 
 <project name="Lagoon" default="lagoon">
 
-  <!-- Change these to match your system, 
-  	   or override with -D command line options -->
-  <property name="JLex" value="C:\javaInstall\JLex"/>
-  <property name="FOP" value="C:\javaInstall\fop\fop.jar"/>
-  <property name="LogKit" value="C:\javaInstall\fop\lib\logkit-1.0.jar"/>
-  <property name="Batik" value="C:\javaInstall\batik\lib"/>
-  <property name="JAF" value="C:\javaInstall\jaf\activation.jar"/>
-  <property name="JARV" value="C:\javaInstall\iso-relax.jar"/>
+  <property file="build.properties"/>
 
   <path id="lagoon.class.path">
     <pathelement location="${FOP}" />
@@ -28,7 +21,6 @@
         <include name="*.jar"/>
     </fileset>
   </path>
-
 
   <property name="Name" value="Lagoon"/>
   <property name="name" value="lagoon"/>
