@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2002, Mikael Ståldal
+ * Copyright (c) 2001-2003, Mikael Ståldal
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without 
@@ -41,6 +41,8 @@
 package nu.staldal.lagoon;
 
 import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import javax.xml.parsers.*;
 import org.xml.sax.*;
@@ -138,33 +140,63 @@ class MyParser implements ErrorHandler
 
 	public void warning(SAXParseException e)
 	{
-		String name = e.getSystemId();
-		if (name.startsWith("file:")) name = name.substring(5);
-		System.err.println(name + ":" + e.getLineNumber() + ":"
-			+ e.getColumnNumber() + ": Warning: " + e.getMessage());
+		try {
+			String name = (e.getSystemId() == null)
+				? null 
+				: ((e.getSystemId().startsWith("file:")) 
+					? new File(new URI(e.getSystemId())).toString()
+					: e.getSystemId());
+					
+			System.err.println(name + ":" + e.getLineNumber() + ":"
+				+ e.getColumnNumber() + ": Warning: " + e.getMessage());
+		}
+		catch (URISyntaxException ex)
+		{
+			ex.printStackTrace(System.err);	
+		}
 	}
 
 	public void error(SAXParseException e)
 	{
-		String name = e.getSystemId();
-		if (name.startsWith("file:")) name = name.substring(5);
-		System.err.println(name + ":" + e.getLineNumber() + ":"
-			+ e.getColumnNumber() + ": Error: " + e.getMessage());
+		try {
+			String name = (e.getSystemId() == null)
+				? null 
+				: ((e.getSystemId().startsWith("file:")) 
+					? new File(new URI(e.getSystemId())).toString()
+					: e.getSystemId());
+	
+			System.err.println(name + ":" + e.getLineNumber() + ":"
+				+ e.getColumnNumber() + ": Error: " + e.getMessage());
+		}
+		catch (URISyntaxException ex)
+		{
+			ex.printStackTrace(System.err);	
+		}
 	}
 
 	public void fatalError(SAXParseException e)
 	{
-		String name = e.getSystemId();
-		if (name != null && name.startsWith("file:")) name = name.substring(5);
-		if (name == null)
-		{
-			System.err.println(e.getMessage());
-			ioError = true;
+		try {
+			String name = (e.getSystemId() == null)
+				? null 
+				: ((e.getSystemId().startsWith("file:")) 
+					? new File(new URI(e.getSystemId())).toString()
+					: e.getSystemId());
+	
+			if (name == null)
+			{
+				System.err.println(e.getMessage());
+				ioError = true;
+			}
+			else
+			{
+				System.err.println(name + ":" + e.getLineNumber() + ":"
+					+ e.getColumnNumber() +  ": Fatal: " + e.getMessage());
+			}
 		}
-		else
+		catch (URISyntaxException ex)
 		{
-			System.err.println(name + ":" + e.getLineNumber() + ":"
-				+ e.getColumnNumber() +  ": Fatal: " + e.getMessage());
+			ex.printStackTrace(System.err);	
 		}
 	}
 }
