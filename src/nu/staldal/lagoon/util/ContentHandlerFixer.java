@@ -49,21 +49,32 @@ public class ContentHandlerFixer implements ContentHandler
 {
 	private static final boolean DEBUG = false;
 
-    private ContentHandler ch;
-    private NamespaceSupport nsSup;
+    private final boolean nsDecl;
+	private final ContentHandler ch;
+    
+	private NamespaceSupport nsSup;
     private boolean contextPushed;
 	private int prefixNum;
 
 
     public ContentHandlerFixer(ContentHandler ch)
     {
-        this.ch = ch;
+		this(ch, false);
+    }
+
+
+    public ContentHandlerFixer(ContentHandler ch, boolean nsDecl)
+    {
+		this.ch = ch;
+        this.nsDecl = nsDecl;
+
         nsSup = new NamespaceSupport();
         contextPushed = false;
 		prefixNum = 0;
 		if (DEBUG) System.out.println("New ContentHandlerFixer");
     }
-
+	
+	
 	private String genPrefix()
 	{
 		return "ns" + (++prefixNum);
@@ -158,21 +169,22 @@ public class ContentHandlerFixer implements ContentHandler
 				atts.getType(i), atts.getValue(i));
         }
 
-		/*
-        for (Enumeration e = nsSup.getDeclaredPrefixes(); e.hasMoreElements(); )
-        {
-            String prefix = (String)e.nextElement();
-            String uri = nsSup.getURI(prefix);
-            if (prefix.length() == 0)
-            {
-                al.addAttribute("xmlns", "CDATA", uri);
-            }
-            else
-            {
-                al.addAttribute("xmlns:"+prefix, "CDATA", uri);
-            }
-        }
-		*/
+		if (nsDecl)
+		{
+			for (Enumeration e = nsSup.getDeclaredPrefixes(); e.hasMoreElements(); )
+			{
+				String prefix = (String)e.nextElement();
+				String uri = nsSup.getURI(prefix);
+				if (prefix.length() == 0)
+				{
+					newAtts.addAttribute("", "xmlns", "xmlns", "CDATA", uri);
+				}
+				else
+				{
+					newAtts.addAttribute("", "xmlns", "xmlns:"+prefix, "CDATA", uri);
+				}
+			}
+		}
 
         for (Enumeration e = nsSup.getDeclaredPrefixes(); e.hasMoreElements(); )
         {

@@ -56,6 +56,7 @@ public class XMLFormatter extends Format
 {
 	private SAXTransformerFactory tfactory;
 	private Properties outputProperties;
+	private boolean xmlOutput;
 	
     public void init() throws LagoonException
     {
@@ -92,6 +93,7 @@ public class XMLFormatter extends Format
         {
 			outputProperties.setProperty(OutputKeys.METHOD, "xml");
 			outputProperties.setProperty(OutputKeys.ENCODING, "UTF-8");
+			xmlOutput = true;
         }
         else if (method.equals("HTML"))
         {
@@ -118,6 +120,7 @@ public class XMLFormatter extends Format
                 break;
             }
 			outputProperties.setProperty(OutputKeys.ENCODING, "iso-8859-1");
+			xmlOutput = false;
         }
         else if (method.equals("XHTML"))
         {
@@ -144,11 +147,13 @@ public class XMLFormatter extends Format
                 break;
             }
 			outputProperties.setProperty(OutputKeys.ENCODING, "iso-8859-1");
+			xmlOutput = true;
         }
         else if (method.equals("TEXT"))
         {
 			outputProperties.setProperty(OutputKeys.METHOD, "text");
 			outputProperties.setProperty(OutputKeys.ENCODING, "iso-8859-1");
+			xmlOutput = false;
         }
         else
             throw new LagoonException("Unknown serializing method");
@@ -182,7 +187,7 @@ public class XMLFormatter extends Format
 			Transformer trans = th.getTransformer();
 			trans.setOutputProperties(outputProperties);
 				
-        	getNext().start(new ContentHandlerFixer(th), target);
+        	getNext().start(new ContentHandlerFixer(th, xmlOutput), target);
 		}
 		catch (TransformerConfigurationException e)
 		{
