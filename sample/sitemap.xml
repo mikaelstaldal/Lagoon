@@ -4,6 +4,14 @@
 
 <delete target="/remove/me.txt"/>
 
+<file target="/New.html">
+	<format type="html">
+		<transform type="lsp">
+			<source/>
+		</transform>
+	</format>
+</file>
+
 <file target="/island.html">
 	<format type="xml">
 		<transform type="lsp">
@@ -79,7 +87,7 @@
 
 
 <!--
-<file target="/picture.jpeg" source="/test.svg">
+<file target="/picture.jpeg" source="/batikLogo.svg">
 	<format type="svg" format="jpeg" quality="0.5">
     	<source/>
     </format>
@@ -87,7 +95,7 @@
 -->
 
 <!--
-<file target="/picture.png" source="/test.svg">
+<file target="/picture.png" source="/batikLogo.svg">
 	<format type="svg" format="png">
     	<source/>
     </format>
@@ -95,7 +103,7 @@
 -->
 
 <!--
-<file target="/picture.tiff" source="/test.svg">
+<file target="/picture.tiff" source="/batikLogo.svg">
 	<format type="svg" format="tiff">
     	<source/>
     </format>
