@@ -42,6 +42,9 @@ package nu.staldal.lagoon.util;
 
 import java.net.URL;
 
+import javax.xml.parsers.*;
+import org.xml.sax.*;
+
 import org.apache.batik.dom.svg.*;
 import org.apache.batik.dom.util.*;
 
@@ -53,16 +56,37 @@ public class MySVGDocumentFactory extends SAXDocumentFactory
 {
 	private URL url;
 	
+	private static String xmlReaderClassName;
+
+	static {
+		try {
+			SAXParserFactory spf = SAXParserFactory.newInstance();
+			XMLReader parser = spf.newSAXParser().getXMLReader();
+			xmlReaderClassName = parser.getClass().getName();
+		}
+		catch (ParserConfigurationException e)
+		{
+			throw new Error(e.getMessage());	
+		}
+		catch (SAXException e)
+		{
+			throw new Error(e.getMessage());	
+		}
+		
+		org.apache.batik.util.XMLResourceDescriptor.setXMLParserClassName(
+			 xmlReaderClassName);
+	}
+
 	
     /**
      * Creates a new MySVGDocumentFactory, ready to receive SAX2 events.
 	 *
-     * @param parser  SAX2 XMLReader implementation classname.
 	 * @param url     URL to use for resolving relative xlinks
      */
-    public MySVGDocumentFactory(String parser, URL url)
+    public MySVGDocumentFactory(URL url)
 	{
-        super(ExtensibleSVGDOMImplementation.getDOMImplementation(), parser);
+        super(ExtensibleSVGDOMImplementation.getDOMImplementation(), 
+			xmlReaderClassName);
 		
 		document = implementation.createDocument(
 			SVGDOMImplementation.SVG_NAMESPACE_URI, "svg", null);

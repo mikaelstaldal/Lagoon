@@ -43,8 +43,6 @@ package nu.staldal.lagoon.producer;
 import java.io.*;
 import java.net.URL;
 
-import javax.xml.parsers.*;
-
 import org.xml.sax.*;
 import org.apache.batik.transcoder.*;
 import org.apache.batik.transcoder.image.*;
@@ -61,23 +59,9 @@ public class BatikFormatter extends Format
 	private static boolean DEBUG = true;
 
 	private ImageTranscoder transcoder;
-	private String xmlReaderClassName;
 	
     public void init() throws LagoonException
     {
-		try {
-			SAXParserFactory spf = SAXParserFactory.newInstance();
-			XMLReader parser = spf.newSAXParser().getXMLReader();
-			xmlReaderClassName = parser.getClass().getName();
-			if (DEBUG) System.out.println("xmlReaderClassName: " + xmlReaderClassName);
-			org.apache.batik.util.XMLResourceDescriptor.setXMLParserClassName(
-				 xmlReaderClassName);
-		} catch (ParserConfigurationException e) {
-			throw new LagoonException(e.getMessage());
-		} catch (SAXException e) {
-			throw new LagoonException(e.getMessage());
-		}
-
         String format = getParam("format");
 		if (format == null) 
 			throw new LagoonException("Image format must be specified");
@@ -124,7 +108,7 @@ public class BatikFormatter extends Format
 		if (DEBUG) System.out.println("The source URL: " + sourceURL);
 
 		MySVGDocumentFactory docFactory = 
-			new MySVGDocumentFactory(xmlReaderClassName, sourceURL);
+			new MySVGDocumentFactory(sourceURL);
 		getNext().start(docFactory, target);			
 		SVGOMDocument doc = docFactory.getDocument();
 		
