@@ -154,6 +154,11 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
 			File sourceDir = new File(sourceRootDir, sourceDirURL); 
             
 			String[] files = sourceDir.list();
+			if (files == null)
+			{
+				throw new FileNotFoundException(
+					sourceDir.getAbsolutePath() + " (directory not found)");	
+			}
             for (int i = 0; i < files.length; i++)
             {				
                 File currentSourceFile = new File(sourceDir, files[i]);
