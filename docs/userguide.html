@@ -459,6 +459,10 @@ for relative to the source file.</p>
 <p><code>part:</code> URL:s may be used when including. 
 Included parts need not to be well-formed.</p> 
 
+<p>This producer will check all files (and other resources) the LSSI
+page depends on, and signal the need for rebuilding if any of them are
+updated (or always signal the need for rebuilding if any resource
+cannot be checked, e.g. an absolute URL).</p>
 
 <h3>&lt;transform type="lsp"&gt;</h3>
 

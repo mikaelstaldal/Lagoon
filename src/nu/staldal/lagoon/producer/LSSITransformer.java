@@ -47,6 +47,7 @@ import org.xml.sax.*;
 
 import nu.staldal.lagoon.core.*;
 import nu.staldal.xmlutil.*;
+import nu.staldal.util.Utils;
 
 
 public class LSSITransformer extends Transform
@@ -60,11 +61,16 @@ public class LSSITransformer extends Transform
     
     public void start(org.xml.sax.ContentHandler sax, final Target target)
     	throws IOException, SAXException
-    {        
+    {
         sax.startDocument();
         
-        getNext().start(new LSSIHandler(getSourceMan(), sax, target), 
+        Set includedFiles = new HashSet();
+        
+        getNext().start(new LSSIHandler(getSourceMan(), sax, target, includedFiles), 
             target);
+            
+        putObjectIntoRepository("includedFiles-"+Utils.encodePath(getSourceMan().getSourceURL()), 
+            includedFiles);
 
         sax.endDocument();
     }
@@ -73,6 +79,19 @@ public class LSSITransformer extends Transform
     public boolean hasBeenUpdated(long when)
         throws LagoonException, IOException
     {
+        Set includedFiles = (Set)getObjectFromRepository(
+            "includedFiles-"+Utils.encodePath(getSourceMan().getSourceURL()));
+        
+        if (includedFiles == null) return true;
+        
+        for (Iterator it = includedFiles.iterator(); it.hasNext(); )
+        {
+            String file = (String)it.next();
+            
+            if (getSourceMan().fileHasBeenUpdated(file, when))
+                return true;
+        }
+        
         return getNext().hasBeenUpdated(when);
     }
 }
@@ -86,14 +105,17 @@ class LSSIHandler implements ContentHandler
     private ContentHandler sax;
     private Target target;
     private Locator locator;
-    private int inDirective;    
+    private int inDirective;
+    private Set includedFiles;    
 
-    LSSIHandler(SourceManager sourceMan, ContentHandler sax, Target target)
+    LSSIHandler(SourceManager sourceMan, ContentHandler sax, Target target,
+        Set includedFiles)
     {
         this.sourceMan = sourceMan;
         this.sax = sax;
         this.target = target;
         this.locator = null;
+        this.includedFiles = includedFiles;
         inDirective = 0;        
     }
     
@@ -131,10 +153,12 @@ class LSSIHandler implements ContentHandler
                     throw new SAXParseException(
                         "lssi:include missing parameter", locator);
 
+                includedFiles.add(file);
+                        
                 try {
                     sourceMan.getFileAsSAX(file, 
-                        new LSSIHandler(sourceMan, sax, target), 
-                        target);
+                        new LSSIHandler(sourceMan, sax, target, includedFiles), 
+                        target);                    
                 }
                 catch (FileNotFoundException e)
                 {
