@@ -63,9 +63,6 @@ public class TreeBuilder implements ContentHandler, ErrorHandler
 {
 	public static final boolean DEBUG = false;
 
-    private static final String XML_NS =
-    	"http://www.w3.org/XML/1998/namespace";
-
 	private Element rootElement = null;
 	private Stack elementStack;
 	private Vector nsPrefix = null;
@@ -333,7 +330,7 @@ public class TreeBuilder implements ContentHandler, ErrorHandler
         {
             el.addAttribute(atts.getURI(i), atts.getLocalName(i),
             	atts.getType(i), atts.getValue(i));
-            if (atts.getURI(i).equals(XML_NS) &&
+            if (atts.getURI(i).equals(Node.XML_NS) &&
             		atts.getLocalName(i).equals("base"))
             {
 				try {

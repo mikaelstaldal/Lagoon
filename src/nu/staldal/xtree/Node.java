@@ -50,11 +50,13 @@ import org.xml.sax.*;
  */
 public abstract class Node implements java.io.Serializable, Locator
 {
+    static final String XML_NS = "http://www.w3.org/XML/1998/namespace";
+
     private String publicId = null;
     private String systemId = null;
     private int line = -1;
     private int column = -1;
-
+        
     protected NodeWithChildren parent = null;
 	
 	
@@ -220,5 +222,18 @@ public abstract class Node implements java.io.Serializable, Locator
 			return parent.getBaseURI();
 	}
 
+
+	/**
+	 * Return the value of any xml:space attribute in force for this node.
+	 *
+	 * @return  <code>true</code> if an xml:space="preserve" is in effect
+	 */
+	public boolean getPreserveSpace()
+	{
+		if (parent == null)
+			return false;
+		else
+			return parent.getPreserveSpace();
+	}
 }
 

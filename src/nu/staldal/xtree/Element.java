@@ -66,6 +66,7 @@ public class Element extends NodeWithChildren
     Vector namespacePrefixes;
     Vector namespaceURIs;
 
+    char xmlSpaceAttribute = ' ';
 
 	/**
 	 * Construct an element.
@@ -183,6 +184,14 @@ public class Element extends NodeWithChildren
 		attrName.addElement(localName + '^' + namespaceURI);
 		attrType.addElement(type);
 		attrValue.addElement(value);
+        
+        if (namespaceURI.equals(XML_NS) && localName.equals("space"))
+        {
+            if (value.equals("preserve"))
+                xmlSpaceAttribute = 'p';
+            else if (value.equals("default"))
+                xmlSpaceAttribute = 'd';
+        }
 	}
 
 
@@ -408,6 +417,29 @@ public class Element extends NodeWithChildren
 			else
 			{
 				return null;
+			}
+		}
+	}
+
+
+	public boolean getPreserveSpace()
+	{
+        switch (xmlSpaceAttribute)
+        {
+        case 'p':
+            return true;
+            
+        case 'd':
+            return false;
+            
+        default:
+			if (parent != null)
+			{
+				return parent.getPreserveSpace();
+			}
+			else
+			{
+				return false;
 			}
 		}
 	}
