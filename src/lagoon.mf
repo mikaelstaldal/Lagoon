@@ -1,2 +1,2 @@
 Main-Class: nu.staldal.lagoon.LagoonGUI
-Class-Path: xmlutil.ja
+Class-Path: xmlutil.jar
