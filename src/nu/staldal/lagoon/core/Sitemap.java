@@ -49,10 +49,8 @@ import nu.staldal.lagoon.util.XMLConfig;
 /**
  * Contains the information needed to (re)build a website.
  *
- * Initialized with a Configuration and a sitemap description file.
+ * Initialized with a sitemap description file.
  * Can then be used to (re)build the website several times.
- *
- * @see nu.staldal.lagoon.core.Configuration
  */
 class Sitemap extends XMLConfig
 {
@@ -68,7 +66,6 @@ class Sitemap extends XMLConfig
 
     // Associations
     protected Hashtable entries;
-    protected Configuration config;
 
     // Attributes
     private LagoonProcessor processor;
@@ -119,7 +116,7 @@ class Sitemap extends XMLConfig
                                 ((type.length() == 0) ?
                                  "(default)" :
                                  type);
-            Producer prod = config.createProducer(localName, type);
+            Producer prod = processor.createProducer(localName, type);
             if (prod == null)
                 throw new LagoonException(
                     "Producer " + prodName + " not found");
@@ -254,19 +251,16 @@ class Sitemap extends XMLConfig
      *
      * @param processor  the processor
      * @param input  where to read the sitemap from
-     * @param config  Configuration to use
      * @param sourceDir  where the source files are
      * @param targetLoc  where to store generated files
      */
     public Sitemap(LagoonProcessor processor,
                    java.io.InputStream input,
-                   Configuration config,
                    java.io.File sourceDir,
 				   FileStorage targetLoc)
         throws java.io.IOException, LagoonException
     {
         this.processor = processor;
-        this.config = config;
 		this.targetLocation = targetLoc;
 
         this.sourceDir = sourceDir;

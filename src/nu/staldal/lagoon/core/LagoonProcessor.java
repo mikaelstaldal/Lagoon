@@ -63,7 +63,10 @@ public class LagoonProcessor
     private File repositoryDir;
     private long sitemapLastUpdated;
 
-    protected final Configuration config;
+    private final Hashtable classDict;
+    private final Hashtable paramDict;
+    private final Hashtable filestorageDict;
+
     protected Sitemap sitemap;
 
 
@@ -77,24 +80,12 @@ public class LagoonProcessor
         throws IOException, LagoonException
     {
         this.targetURL = targetURL;
-        config = new Configuration();
 
-        InputStream configFile = getClass().getResourceAsStream("config.xml");
-        if (configFile == null)
-        {
-            throw new LagoonException("Main configuration file not found");
-        }
-        else
-        {
-            config.readFile(configFile);
-        }
+        classDict = new Hashtable();
+        paramDict = new Hashtable();
+        filestorageDict = new Hashtable();
 
-        String configFileName =
-            System.getProperty("nu.staldal.lagoon.ConfigFile");
-        if (configFileName != null)
-            config.readFile(new FileInputStream(configFileName));
-
-        targetLocation = config.createFileStorage(targetURL);
+        targetLocation = createFileStorage(targetURL);
     }
 
     /**
@@ -135,8 +126,7 @@ public class LagoonProcessor
 
         targetLocation.open(targetURL, this, password);
 
-        this.sitemap = new Sitemap(this, sitemap, config,
-                                   sourceDir, targetLocation);
+        this.sitemap = new Sitemap(this, sitemap, sourceDir, targetLocation);
         this.sitemapLastUpdated = sitemapLastUpdated;
     }
 
@@ -292,4 +282,207 @@ public class LagoonProcessor
         ObjectOutputStream oos = new ObjectOutputStream(os);
         oos.writeObject(obj);
     }
+
+
+    /**
+     * Create a new producer.
+     *
+     * @param cat  the producer category (format, transform, source,
+	 *             read, parse or process).
+     * @param type the producer type, use "" for default.
+     *
+     * @return  a new Producer
+     *          or <code>null</code> if it cannot be found.
+     */
+    public Producer createProducer(String cat, String type)
+        throws LagoonException
+    {
+        Class cls = (Class)classDict.get(cat + ":" + type);
+
+        if (cls == null)
+        try
+        {
+			String fileName = "/nu/staldal/lagoon/producer/" + cat
+				+ ((type == "") ? "" : ("-" + type));
+
+			InputStream is = getClass().getResourceAsStream(fileName);
+
+			if (is == null) return null;
+
+			BufferedReader br = new BufferedReader(new InputStreamReader(is));
+			String className = br.readLine();
+			if (className == null)
+				throw new LagoonException(
+					"Illegal Producer config file: " + fileName);
+
+			String baseClassName =
+				"nu.staldal.lagoon.core." +
+				Character.toUpperCase(cat.charAt(0)) + cat.substring(1);
+
+			try {
+				cls = Class.forName(className);
+				if (!Class.forName(baseClassName).isAssignableFrom(cls))
+					throw new LagoonException(
+						cat + " class must derive from " + baseClassName);
+
+				classDict.put(cat + ":" + type, cls);
+			}
+			catch (ClassNotFoundException e)
+			{
+				throw new LagoonException(
+					"Producer class cannot be found:" + e.getMessage());
+			}
+
+			Hashtable params = new Hashtable();
+
+			for (;;)
+			{
+				String s = br.readLine();
+				if (s == null) break;
+
+				int colon = s.indexOf(':');
+				if (colon < 1)
+					throw new LagoonException(
+						"Illegal producer config file: " + fileName);
+
+				String paramName = s.substring(0, colon).trim();
+				String paramValue = s.substring(colon+1).trim();
+
+				params.put(paramName, paramValue);
+			}
+			br.close();
+
+			paramDict.put(cat + ":" + type, params);
+		}
+        catch (IOException e)
+        {
+            throw new LagoonException(
+                "Unable to read producer config file: " + e.toString());
+        }
+
+        try {
+            Producer prod = (Producer)cls.newInstance();
+
+            Hashtable params = (Hashtable)paramDict.get(cat + ":" + type);
+
+            for (Enumeration e = params.keys(); e.hasMoreElements(); )
+            {
+                String name = (String)e.nextElement();
+                String value = (String)params.get(name);
+                prod.addParam(name, value);
+            }
+
+            return prod;
+        }
+        catch (IllegalAccessException e)
+        {
+            throw new LagoonException(
+                "Unable to instantiate producer class (illegal access): " +
+                e.getMessage());
+        }
+        catch (InstantiationException e)
+        {
+            throw new LagoonException(
+                "Unable to instantiate producer class (instantiation failed): " +
+                e.getMessage());
+        }
+    }
+
+
+    /**
+     * Create a new file storage
+     *
+     * @param url  the URL
+     *
+     * @return  a new FileStorage
+     *          or <code>null</code> if it cannot be found.
+     */
+    public FileStorage createFileStorage(String url)
+        throws LagoonException
+    {
+        Class cls = null;
+
+        String prefix;
+        int colon = url.indexOf(':');
+        if (colon < 1)
+        {
+			prefix = "";
+            cls = (Class)filestorageDict.get("");
+        }
+        else
+        {
+            prefix = url.substring(0, colon);
+            cls = (Class)filestorageDict.get(prefix);
+            if (cls == null)
+            {
+                cls = (Class)filestorageDict.get("");
+            }
+        }
+
+        if (cls == null)
+        try
+        {
+			String fileName = "/nu/staldal/lagoon/filestorage/FileStorage"
+				+ ((prefix == "") ? "" : ("-" + prefix));
+
+			InputStream is = getClass().getResourceAsStream(fileName);
+
+			if (is == null)
+			{
+				fileName = "/nu/staldal/lagoon/filestorage/FileStorage";
+
+				is = getClass().getResourceAsStream(fileName);
+
+				prefix = "";
+			}
+
+			if (is == null) return null;
+
+			BufferedReader br = new BufferedReader(new InputStreamReader(is));
+			String className = br.readLine();
+			br.close();
+			if (className == null)
+				throw new LagoonException(
+					"Illegal FileStorage config file: " + fileName);
+
+			String baseClassName = "nu.staldal.lagoon.core.FileStorage";
+
+			try {
+				cls = Class.forName(className);
+				if (!Class.forName(baseClassName).isAssignableFrom(cls))
+					throw new LagoonException(
+						"file storage class must derive from "
+						+ baseClassName);
+
+				filestorageDict.put(prefix, cls);
+			}
+			catch (ClassNotFoundException e)
+			{
+				throw new LagoonException(
+					"FileStorage class cannot be found:" + e.getMessage());
+			}
+		}
+        catch (IOException e)
+        {
+            throw new LagoonException(
+                "Unable to read producer config file: " + e.toString());
+        }
+
+        try {
+            return (FileStorage)cls.newInstance();
+        }
+        catch (IllegalAccessException e)
+        {
+            throw new LagoonException(
+                "Unable to instantiate file storage class (illegal access): "
+                + e.getMessage());
+        }
+        catch (InstantiationException e)
+        {
+            throw new LagoonException(
+                "Unable to instantiate file storage class (instantiation failed): "
+                + e.getMessage());
+        }
+    }
+
 }

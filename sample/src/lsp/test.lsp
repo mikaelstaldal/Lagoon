@@ -63,12 +63,12 @@ in output like this</lsp:processing-instruction>
 <lsp:when test="5 &lt; 7">
 	<p>5 is less than 7</p>
 </lsp:when>
-<lsp:when test="5 &lt; 6">
-	<p>5 is less than 6</p>
-</lsp:when>
 <lsp:otherwise>
 	<p>Otherwise</p>
 </lsp:otherwise>
+<lsp:when test="5 &lt; 6">
+	<p>5 is less than 6</p>
+</lsp:when>
 </lsp:choose>
 
 <lsp:choose>

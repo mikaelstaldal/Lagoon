@@ -116,8 +116,7 @@ from <a href="http://xml.apache.org/dist/">http://xml.apache.org/dist/</a>.
 The simplest way is to download Xalan only, it includes a suitable version
 of Xerces.</li>
 
-<li>Apache FOP (PDF rendering) version 0.17 or later. You can download it
-from <a href="http://xml.apache.org/dist/">http://xml.apache.org/dist/</a>.</li>
+<li>To use XSL:FO to PDF formatting, you need Apache FOP (PDF rendering) version 0.17 or later. You can download it from <a href="http://xml.apache.org/dist/">http://xml.apache.org/dist/</a>.</li>
 
 <li>To use SSH, you need a command-line based SSH client. Most (but
 not all) SSH clients for Windows are GUI based, and will not work. A
@@ -130,8 +129,7 @@ CVS.</li>
 
 <ol>
 <li>Make sure that your JRE is properly installed and working.</li>
-<li>Add the distribution JAR files from Xerces, Xalan and FOP (you need
-both <code>fop.jar</code> and <code>w3c.jar</code>) to your Java
+<li>Add the distribution JAR files from Xerces, Xalan and (if you use it)FOP (you need both <code>fop.jar</code> and <code>w3c.jar</code>) to your Java
 <code>CLASSPATH</code>.</li>
 <li>Add all the <code>.jar</code> files in the <code>lib</code> directory
 to your Java <code>CLASSPATH</code>.</li>
@@ -428,7 +426,7 @@ setting of the "html" parameter.</p>
 <p>An "encoding" parameter can be used to specify the character
 encoding to use, default is iso-8859-1.</p>
 
-<h3>&lt;format type="pdf"&gt;</h3>
+<h3>&lt;format type="fo"&gt;</h3>
 
 <p>Formats XSL:FO into PDF using Apache FOP.</p>
 
@@ -475,7 +473,7 @@ XML (but not necessary valid XHTML):</p>
 <p>Transform the same XML files with another XSLT stylesheet into PDF:</p>
 <pre>
 &lt;file target="/books/*.pdf" source="/books/*.xml"&gt;
-  &lt;format type="pdf"&gt;
+  &lt;format type="fo"&gt;
     &lt;transform type="xslt" stylesheet="/style/book_print.xsl"&gt;
       &lt;source/&gt;
     &lt;/transform&gt;

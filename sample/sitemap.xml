@@ -46,7 +46,7 @@
 </file>
 
 <file target="/report.pdf" source="/work/report.xml">
-	<format type="pdf">
+	<format type="fo">
 	   	<transform type="xslt" stylesheet="/style/report_print.xsl">
     	    <source/>
 		</transform>
