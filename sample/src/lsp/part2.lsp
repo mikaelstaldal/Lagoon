@@ -5,6 +5,6 @@
 <div xmlns:lsp="http://staldal.nu/LSP/core">
 <h3>LSP Part</h3>
 
-This is also an LSP part: {$foo}.
+This is also an LSP part: <lsp:value-of select="$foo"/>.
 
 </div>

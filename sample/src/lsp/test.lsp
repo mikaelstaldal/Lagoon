@@ -18,18 +18,14 @@
 <lsp:processing-instruction name="{$pi}">Create a processing instrunction 
 in output like this</lsp:processing-instruction>
 
-<a href="{$hej}">Foo: {$foo} bar</a>
-
-<lsp:raw>
-<a href="{$hej}">{$foo}</a>
-</lsp:raw>
+<a href="{$hej}">Foo: <lsp:value-of select="$foo">FOOTEST</lsp:value-of> bar</a>
 
 <lsp:root>
-<a href="{$hej}">{$foo}bar{$hej}</a>
+<a href="{$hej}"><lsp:value-of select="$foo"/>bar<lsp:value-of select="$hej">HEJVAR</lsp:value-of></a>
 </lsp:root>
 
 <lsp:if test="$bool">
-<p>The parameter $bool was set to a non-empty string, namly "{$bool}"</p>
+<p>The parameter $bool was set to a non-empty string, namly "<lsp:value-of select="$bool"/>"</p>
 </lsp:if>
 
 <hr />
@@ -98,34 +94,34 @@ in output like this</lsp:processing-instruction>
 
 <hr/>
 <h2>Expressions</h2>
-<p>5+6.8*7.1-2: "{5+6.8*7.1-2}"</p>
-<p>-5 mod 2: "{-5 mod 2}"</p>
-<p>round(11.2): "{round(11.2)}"</p>
-<p>0 div 0: "{0 div 0}"</p>
-<p>concat('foo','bar'): "{concat('foo','bar')}"</p>
-<p>concat('foo','bar','apa'): "{concat('foo','bar','apa')}"</p>
-<p>substring('12345',2,3): "{substring('12345',2,3)}"</p>
-<p>substring('12345',2): "{substring('12345',2)}"</p>
-<p>substring('12345',1.5, 2.6): "{substring('12345',1.5,2.6)}"</p>
-<p>substring('12345',0,3): "{substring('12345',0,3)}"</p>
-<p>substring('12345',0 div 0,3): "{substring('12345',0 div 0,3)}"</p>
-<p>substring('12345',1,0 div 0): "{substring('12345',1,0 div 0)}"</p>
-<p>concat(substring('12345',0,3),' ',translate('foo','fo','FOA')): "{concat(substring('12345',0,3),' ',translate('foo','fo','FOA'))}"</p>
-<p>5.2 > 11: "{5.2 > 11}"</p>
-<p>(5.2 &lt; 11) and (string-length('foo') = 3): "{(5.2 &lt; 11) and (string-length('foo') = 3)}"</p>
-<p>not(true()): "{not(true())}"</p>
-<p>$a: "{$a}"</p>
-<!-- <p>$a.b: "{$a.b}"</p> -->
+<p>5+6.8*7.1-2: "<lsp:value-of select="5+6.8*7.1-2"/>"</p>
+<p>-5 mod 2: "<lsp:value-of select="-5 mod 2"/>"</p>
+<p>round(11.2): "<lsp:value-of select="round(11.2)"/>"</p>
+<p>0 div 0: "<lsp:value-of select="0 div 0"/>"</p>
+<p>concat('foo','bar'): "<lsp:value-of select="concat('foo','bar')"/>"</p>
+<p>concat('foo','bar','apa'): "<lsp:value-of select="concat('foo','bar','apa')"/>"</p>
+<p>substring('12345',2,3): "<lsp:value-of select="substring('12345',2,3)"/>"</p>
+<p>substring('12345',2): "<lsp:value-of select="substring('12345',2)"/>"</p>
+<p>substring('12345',1.5, 2.6): "<lsp:value-of select="substring('12345',1.5,2.6)"/>"</p>
+<p>substring('12345',0,3): "<lsp:value-of select="substring('12345',0,3)"/>"</p>
+<p>substring('12345',0 div 0,3): "<lsp:value-of select="substring('12345',0 div 0,3)"/>"</p>
+<p>substring('12345',1,0 div 0): "<lsp:value-of select="substring('12345',1,0 div 0)"/>"</p>
+<p>concat(substring('12345',0,3),' ',translate('foo','fo','FOA')): "<lsp:value-of select="concat(substring('12345',0,3),' ',translate('foo','fo','FOA'))"/>"</p>
+<p>5.2 > 11: "<lsp:value-of select="5.2 > 11"/>"</p>
+<p>(5.2 &lt; 11) and (string-length('foo') = 3): "<lsp:value-of select="(5.2 &lt; 11) and (string-length('foo') = 3)"/>"</p>
+<p>not(true()): "<lsp:value-of select="not(true())"/>"</p>
+<p>$a: "<lsp:value-of select="$a"/>"</p>
+<!-- <p>$a.b: "<lsp:value-of select="$a.b"/>"</p> -->
 
 <hr/>
 <h2>for-each</h2>
 
-<!-- <h4>A list of {count($foo)} elements</h4> -->
+<!-- <h4>A list of <lsp:value-of select="count($foo)"/> elements</h4> -->
 
 <ul>
 
 <!-- <lsp:for-each select="$foo" var="i">
-<li>{$i}</li>
+<li><lsp:value-of select="$i"/></li>
 </lsp:for-each> -->
 </ul>
 
@@ -160,12 +156,13 @@ in output like this</lsp:processing-instruction>
 <stringtest:hej>apa</stringtest:hej>
 </p>
 
+<!--
 <h2>ExtFunc</h2>
 
-<p>{test:func(1, 2, 3, 'one', 'two', 'three')}</p>
-<p>{test:foo(1)}</p>
-<p>{test:bar()}</p>
-<!-- <p>{stringtest:func(1, 2, 3, 'one', 'two', 'three')}</p> -->
+<p><lsp:value-of select="test:func(1, 2, 3, 'one', 'two', 'three')"/></p>
+<p><lsp:value-of select="test:foo(1)"/></p>
+<p><lsp:value-of select="test:bar()"/></p> -->
+<!-- <p><lsp:value-of select="stringtest:func(1, 2, 3, 'one', 'two', 'three')"/></p> -->
 
 <p>---End of LSP Test---</p>
 

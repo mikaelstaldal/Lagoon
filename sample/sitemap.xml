@@ -4,14 +4,6 @@
 
 <delete target="/remove/me.txt"/>
 
-<file target="/New.html">
-	<format type="html">
-		<transform type="lsp">
-			<source/>
-		</transform>
-	</format>
-</file>
-
 <file target="/island.html">
 	<format type="xml">
 		<transform type="lsp">
