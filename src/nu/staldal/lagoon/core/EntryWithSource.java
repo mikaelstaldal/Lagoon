@@ -51,6 +51,7 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.transform.sax.SAXSource;
 import org.xml.sax.*;
 
+import nu.staldal.xmlutil.*;
 import nu.staldal.lagoon.util.*;
 
 

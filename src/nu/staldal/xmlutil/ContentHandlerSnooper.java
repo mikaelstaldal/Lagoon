@@ -38,131 +38,128 @@
  * http://www.gnu.org/philosophy/license-list.html
  */
 
-package nu.staldal.lagoon.util;
+
+package nu.staldal.xmlutil;
+
+import java.io.PrintWriter;
 
 import org.xml.sax.*;
-import org.xml.sax.helpers.*;
-
-import java.util.Enumeration;
 
 
 /**
- * An adapter to convert from SAX1 DocumentHandler to SAX2 ContentHandler.
+ * A filter to print messages to a PrintWriter for the events of a 
+ * SAX2 ContentHandler. Useful for debugging.
  */
-public class ContentHandlerAdapter implements DocumentHandler
+public class ContentHandlerSnooper implements ContentHandler
 {
-	private ContentHandler ch;
-	private NamespaceSupport sup;
+	private static final boolean DEBUG = true;
+
+    private ContentHandler ch;
+	private PrintWriter out;
 
 
 	/**
-	 * Constructs an adapter.
+	 * Constructs a filter.
 	 *
 	 * @param ch  the SAX2 ContentHandler to fire events on.
+	 * @param out  where to print the messages
 	 */
-	public ContentHandlerAdapter(ContentHandler ch)
+    public ContentHandlerSnooper(ContentHandler ch, PrintWriter out)
     {
-		this.ch = ch;
-		sup = new NamespaceSupport();
+        this.ch = ch;
+		this.out = out;
+		if (DEBUG) out.println("New ContentHandlerSnooper");
     }
 
-	
-    // DocumentHandler implementation
+
+    // ContentHandler implementation
 
     public void setDocumentLocator(Locator locator)
     {
-        ch.setDocumentLocator(locator);
+        // ch.setDocumentLocator(locator);
     }
 
     public void startDocument()
         throws SAXException
     {
+		if (DEBUG) out.println("startDocument");
         ch.startDocument();
     }
 
     public void endDocument()
         throws SAXException
     {
+		if (DEBUG) out.println("endDocument");
         ch.endDocument();
     }
 
-	public void startElement(String name, AttributeList atts)
+    public void startElement(String namespaceURI, String localName,
+                             String qname, Attributes atts)
         throws SAXException
     {
-		sup.pushContext();
-		for (int i = 0; i < atts.getLength(); i++)
-		{
-			String aName = atts.getName(i);
-			if (aName.startsWith("xmlns:"))
-			{
-				sup.declarePrefix(aName.substring(6), atts.getValue(i));
-			}
-			else if (aName.equals("xmlns"))
-			{
-				sup.declarePrefix("", atts.getValue(i));
-			}
-		}
+		if (DEBUG) out.println("startElement("+namespaceURI+
+            ','+localName+','+qname+')');
+			
+		ch.startElement(namespaceURI, localName, qname, atts);
 
-		String[] parts = new String[3];
-		AttributesImpl ai = new AttributesImpl();
-		for (int i = 0; i < atts.getLength(); i++)
-		{
-			String aName = atts.getName(i);
-			if (!aName.startsWith("xmlns:") && !aName.equals("xmlns"))
-			{
-				parts = sup.processName(aName, parts, true);
-
-                ai.addAttribute(parts[0], parts[1], parts[2],
-                			   atts.getType(i),
-                			   atts.getValue(i));
-			}
-		}
-
-		for (Enumeration e = sup.getDeclaredPrefixes(); e.hasMoreElements(); )
-		{
-			String p = (String)e.nextElement();
-			ch.startPrefixMapping(p, sup.getURI(p));
-		}
-
-		parts = sup.processName(name, parts, false);
-
-		ch.startElement(parts[0], parts[1], parts[2], ai);
-	}
-
-	public void endElement(String name)
-        throws SAXException
-    {
-		String[] parts = new String[3];
-
-		parts = sup.processName(name, parts, false);
-
-		ch.endElement(parts[0], parts[1], parts[2]);
-
-		for (Enumeration e = sup.getDeclaredPrefixes(); e.hasMoreElements(); )
-		{
-			String p = (String)e.nextElement();
-			ch.endPrefixMapping(p);
-		}
-
-		sup.popContext();
-	}
-
-    public void characters(char[] c, int start, int length)
-        throws SAXException
-    {
-        ch.characters(c, start, length);
     }
 
-    public void ignorableWhitespace(char[] c, int start, int length)
+    public void endElement(String namespaceURI, String localName,
+                           String qname)
         throws SAXException
     {
-        ch.ignorableWhitespace(c, start, length);
+		if (DEBUG) out.println("endElement("+namespaceURI+','+
+            localName+','+qname+')');
+			
+		ch.endElement(namespaceURI, localName, qname);
+
+    }
+
+    public void startPrefixMapping(String prefix, String uri)
+        throws SAXException
+    {
+		if (DEBUG) out.println("startPrefixMapping("+
+			((prefix.length() == 0) ? "<default>" : prefix) +','+uri+')');
+			
+		ch.startPrefixMapping(prefix, uri);
+    }
+
+    public void endPrefixMapping(String prefix)
+        throws SAXException
+    {
+		if (DEBUG) out.println("endPrefixMapping("+
+			((prefix.length() == 0) ? "<default>" : prefix)+')');
+			
+		ch.endPrefixMapping(prefix);
+    }
+
+    public void characters(char[] chars, int start, int length)
+        throws SAXException
+    {
+        ch.characters(chars, start, length);
+    }
+
+    public void ignorableWhitespace(char[] chars, int start, int length)
+        throws SAXException
+    {
+        ch.ignorableWhitespace(chars, start, length);
     }
 
     public void processingInstruction(String target, String data)
         throws SAXException
     {
+		if (DEBUG) out.println("processingInstruction("+target+','+
+			data+')');
+
         ch.processingInstruction(target, data);
+    }
+
+    public void skippedEntity(String name)
+        throws SAXException
+    {
+		if (DEBUG) out.println("skippedEntity("+name+')');
+
+        ch.skippedEntity(name);
     }
 
 }

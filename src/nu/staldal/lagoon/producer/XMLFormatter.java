@@ -49,7 +49,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.xml.sax.*;
 
 import nu.staldal.lagoon.core.*;
-import nu.staldal.lagoon.util.ContentHandlerFixer;
+import nu.staldal.xmlutil.ContentHandlerFixer;
 
 
 public class XMLFormatter extends Format

@@ -38,7 +38,7 @@
  * http://www.gnu.org/philosophy/license-list.html
  */
 
-package nu.staldal.lagoon.util;
+package nu.staldal.xmlutil;
 
 import org.xml.sax.*;
 
@@ -127,4 +127,3 @@ public abstract class XMLReaderImpl implements XMLReader
 		throw new SAXNotRecognizedException(name);
 	}
 }
-

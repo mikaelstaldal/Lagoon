@@ -48,6 +48,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.xml.sax.*;
 import org.xml.sax.helpers.AttributesImpl;
 
+import nu.staldal.xmlutil.*;
 import nu.staldal.lagoon.util.*;
 
 public class BuildSitemap

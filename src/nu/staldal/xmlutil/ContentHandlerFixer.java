@@ -38,7 +38,7 @@
  * http://www.gnu.org/philosophy/license-list.html
  */
 
-package nu.staldal.lagoon.util;
+package nu.staldal.xmlutil;
 
 import java.util.*;
 
@@ -47,49 +47,75 @@ import org.xml.sax.helpers.*;
 
 
 /**
- * An adapter to convert from SAX2 ContentHandler to SAX1 DocumentHandler. 
+ * A filter to add missing qName parameters to SAX2 ContentHandler
+ * events for elements and attributes.
  */
-public class DocumentHandlerAdapter implements ContentHandler
+public class ContentHandlerFixer implements ContentHandler
 {
 	private static final boolean DEBUG = false;
 
-    private DocumentHandler dh;
-    private NamespaceSupport nsSup;
+    private final boolean nsDecl;
+	private final ContentHandler ch;
+    
+	private NamespaceSupport nsSup;
     private boolean contextPushed;
+	private int prefixNum;
 
 
 	/**
-	 * Constructs an adapter.
+	 * Constructs a filter.
 	 *
-	 * @param dh  the SAX1 DocumentHandler to fire events on.
+	 * @param ch  the SAX2 ContentHandler to fire events on.
 	 */
-    public DocumentHandlerAdapter(DocumentHandler dh)
+    public ContentHandlerFixer(ContentHandler ch)
     {
-        this.dh = dh;
-        nsSup = new NamespaceSupport();
-        contextPushed = false;
+		this(ch, false);
     }
 
 
+	/**
+	 * Constructs a filter.
+	 *
+	 * @param ch  the SAX2 ContentHandler to fire events on.
+	 * @param nsDecl  add namespace declarationa as explicit 'xmlns' attributes.
+	 */
+    public ContentHandlerFixer(ContentHandler ch, boolean nsDecl)
+    {
+		this.ch = ch;
+        this.nsDecl = nsDecl;
+
+        nsSup = new NamespaceSupport();
+        contextPushed = false;
+		prefixNum = 0;
+		if (DEBUG) System.out.println("New ContentHandlerFixer");
+    }
+	
+	
+	private String genPrefix()
+	{
+		return "ns" + (++prefixNum);
+	}
+	
+	
     // ContentHandler implementation
 
     public void setDocumentLocator(Locator locator)
     {
-        dh.setDocumentLocator(locator);
+        // ch.setDocumentLocator(locator);
     }
 
     public void startDocument()
         throws SAXException
     {
 		if (DEBUG) System.out.println("startDocument");
-        dh.startDocument();
+        ch.startDocument();
     }
 
     public void endDocument()
         throws SAXException
     {
 		if (DEBUG) System.out.println("endDocument");
-        dh.endDocument();
+        ch.endDocument();
     }
 
     public void startElement(String namespaceURI, String localName,
@@ -123,14 +149,16 @@ public class DocumentHandlerAdapter implements ContentHandler
 	                if ((defaultURI != null) && defaultURI.equals(namespaceURI))
 	                    prefix = ""; // default namespace
 	                else
-	                    throw new Error("no prefix for \'" + namespaceURI +
-	                    	'\'');
+					{
+	                    prefix = genPrefix();
+						nsSup.declarePrefix(prefix, namespaceURI);
+					}
 			 	}
             }
             name = ((prefix.length() == 0) ? "" : (prefix + ':')) + localName;
         }
 
-        AttributeListImpl al = new AttributeListImpl();
+        AttributesImpl newAtts = new AttributesImpl();
         for (int i = 0; i < atts.getLength(); i++)
         {
             String aname = atts.getQName(i);
@@ -146,29 +174,42 @@ public class DocumentHandlerAdapter implements ContentHandler
                 {
                     String prefix = nsSup.getPrefix(uri);
                     if (prefix == null)
-                        throw new Error("no attribute prefix for \'"
-                            + uri + '\'');
+					{
+                       	prefix = genPrefix();
+						nsSup.declarePrefix(prefix, namespaceURI);
+					}
                     aname = prefix + ':' + alocalName;
                 }
             }
-            al.addAttribute(aname, atts.getType(i), atts.getValue(i));
+            newAtts.addAttribute(atts.getURI(i), atts.getLocalName(i), aname, 
+				atts.getType(i), atts.getValue(i));
         }
+
+		if (nsDecl)
+		{
+			for (Enumeration e = nsSup.getDeclaredPrefixes(); e.hasMoreElements(); )
+			{
+				String prefix = (String)e.nextElement();
+				String uri = nsSup.getURI(prefix);
+				if (prefix.length() == 0)
+				{
+					newAtts.addAttribute("", "xmlns", "xmlns", "CDATA", uri);
+				}
+				else
+				{
+					newAtts.addAttribute("", "xmlns", "xmlns:"+prefix, "CDATA", uri);
+				}
+			}
+		}
 
         for (Enumeration e = nsSup.getDeclaredPrefixes(); e.hasMoreElements(); )
         {
             String prefix = (String)e.nextElement();
             String uri = nsSup.getURI(prefix);
-            if (prefix.length() == 0)
-            {
-                al.addAttribute("xmlns", "CDATA", uri);
-            }
-            else
-            {
-                al.addAttribute("xmlns:"+prefix, "CDATA", uri);
-            }
+			ch.startPrefixMapping(prefix, uri);
         }
-
-        dh.startElement(name, al);
+						
+        ch.startElement(namespaceURI, localName, name, newAtts);
     }
 
     public void endElement(String namespaceURI, String localName,
@@ -196,14 +237,21 @@ public class DocumentHandlerAdapter implements ContentHandler
 	                if ((defaultURI != null) && defaultURI.equals(namespaceURI))
 	                    prefix = ""; // default namespace
 	                else
-	                    throw new Error("no prefix for \'" + namespaceURI +
-	                    	'\'');
+					{
+						throw new Error("No prefix for " + namespaceURI);
+					}	                    
 			 	}
             }
             name = ((prefix.length() == 0) ? "" : (prefix + ':')) + localName;
         }
 
-        dh.endElement(name);
+        ch.endElement(namespaceURI, localName, name);
+
+        for (Enumeration e = nsSup.getDeclaredPrefixes(); e.hasMoreElements(); )
+        {
+            String prefix = (String)e.nextElement();
+			ch.endPrefixMapping(prefix);
+        }
 
         nsSup.popContext();
     }
@@ -220,7 +268,7 @@ public class DocumentHandlerAdapter implements ContentHandler
             contextPushed = true;
         }
 
-        nsSup.declarePrefix(prefix,uri);
+        nsSup.declarePrefix(prefix, uri);
     }
 
     public void endPrefixMapping(String prefix)
@@ -228,20 +276,18 @@ public class DocumentHandlerAdapter implements ContentHandler
     {
 		if (DEBUG) System.out.println("endPrefixMapping("+
 			((prefix.length() == 0) ? "<default>" : prefix)+')');
-
-        // nothing to do
     }
 
-    public void characters(char ch[], int start, int length)
+    public void characters(char[] chars, int start, int length)
         throws SAXException
     {
-        dh.characters(ch, start, length);
+        ch.characters(chars, start, length);
     }
 
-    public void ignorableWhitespace(char ch[], int start, int length)
+    public void ignorableWhitespace(char[] chars, int start, int length)
         throws SAXException
     {
-        dh.ignorableWhitespace(ch, start, length);
+        ch.ignorableWhitespace(chars, start, length);
     }
 
     public void processingInstruction(String target, String data)
@@ -250,7 +296,7 @@ public class DocumentHandlerAdapter implements ContentHandler
 		if (DEBUG) System.out.println("processingInstruction("+target+','+
 			data+')');
 
-        dh.processingInstruction(target, data);
+        ch.processingInstruction(target, data);
     }
 
     public void skippedEntity(String name)
@@ -258,7 +304,7 @@ public class DocumentHandlerAdapter implements ContentHandler
     {
 		if (DEBUG) System.out.println("skippedEntity("+name+')');
 
-        // nothing to do
+        ch.skippedEntity(name);
     }
 
 }

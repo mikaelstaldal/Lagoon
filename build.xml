@@ -27,13 +27,14 @@
 
   <property name="manifest" value="src/lagoon.mf"/>
 
+<!--
   <taskdef name="lagoon" classname="nu.staldal.lagoon.LagoonAntTask">
     <classpath>
       <pathelement location="${dist.jars}/lagoon.jar" />
-      <pathelement location="${dist.jars}/xtree.jar" />
+      <pathelement location="${dist.jars}/xmlutil.jar" />
     </classpath>
   </taskdef>  
-
+-->
   <target name="init">
     <tstamp/>
     <mkdir dir="${build.classes}"/>
@@ -48,7 +49,7 @@
   </target>
 
   
-  <target name="lagoon" depends="init,xtree,lexer"
+  <target name="lagoon" depends="init,xmlutil,lexer"
   	description="Compiles Lagoon">
     <javac srcdir="${src.dir}"
     	   includes="nu/staldal/lagoon/**/*,nu/staldal/lsp/**/*,nu/staldal/syntax/**/*"
@@ -90,24 +91,25 @@
   </target>
 
 
-  <target name="xtree" depends="init"
+  <target name="xmlutil" depends="init"
   	description="Compiles XTree">
     <javac srcdir="${src.dir}"
-    	   includes="nu/staldal/xtree/**/*"
+    	   includes="nu/staldal/xtree/**/*,nu/staldal/xmlutil/**/*"
            destdir="${build.classes}"
            optimize="off" debug="on"/>
 
     <copy todir="${build.classes}">
       <fileset dir="${src.dir}">
-        <include name="nu/staldal/xtree/**/*" />
+        <include name="nu/staldal/xtree/**/*,nu/staldal/xmlutil/**/*" />
         <exclude name="**/*.java" />
       </fileset>
     </copy>
 
-    <jar jarfile="${dist.jars}/xtree.jar">
+    <jar jarfile="${dist.jars}/xmlutil.jar">
          <!-- manifest="${manifest}" -->
       <fileset dir="${build.classes}"> 
     	 <include name="nu/staldal/xtree/**/*"/>
+    	 <include name="nu/staldal/xmlutil/**/*"/>
       </fileset>	 
     </jar>
   </target>
@@ -125,7 +127,7 @@
   </target>
 
 
-  <target name="testsuite" depends="init,xtree,lagoon"
+  <target name="testsuite" depends="init,xmlutil,lagoon"
   	description="Compiles testsuite">
     <javac srcdir="${src.testsuite}"
     	   includes="nu/staldal/**/*"
@@ -152,7 +154,7 @@
       <fileset dir="docs"/>
     </copy>
     <mkdir dir="${dist.dir}/docs/javadoc"/>
-    <javadoc packagenames="nu.staldal.lagoon.core,nu.staldal.lagoon.util,nu.staldal.xtree,nu.staldal.lsp,nu.staldal.syntax"
+    <javadoc packagenames="nu.staldal.lagoon.core,nu.staldal.lagoon.util,nu.staldal.xtree,nu.staldal.lsp,nu.staldal.syntax,nu.staldal.xmlutil"
     	     sourcepath="${src.dir}"
              destdir="${dist.dir}/docs/javadoc"
              author="true"

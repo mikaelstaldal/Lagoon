@@ -50,7 +50,8 @@ import javax.xml.transform.stream.StreamSource;
 import org.xml.sax.*;
 
 import nu.staldal.lagoon.core.*;
-import nu.staldal.lagoon.util.*;
+import nu.staldal.xmlutil.*;
+
 
 public class XSLTransformer extends Transform
 {
