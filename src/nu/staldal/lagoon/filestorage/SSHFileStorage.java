@@ -54,7 +54,7 @@ import nu.staldal.lagoon.core.LagoonContext;
  */
 public class SSHFileStorage extends RemoteFileStorage
 {
-	private static final boolean DEBUG = false;
+	private static final boolean DEBUG = true;
 
 	private String host;
     private int port;
@@ -74,12 +74,12 @@ public class SSHFileStorage extends RemoteFileStorage
 		cmdline[3] = "none";
 		cmdline[4] = "-l";
 		cmdline[5] = username;
-		cmdline[6] = host;
         if (port > 0)
         {
-    		cmdline[7] = "-p";
-	    	cmdline[8] = Integer.toString(port);
+    		cmdline[6] = "-p";
+	    	cmdline[7] = Integer.toString(port);
         }
+		cmdline[(port>0) ? 8 : 6] = host;
 
 		System.arraycopy(command, 0,
                          cmdline, ((port>0) ? 9 : 7), command.length);
@@ -193,8 +193,11 @@ public class SSHFileStorage extends RemoteFileStorage
         throws java.io.IOException
     {
 		String currentPath = path;
-		Process currentProc = runSSH(new String[] { "mkdir", "-p",
-            "`dirname", rootPath+path + "`",
+		String s = rootPath+path;
+		int i = s.lastIndexOf('/');
+		String dir = (i < 0) ? "." : s.substring(0, i);
+		if (DEBUG) System.out.println("dir: " + dir);
+		Process currentProc = runSSH(new String[] { "mkdir", "-p", dir,
             "&&", "rm", "-f", rootPath+path,
             "&&", "cat", ">" + rootPath+path });
 
