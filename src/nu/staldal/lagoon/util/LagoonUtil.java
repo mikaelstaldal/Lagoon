@@ -49,32 +49,5 @@ public final class LagoonUtil
      * Private default constructor to prevent instantiation.
      */
     private LagoonUtil() {}
-
-
-    /**
-     * Check whether an URL is absolute.
-     * Returns true if the URL contains at least one colon, and
-     * the first colon is before the first slash (if any).
-     */
-    public static boolean absoluteURL(String url)
-    {
-        int colon = url.indexOf(':');
-        if (colon < 0) return false;
-
-        int slash = url.indexOf('/');
-        if (slash < 0) return true;
-
-        return colon < slash;
-    }
-
- 
-    /**
-     * Check whether an URL is pseudo-absolute.
-     * Returns true if the URL start with a slash.
-     */
-    public static boolean pseudoAbsoluteURL(String url)
-    {
-        return (url.length() > 0) && (url.charAt(0) == '/');
-    }	
 	
 }
