@@ -121,8 +121,8 @@ of Xerces. Alternativly, you can download the Java XML Pack from
 version 0.19 (version 0.20 currently doesn't work). You can download it from 
 <a href="http://xml.apache.org/dist/">http://xml.apache.org/dist/</a>.</li>
 
-<li>To use SVG rendering, you need Apache Batik version 1.1rc1 
-(later versions may not work). You can download it from 
+<li>To use SVG rendering, you need Apache Batik version 1.1.1. 
+You can download it from 
 <a href="http://xml.apache.org/dist/">http://xml.apache.org/dist/</a>. 
 Note that Apache Batik requires Java2.</li>
 
@@ -138,9 +138,9 @@ CVS.</li>
 <ol> 
 <li>Make sure that your JRE is properly installed and working.</li>
 <li>Add the distribution JAR files from Xerces, Xalan and (if you use it)
-Batik and FOP to your Java <code>CLASSPATH</code>. You should put Batik
-before FOP. If you use Batik, you need to put
-<code>batik-patch.jar</code> before Batik.</li> 
+Batik or FOP to your Java <code>CLASSPATH</code>. Due to a problem with
+Batik, it's currently not possible to use Batik and FOP 
+at the same time, Batik will not work if FOP is in the CLASSPATH.</li> 
 <li>Add the <code>bin</code> directory (which contains scripts for Windows, 
 OS/2 and UNIX based systems) to your <code>PATH</code> and set an
 environment variable <code>LAGOON_HOME</code> to the directory where you
@@ -513,6 +513,8 @@ encoding to use, default is iso-8859-1.</p>
 compression rate, it's a floating point number between 0 and 1 where a larger 
 number means better quality but less compression (larger file). The default 
 quality is 0.8.</p>
+
+<p>It's currently not possible to have xlinks in SVG.</p>
 
 <h3>&lt;parse&gt;</h3>
 

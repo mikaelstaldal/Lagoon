@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001, Mikael Ståldal
+ * Copyright (c) 2001-2002, Mikael Ståldal
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -54,7 +54,7 @@ import nu.staldal.lagoon.core.*;
 import nu.staldal.lagoon.util.*;
 
 /**
- * Uses Apache Batik version 1.1rc1.
+ * Uses Apache Batik version 1.1.1.
  */
 public class BatikFormatter extends Format
 {
@@ -111,10 +111,6 @@ public class BatikFormatter extends Format
     public void start(OutputStream out, final Target target)
         throws IOException, SAXException
     {
-		SAXSVGDocumentFactory docFactory = new SAXSVGDocumentFactory(xmlReaderClassName);
-		// docFactory.prepareDocument();
-		getNext().start(docFactory, target);
-		
 		URL sourceURL;
 		String _sourceURL = getSourceMan().getSourceURL();
 		if (LagoonUtil.absoluteURL(_sourceURL))
@@ -125,11 +121,12 @@ public class BatikFormatter extends Format
 		else
 			sourceURL = new java.net.URL(getSourceMan().getRootDir().toURL(),
 				_sourceURL);
-							
 		if (DEBUG) System.out.println("The source URL: " + sourceURL);
-		
-		// *** will not work!
-		SVGOMDocument doc = docFactory.createDocument(sourceURL.toString());
+
+		MySVGDocumentFactory docFactory = 
+			new MySVGDocumentFactory(xmlReaderClassName, sourceURL);
+		getNext().start(docFactory, target);			
+		SVGOMDocument doc = docFactory.getDocument();
 		
 		if (DEBUG) System.out.println("Batik SVG DOM building complete");
         TranscoderInput input = new TranscoderInput(doc);
@@ -145,6 +142,7 @@ public class BatikFormatter extends Format
 					}					
 				});			
 */				
+
         TranscoderOutput output = new TranscoderOutput(out);
         try {
 			if (DEBUG) System.out.println("about to transcode");
@@ -162,3 +160,4 @@ public class BatikFormatter extends Format
     }
 
 }
+

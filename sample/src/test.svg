@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+    <filter id="dropShadow" filterUnits="userSpaceOnUse" x="-10" y="-10" width="650" height="100">
+        <feFlood result="grey" flood-color="rgb(89,89,89)" flood-opacity="1"/>
+        <feOffset in="SourceAlpha" result="offset" dx="2" dy="1"/>
+        <feComposite operator="in" in="grey" in2="offset" result="shadow"/>
+        <feComposite in="SourceGraphic" in2="shadow" operator="over"/>
+    </filter>
+    <rect fill="rgb(238,156,0)" x="0" y="0" width="500" height="70"/>
+    <rect fill="rgb(255,255,255)" x="20" y="10" width="460" height="50"/>
+    <rect fill="rgb(89,89,89)" x="21" y="11" width="458" height="48"/>
+    <rect fill="rgb(255,255,255)" x="25" y="15" width="450" height="40"/>
+    <text font-family="Arial" font-weight="bold" font-size="32" fill-opacity="1" fill="rgb(238,156,0)" stroke-opacity="1" stroke-width="3" color="rgb(238,156,0)" text-anchor="middle" x="250" y="45" filter="url(#dropShadow)" id="xweb">oopsala</text>
+</svg>

@@ -76,7 +76,7 @@
 	</format>
 </file>
 
-
+<!--
 <file target="/report.pdf" source="/work/report.xml">
 	<format type="fo">
 	   	<transform type="xslt" stylesheet="/style/report_print.xsl">
@@ -84,15 +84,13 @@
 		</transform>
     </format>
 </file>
+-->
 
-
-<!--
-<file target="/picture.jpeg" source="/batikLogo.svg">
+<file target="/picture.jpeg" source="/test.svg">
 	<format type="svg" format="jpeg" quality="0.5">
     	<source/>
     </format>
 </file>
--->
 
 <!--
 <file target="/picture.png" source="/batikLogo.svg">
