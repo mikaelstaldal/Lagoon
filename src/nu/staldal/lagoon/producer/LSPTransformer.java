@@ -185,13 +185,7 @@ public class LSPTransformer extends Transform
 
         ch.startDocument();
 
-        theCompiledPage.execute(ch, new URLResolver() {
-            public void resolve(String url, ContentHandler ch)
-				throws IOException, SAXException
-            {
-				getSourceMan().getFileAsSAX(url, ch, target);	
-            }
-        }, params, getContext());
+        theCompiledPage.execute(ch, params, getContext());
 
         ch.endDocument();
     }
@@ -200,27 +194,7 @@ public class LSPTransformer extends Transform
     public boolean hasBeenUpdated(long when)
         throws LagoonException, IOException
     {
-        if ((theCompiledPage == null)
-                || sourceUpdated(theCompiledPage.getTimeCompiled()))
-        {
-            return true;
-        }
-
-		if (theCompiledPage.isExecuteDynamic()) return true;
-
-		String[] includedFiles = theCompiledPage.getExecuteDependentFiles(); 
-		for (int i = 0; i<includedFiles.length; i++)
-		{
-			String f = includedFiles[i];
-			if (getSourceMan().fileHasBeenUpdated(f, when))
-			{
-				return true;
-			}
-		}
-
-        return false;
-		
-		// *** check extLibs
+        return true;    // always rebuild (but not always recompile)
     }
 
 }
