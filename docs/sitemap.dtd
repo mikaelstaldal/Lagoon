@@ -15,7 +15,8 @@ the producer. Any non-whitespace character content of the <source> and
 Source and target must be specified as pseudo-absolute URL:s,
 i.e. a relative URL starting with '/'. For example "/foo/bar.html".
 Target URL:s is the request URL for the web server. Source URL:s
-are relative to the local source root directory.
+are relative to the local source root directory. If source is omitted, 
+it's set to the same string as target (including any wildcard).
 -->
 
 <!--
@@ -34,7 +35,7 @@ read: ? -> byte-stream
 	target CDATA #REQUIRED  
 	source CDATA #IMPLIED > 
 <!-- Target must contain wildcard if and only if
-     source exists and contain wildcard -->
+     source contain wildcard -->
 <!-- Source may contain wildcard -->
 
 <!ELEMENT format (source|parse|transform) >

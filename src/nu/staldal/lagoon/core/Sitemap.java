@@ -100,8 +100,13 @@ class Sitemap extends XMLConfig
                 throw new LagoonException(
                     "invalid target specification: " + currentTargetName);
             }
+			
+			String theSource = atts.getValue("","source");
+			if (theSource == null || theSource.length() < 1)
+				theSource = currentTargetName;
+				
             currentFile = new FileEntry(currentTargetName,
-                                        atts.getValue("","source"),
+                                        theSource,
                                         sourceDir, targetLocation);
         }
         else if (localName.equals("format") || localName.equals("transform") ||

@@ -97,7 +97,6 @@ public class BuildSitemap
                 String url = "/" + ent.getPath().replace(
                     File.separatorChar, '/');
 
-				atts.addAttribute("","source","","CDATA", url);
 				atts.addAttribute("","target","","CDATA", url);
 
 				ch.startElement("", "file", "", atts);
