@@ -2,6 +2,9 @@
 <!-- You need Apache Ant, version 1.2 or later, to use it -->
 <!-- Get it from http://jakarta.apache.org/ant/ -->
 
+<!-- Assumes that you have support for JAXP 1.1, 
+     e.g. Apache Xerces and Xalan, in your CLASSPATH -->
+
 <project name="Lagoon" default="lagoon">
 
   <!-- Change these to match your system, 

@@ -107,14 +107,15 @@ the basic features of Lagoon.</p>
 with Java2 too. See <a href="http://java.sun.com/">http://java.sun.com/</a> 
 for information on how to obtain a JRE. Note that the Java Development Kit (JDK) 
 includes a JRE, you don't need to separately install a JRE if you already
-have a JDK.</li>
+have a JDK. The GUI part of Lagoon requires Java2.</li>
 
 <li>An XML parser and an XSLT processor with JAXP 1.1 interface.
 Lagoon has been tested with Apache Xerces version 1.4.1 and Apache Xalan 
 (XSLT processor) version 2.2D9 or later. You can download Xerces and Xalan
 from <a href="http://xml.apache.org/dist/">http://xml.apache.org/dist/</a>.
 The simplest way is to download Xalan only, it includes a suitable version
-of Xerces.</li>
+of Xerces. Alternativly, you can download the Java XML Pack from 
+<code>http://java.sun.com/xml/</code>.</li>
 
 <li>To use XSL:FO to PDF formatting, you need Apache FOP 
 version 0.19 (version 0.20 currently doesn't work). You can download it from 
@@ -649,7 +650,8 @@ lines beginning with '#' are ignored.</p>
 
 <p>The sitemap file and source directory are specified using platform-dependent 
 paths (e.g. use '\' as path separator in Windows), <em>not</em> as URLs. 
-They may be absolute or relative (to the current working directory).</p>
+They may be absolute or relative (to the current working directory). Please 
+note that the Java property file format requires you to escape '\' with '\\'.</p>
 
 <p>If no property file is used (the sitemap file is specified directly on the 
 command line), sourceDir and targetURL will both be set to the current 
@@ -661,8 +663,8 @@ obviously won't work if sourceDir and targetURL are the same).</p>
 <pre>
 # Lagoon properties
 
-sitemapFile: C:\joe_files\webbsite\sitemap.xml
-sourceDir: C:\joe_files\webbsite\src
+sitemapFile: C:\\joe_files\\webbsite\\sitemap.xml
+sourceDir: C:\\joe_files\\webbsite\\src
 targetURL: ftp://joe@ftp.acme.com/public_html/
 password: secret
 </pre>
@@ -720,7 +722,7 @@ build file like this:</p>
 &lt;taskdef name="lagoon" classname="nu.staldal.lagoon.LagoonAntTask"&gt;
   &lt;classpath&gt;
     &lt;pathelement location="<em>locationOfLagoonJars</em>/lagoon.jar" /&gt;
-    &lt;pathelement location="<em>locationOfLagoonJars</em>/xtree.jar" /&gt;
+    &lt;pathelement location="<em>locationOfLagoonJars</em>/xmlutil.jar" /&gt;
   &lt;/classpath&gt;
 &lt;/taskdef&gt;  
 </pre>
@@ -737,6 +739,20 @@ build file like this:</p>
 
 <p>The <em>password</em> attribute can be omitted if not needed. Use the
 optional attribute <code>force</code> to override dependency checking.</p>
+
+
+<h2>Lagoon GUI</h2>
+
+<p>Lagoon comes with a simple GUI which you can use instead of the command
+line tool. The application class is <code>nu.staldal.lagoon.LagoonGUI</code>.
+The syntax is:</p>
+<pre>
+lagoongui [<em>property_file</em>]
+</pre>
+
+<p>Alternatively, you can simply execute the <code>lagoon.jar</code> file,
+but that requires you to put the required libraries (JAXP etc) in the same 
+directory as <code>lagoon.jar</code> (instead of in the Java <code>CLASSPATH</code>).
 
 
 <h2>Adapting your web site for Lagoon</h2>
