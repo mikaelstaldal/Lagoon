@@ -110,7 +110,7 @@ includes a JRE, you don't need to separately install a JRE if you already
 have a JDK.</li>
 
 <li>Apache Xerces (XML Parser) version 1.4.1 or later and Apache Xalan
-(XSLT processor) version 2.0 or later. You can download Xerces and Xalan
+(XSLT processor) version 2.2D7 or later. You can download Xerces and Xalan
 from <a href="http://xml.apache.org/dist/">http://xml.apache.org/dist/</a>.
 The simplest way is to download Xalan only, it includes a suitable version
 of Xerces.</li>
@@ -137,14 +137,67 @@ CVS.</li>
 to your Java <code>CLASSPATH</code>.</li>
 </ol>
 
-<h2>The core functionality of Lagoon</h2>
+<h2>The sitemap</h2>
 
 <p>Lagoon is based on a <em>sitemap</em>, which is a file describing
 the structure of the website. The sitemap is in XML format, see
-the <a href="sitemap.dtd">the pseudo-DTD</a> The sitemap has entries
-for files, each file entry describes how that file should be
-created. Each sitemap must have a name which unique identifies it on the 
-system.</p>
+the <a href="sitemap.rng">schema</a> Each sitemap must have a name which 
+unique identifies it on the system.</p>
+
+<p>The sitemap has entries for files, each file entry describes how that file 
+should be created. The target is the request URL for the web server, 
+and must be specified as a pseudo-absolute URL. The source URL must be specified 
+as an absolute or pseudo-absolute URL. A pseudo-absolute source URL is
+relative to the local source root directory. If source is omitted, 
+it's set to the same string as target (including any wildcard).</p>
+
+
+<h3>URLs</h3>
+
+<p>In the sitemap, URLs are used to point out files and other resources. 
+See <a href="http://www.ietf.org/rfc/rfc1738.txt">RFC 1738</a> 
+for more information about URLs. There are three kinds of URLs:</p>
+
+<ul>
+<li>An <em>absolute</em> URL contains at least one colon (<code>:</code>), and 
+have no slash (<code>/</code>) before the first colon. The part before the 
+first colon is called the <em>scheme</em>. E.g. 
+<code>http://www.foo.com/bar/baz.html</code> 
+(the scheme here is <code>html</code>).</li>
+
+<li>An <em>pseudo-absolute</em> URL starts with a slash. 
+E.g. <code>/foo/bar.xml</code>.</li> 
+
+<li>A <em>relative</em> URL meets non of these two criteria. E.g. 
+<code>pic/photo.jpeg</code>.
+</ul>
+
+<p>Absolute URLs are handled by the <code>java.net.URLConnection</code>
+class in Java. It has a pluggable API and it's possible to install custom 
+handlers for any scheme (see the Java documentation for information about 
+this). However, two schemes are handled specially by Lagoon, 
+<code>file</code> and <code>res</code>.</p>
+
+<p>The <code>file</code> scheme is used to point out a file anywhere in the 
+local file system. Lagoon handles this by itself because the support for it
+in several versions of Java is broken. These URLs must be written in the form
+<code>file:<em>native absolute file path</em></code>. E.g. 
+<code>file:/usr/local/file.txt</code> on a UNIX system or 
+<code>file:C:\Documents\file.txt</code> on a Windows or OS/2 system. 
+(Note that this is <em>not</em> according to the definition of 
+<code>file</code> URLs in RFC 1738.)</p>
+
+<p>The <code>res</code> scheme is used to point out a file in the 
+<em>resource directory</em> (see below). 
+E.g. <code>res:/style/photoindex.xsl</code></p>
+
+<p>Dependency checking of sources works for relative, pesudo-absolute and 
+absolute URLs with <code>file</code> or <code>res</code> schemes. However, 
+it does <em>not</em> work with absolute URLs with other schemes, if any such
+is used as source, it causes rebuilding each time.</p> 
+
+
+<h3>Producers</h3>
 
 <p>A file is created with a pipeline of connected <em>producers</em>. A
 producer is a component which produces a stream of bytes (implemented
@@ -178,10 +231,12 @@ images).</dd>
 </dl>
 
 <p>Parameters can be passed to a producer, which is useful for e.g.
-giving the name of the stylesheet to a XSLT processor. Each file entry
-may have an input file, which can be read by the source producer
-(however, a source producer may instead obtain the data from some other
-source).</p>
+giving the name of the stylesheet to a XSLT processor, parameters are given
+as attribute to the producer element in the sitemap. Any character content
+to the source producer elements is taken as a parameter with the name "name".
+Each file entry may have an main source, which can be read by the source 
+producer (however, a source producer may instead obtain the data from some 
+other source).</p>
 
 <p>When Lagoon is started, the sitemap is parsed and a pipeline is set
 up for each file entry. Lagoon is now ready to build the website, which
@@ -193,16 +248,19 @@ any source data has been updated since the last time it was
 processed. It's up to each producer to implement this dependency
 checking.</p>
 
+
 <h3>Wildcards</h3>
 
-You can specify similar treatment of several files by using a wildcard
+<p>You can specify similar treatment of several files by using a wildcard
 in the source filename. Lagoon will enumerate all source files matching
 the given wildcard pattern, and process all of them in sequence. The
 target filename must also contains a wildcard, it will be instantiated
 with the same string used to match the source pattern, i.e. if the
 source pattern is <code>*.xml</code> and the target is
 <code>*.html</code>, then the source file <code>book.xml</code> will
-generate <code>book.html</code>.
+generate <code>book.html</code>. You cannot use wildcards if the source
+is an absolute URL.</p>
+
 
 <h3>Splitting</h3>
 
@@ -219,32 +277,27 @@ filename for it as well).</p>
 href="advuserguide.html">Advanced User Guide</a>.</p>
 
 <p>If nothing else is stated, a producer signal the need for rebuilding when
-the source file has been updated (for source producers), or asks the
+the main source has been updated (for source producers), or asks the
 next upstream producer (for other producers).</p>
 
 
 <h3>&lt;source&gt;</h3>
 
-Parse the source file as XML.
+Parse the main source as XML.
 
 
 <h3>&lt;source type="dir"&gt;</h3>
 
-<p>The source must be a directory, and the source URL must end with '/'.
-The files and subdirectories in this directory is listed and provided as
-XML in the following format:</p>
-
-  <directory filename="CVS" url="/style/CVS" absurl="file:/D:/mikes/lagoon/sample/src/style/CVS"  /> 
-  <file filename="first.xsl" url="/style/first.xsl" absurl="file:/D:/mikes/lagoon/sample/src/style/first.xsl" timestamp="987197358000" date="2001-04-13" time="23:29:18" size="445" /> 
-  
+<p>The main source must be a directory (and the source URL must end with '/'), 
+and may not be an absolute URL with other scheme than <code>file</code> or 
+<code>res</code>. The files and subdirectories in this directory 
+is listed and provided as XML in the following format:</p>
 
 <pre>
 &lt;dirlist&gt;
     &lt;directory filename="somedir" url="/thisdir/somedir" 
-        absurl="file:/D:/MySites/ThisSite/thisdir/somedir"
         timestamp="987198810097" date="2001-04-13" time="23:53:30"/&gt;
     &lt;file filename="somefile.txt" url="/thisdir/somefile.txt" 
-        absurl="file:/D:/MySites/ThisSite/thisdir/somefile.txt" 
         timestamp="987197358000" date="2001-04-13" time="23:29:18" 
         size="445"/&gt;
 &lt;/dirlist&gt;
@@ -265,27 +318,9 @@ renamed. However, it does <em>not</em> check if the content of any file
 in the directory is updated.</p>
 
 
-<h3>&lt;source type="url"&gt;</h3>
-
-<p>The "name" parameter is parsed as an absolute URL and this URL is fetched
-and parsed as XML.</p>
-
-<p>This producer signals the need for rebuild each time, since there is
-no way to know whether a general URL has been updated.</p>
-
-
 <h3>&lt;read&gt;</h3>
 
-<p>Read the source file as a byte stream.</p>
-
-
-<h3>&lt;read type="url"&gt;</h3>
-
-<p>The "name" parameter is parsed as an absolute URL and this URL is fetched
-and provided as a byte stream.</p>
-
-<p>This producer signals the need for rebuild each time, since there is
-no way to know whether a general URL has been updated.</p>
+<p>Read the main source as a byte stream.</p>
 
 
 <h3>&lt;transform type="xslt"&gt;</h3>
@@ -463,7 +498,7 @@ may affect performance, and can in some situations cause deadlocks.</p>
 <p>Format an HTML page. Note that the source HTML file must be well-formed
 XML (but not necessary valid XHTML):</p>
 <pre>
-&lt;file target="/index.html" source="/index.html"&gt;
+&lt;file target="/index.html"&gt;
   &lt;format type="html"&gt;
     &lt;source/&gt;
   &lt;/format&gt;
@@ -506,7 +541,7 @@ XML (but not necessary valid XHTML):</p>
 <p>Generate an HTML page using LSP (the parameter "showpicture" is sent
 to the LSP page):</p>
 <pre>
-&lt;file target="/coolpage.html" source="/coolpage.html"&gt;
+&lt;file target="/coolpage.html"&gt;
   &lt;format type="html"&gt;
     &lt;transform type="lsp" showpicture="yes"&gt;
       &lt;source/&gt;
@@ -521,8 +556,8 @@ to the LSP page):</p>
 <p>Lagoon is invoked by the application class
 <code>nu.staldal.lagoon.LagoonCLI</code>. The syntax is one of:</p>
 <pre>
-<em>java</em> nu.staldal.lagoon.LagoonCLI <em>property_file</em> <em>how_to_run</em>
-<em>java</em> nu.staldal.lagoon.LagoonCLI <em>sitemap_file</em> <em>how_to_run</em>
+<em>java</em> -DresourceDir=<em>resourceDir</em> nu.staldal.lagoon.LagoonCLI <em>property_file</em> <em>how_to_run</em>
+<em>java</em> -DresourceDir=<em>resourceDir</em> nu.staldal.lagoon.LagoonCLI <em>sitemap_file</em> <em>how_to_run</em>
 </pre>
 
 <p><em>java</em> is your Java interpreter, usually just "java". It's
@@ -530,10 +565,11 @@ not recommended to use "javaw" in Sun JDK for Windows, since Lagoon
 will write error messages and other information to standard out.</p>
 
 <p>The <em>property_file</em> and <em>sitemap_file</em> is specified using 
-a platform-dependent path (e.g. use '\' as path separator in Windows). It may 
-be absolute or relative (to the current working directory). If the filename 
-ends with "<code>.xml</code>" or "<code>.sitemap</code>", it will be taken as 
-a sitemap file, otherwise it will be taken as a property file.</p>
+a platform-dependent path (e.g. use '\' as path separator in Windows), 
+<em>not</em> as an URL. It may be absolute or relative (to the current 
+working directory). If the filename ends with "<code>.xml</code>" or 
+"<code>.sitemap</code>", it will be taken as a sitemap file, otherwise 
+it will be taken as a property file.</p>
 
 <p>The <em>how_to_run</em> argument specifies what Lagoon should do
 after initialization. "build" causes it to perform a normal build
@@ -547,6 +583,9 @@ a command (write something on the keyboard and press [ENTER]), 'b' will
 cause normal build, 'f' will cause a force build and just pressing
 [ENTER] will cause it to exit.</p>
 
+<p>The <em>resourceDir</em> specifies the directory where absolute URLs with the
+<code>res</code> scheme are searched for. It's optional, but without it no URL
+with <code>res</code> scheme will work.</p> 
 
 <h3>The property file</h3>
 
@@ -557,8 +596,8 @@ a text file with one keyword-value pair on each line, separated by ':';
 lines beginning with '#' are ignored.</p>
 
 <p>The sitemap file and source directory are specified using platform-dependent 
-paths (e.g. use '\' as path separator in Windows). They may be absolute or 
-relative (to the current working directory).</p>
+paths (e.g. use '\' as path separator in Windows), <em>not</em> as URLs. 
+They may be absolute or relative (to the current working directory).</p>
 
 <p>If no property file is used (the sitemap file is specified directly on the 
 command line), sourceDir and targetURL will both be set to the current 

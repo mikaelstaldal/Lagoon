@@ -103,42 +103,39 @@ public class XSLTransformer extends Transform
     {
         container = new StylesheetContainer(always);
 
-        final String xslPath = LagoonUtil.absoluteURL(xslFile) 
-			? null
-			: getSourceMan().getFilePath(xslFile);
+        final String xslPath = getSourceMan().getFileURL(xslFile);
 			
-		if (xslPath == null) container.compileDynamic = true;
+		if (!getSourceMan().canCheckFileHasBeenUpdated(xslPath))
+			container.compileDynamic = true;
 
         if (DEBUG) System.out.println("Read stylesheet: " + xslPath);
 
         tfactory.setURIResolver(new URIResolver() {
             public Source resolve(String href, String base)
             {
-                if (xslPath == null	|| LagoonUtil.absoluteURL(href))
-                {
-                    container.compileDynamic = true;
-                    return null; // let XSLT processor resolve 
-                }
-                else
-                {
-                    String file = getSourceMan().getFilePathRelativeTo(href,
-                        xslPath);
-                    container.importedFiles.put(file, "");
-                    try {
-                        return new StreamSource(getSourceMan().openFile(file));
-                    }
-                    catch (FileNotFoundException e)
-                    {
-                        // let XSLT processor discover error
-                        return null;
-                    }
-                }
+				String thisFile = 
+					getSourceMan().getFileURLRelativeTo(href, xslPath);
+
+				try {
+	                if (!getSourceMan().canCheckFileHasBeenUpdated(thisFile))
+	                {
+	                    container.compileDynamic = true;
+	                }
+					else
+					{
+	                    container.importedFiles.put(thisFile, "");
+					}
+				
+					return getSourceMan().getFileAsStreamSource(thisFile);
+				}
+				catch (FileNotFoundException e)
+				{
+					return null; // let XSLT processor discover error
+				}
             }
         });
 
-		StreamSource ss = (xslPath == null) 
-			? new StreamSource(xslFile)
-			: new StreamSource(getSourceMan().openFile(xslPath));
+		StreamSource ss = getSourceMan().getFileAsStreamSource(xslPath);
 		
         try {
             container.stylesheet = tfactory.newTemplates(ss);
@@ -222,26 +219,24 @@ public class XSLTransformer extends Transform
         th.getTransformer().setURIResolver(new URIResolver() {
             public Source resolve(String href, String base)
             {
-                if (LagoonUtil.absoluteURL(href))
-                {
-                    container.executeDynamic = true;
-                    return null; // let XSLT processor resolve 
-                }
-                else     
-                {
-                    // *** search Sitemap
-                    try {
-                        String file = getSourceMan().getFilePath(href);
-                        container.readFiles.put(file, "");
-                        return new StreamSource(getSourceMan().openFile(file));
-                    }
-                    catch (FileNotFoundException e)
-                    {
-                        // let XSLT processor discover error
-                        return null;
-                    }
-                }
-            }
+				try {
+					if (!getSourceMan().canCheckFileHasBeenUpdated(href))
+					{
+						container.executeDynamic = true;
+					}
+					else
+					{
+						container.readFiles.put(
+							getSourceMan().getFileURL(href), "");
+					}
+					
+					return getSourceMan().getFileAsStreamSource(href);
+					}
+				catch (FileNotFoundException e)
+				{
+					return null; // let XSLT processor discover error
+				}
+            } 
         });
 
         getNext().start(th, target);

@@ -158,7 +158,7 @@ public abstract class Producer implements ProducerInterface
     public InputStream readFileFromRepository(String key)
     {
         return processor.readFileFromRepository(
-            LagoonUtil.encodePath(getSourceMan().getTargetPath()),
+            LagoonUtil.encodePath(getSourceMan().getTargetURL()),
             makeKey(key));
     }
 
@@ -174,7 +174,7 @@ public abstract class Producer implements ProducerInterface
         throws IOException
     {
         return processor.storeFileInRepository(
-            LagoonUtil.encodePath(getSourceMan().getTargetPath()),
+            LagoonUtil.encodePath(getSourceMan().getTargetURL()),
             makeKey(key));
     }
 
@@ -190,7 +190,7 @@ public abstract class Producer implements ProducerInterface
         throws java.io.IOException
     {
         return processor.getObjectFromRepository(
-            LagoonUtil.encodePath(getSourceMan().getTargetPath()),
+            LagoonUtil.encodePath(getSourceMan().getTargetURL()),
             makeKey(key));
     }
 
@@ -205,7 +205,7 @@ public abstract class Producer implements ProducerInterface
         throws java.io.IOException
     {
         processor.putObjectIntoRepository(
-            LagoonUtil.encodePath(getSourceMan().getTargetPath()),
+            LagoonUtil.encodePath(getSourceMan().getTargetURL()),
             makeKey(key),
             obj);
     }

@@ -44,25 +44,18 @@ import java.io.*;
 
 /**
  * Defines operations a Producer can do on the source file tree.
- *
- * Filename parameters are specified as an relative URL,
- * i.e. using '/' to separate directories. If a filename
- * parameter starts with '/', it's searched for relative to the
- * source root directory, otherwise it's searched for relative to
- * the main source file (or a FileNotFoundException is thrown if
- * there is no main source file).
  */
 public interface SourceManager
 {
     /**
      * Get the current target URL.
-     * Will return a pseudo-absolute URL string.
+     * Will return a pseudo-absolute URL.
      * Will return the target URL <em>before</em> wildcard expansion.
      *
      * This method doesn't conceptually belong in this interface,
      * but I found no better place for it.
      */
-    public String getTargetPath();
+    public String getTargetURL();
 
 
     /**
@@ -70,121 +63,122 @@ public interface SourceManager
      */
     public File getRootDir();
 
-
-    /**
-     * Get an absolute URL object representing the source root directory.
-     */
-    public java.net.URL getRootDirURL();
-
-
-    /**
-     * Open the main source file (if any).
+		
+	/**
+     * Get the URL representing the main source.
+	 * Might be a file or a directory.
      *
-     * @return an InputStream to the file.
-     *
-     * @throw FileNotFoundException
-     * if the main source file cannot be found, or is not specified,
-     * or is a directory.
+	 * @return an absolute or pseudo-absolute URL, never <code>null</code> 
+     * @throws FileNotFoundException if the main source file is not specified
      */
-    public InputStream openSource()
+    public String getSourceURL()
         throws FileNotFoundException;
 
-    /**
-     * Get a File object representing the main source file.
-     * Might be a file or a directory.
-     *
-     * @throw FileNotFoundException
-     * if the main source file is not specified.
-     */
-    public File getSource()
-        throws FileNotFoundException;
-
-    /**
-     * Get a pseudo-absolute URL string representing the main source file.
-     * Might be a file or a directory.
-     *
-     * @throw FileNotFoundException
-     * if the main source file is not specified.
-     */
-    public String getSourcePath()
-        throws FileNotFoundException;
-
-    /**
-     * Get an absolute URL representing the main source file.
-     * Might be a file or a directory.
-     *
-     * @throw FileNotFoundException
-     * if the main source file is not specified.
-     */
-    public java.net.URL getSourceURL()
-        throws FileNotFoundException;
-
-    /**
-     * Check if the main source file has been updated since the specified time.
-     *
-     * @param when  the time
-     *
-     * @return false if the main source is not specified.
-     */
-    public boolean sourceHasBeenUpdated(long when);
-
-
+	
     /**
      * Open an auxiallary source file.
      * This might e.g. be used to read the stylesheet for an
      * XSLT transformation.
-     *
-     * @param filename  the name of the file to open
-     *
+	 *
+	 * @param url  URL to the file, if relative it's searched for relative to
+	 * the main source file (or a FileNotFoundException is thrown if
+	 * there is no main source file).
+	 *
      * @return an InputStream to the file.
      */
-    public InputStream openFile(String filename)
-        throws FileNotFoundException;
+    public InputStream openFile(String url)
+        throws FileNotFoundException, IOException;
 
-    /**
+
+	/**
      * Get a File object representing the given file or directory.
+	 *
+	 * @param url  URL to the file, if relative it's searched for relative to
+	 * the main source file (or a FileNotFoundException is thrown if
+	 * there is no main source file).
      *
-     * @param filename  the name of the file to get
+     * @return <code>null</code> if URL is absolute with another scheme than
+	 *  file or res.  
      */
-    public File getFile(String filename)
+    public File getFile(String url)
         throws FileNotFoundException;
 
-    /**
-     * Get an pseudo-absolute URL string representing the given file or
-     * directory.
+
+	/**
+     * Get a SAX InputSource object representing the given file.
+	 *
+	 * @param url  URL to the file, if relative it's searched for relative to
+	 * the main source file (or a FileNotFoundException is thrown if
+	 * there is no main source file).
      *
-     * @param name  the name of the file to get
+     * @throws FileNotFoundException if the main source file is not specified
      */
-    public String getFilePath(String name)
+    public org.xml.sax.InputSource getFileAsInputSource(String url)
         throws FileNotFoundException;
 
-    /**
-     * Get an absolute URL representing the given file or directory.
+
+	/**
+     * Get a TrAX/JAXP StreamSource object representing the given file.
+	 *
+	 * @param url  URL to the file, if relative it's searched for relative to
+	 * the main source file (or a FileNotFoundException is thrown if
+	 * there is no main source file).
      *
-     * @param name  the name of the file to get
+     * @throws FileNotFoundException if the main source file is not specified
      */
-    public java.net.URL getFileURL(String name)
+    public javax.xml.transform.stream.StreamSource getFileAsStreamSource(String url)
         throws FileNotFoundException;
+		
+		
+    /**
+     * Get an URL representing the given file or directory.
+	 *
+	 * @param url  URL to the file, if relative it's searched for relative to
+	 * the main source file (or a FileNotFoundException is thrown if
+	 * there is no main source file).
+	 *
+	 * @return an absolute or pseudo-absolute URL
+	 * 		   (the url parameter unchangen unless it's relative)
+     */
+    public String getFileURL(String url)
+        throws FileNotFoundException;
+
 
     /**
      * Check if the specified file has been updated since the specified time.
+	 *
+	 * @param url  URL to the file, if relative it's searched for relative to
+	 * the main source file (or a FileNotFoundException is thrown if
+	 * there is no main source file).
      *
-     * @param filename  name of the file to check.
      * @param when  the time
      */
-    public boolean fileHasBeenUpdated(String filename, long when)
+    public boolean fileHasBeenUpdated(String url, long when)
         throws FileNotFoundException;
 
+		
+    /**
+     * Tell whether the given source can be checked for dependency.
+	 *
+	 * @param url  URL to the file, if relative it's searched for relative to
+	 * the main source file (or a FileNotFoundException is thrown if
+	 * there is no main source file).
+     */
+    public boolean canCheckFileHasBeenUpdated(String url)
+        throws FileNotFoundException;
+	
 
     /**
-     * Get an pseudo-absolute URL string representing the given file or
-     * directory. If name is relative, it will be searched for realtive to
-     * the base parameter (and not the main source file). The return value
-     * can be used as argument to openFile(String), getFile(String) or
-     * fileHasBeenUpdated(String,long).
-     *
-     * @param name  the name of the file to get
-     * @param base  an pseudo-absolute URL string
+     * Get an URL representing the given file or directory.
+	 *
+	 * @param url  URL to the file, if relative it's searched for relative to
+	 * the base parameter.
+	 *
+	 * @param base  base URL, must be pseudo-absolute
+	 *
+	 * @return an absolute or pseudo-absolute URL
+	 * 		   (the url parameter unchangen unless it's relative)
      */
-    public String getFilePathRelativeTo(String name, String base);
+    public String getFileURLRelativeTo(String url, String base);
 }
+

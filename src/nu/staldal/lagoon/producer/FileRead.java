@@ -54,7 +54,7 @@ public class FileRead extends Read
     public void start(OutputStream bytes, Target target)
         throws IOException
     {
-        InputStream fis = getSourceMan().openSource();
+        InputStream fis = getSourceMan().openFile(getSourceMan().getSourceURL());
 
         byte[] buf = new byte[4096];
 
@@ -69,8 +69,10 @@ public class FileRead extends Read
     }
 
     public boolean hasBeenUpdated(long when)
+		throws FileNotFoundException
     {
-        return getSourceMan().sourceHasBeenUpdated(when);
+        return 
+			getSourceMan().fileHasBeenUpdated(getSourceMan().getSourceURL(),when);
     }
 
 }

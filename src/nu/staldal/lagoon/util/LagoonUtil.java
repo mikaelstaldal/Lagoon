@@ -50,6 +50,7 @@ public final class LagoonUtil
      */
     private LagoonUtil() {}
 
+
     /**
      * Check whether an URL is absolute.
      * Returns true if the URL contains at least one colon, and
@@ -67,6 +68,16 @@ public final class LagoonUtil
     }
 
  
+    /**
+     * Check whether an URL is pseudo-absolute.
+     * Returns true if the URL start with a slash.
+     */
+    public static boolean pseudoAbsoluteURL(String url)
+    {
+        return (url.length() > 0) && (url.charAt(0) == '/');
+    }
+
+
  	/**
 	 * Encode a path name into a filename.
 	 */

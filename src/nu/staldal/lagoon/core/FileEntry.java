@@ -42,10 +42,14 @@ package nu.staldal.lagoon.core;
 
 import java.io.*;
 import java.util.*;
+import java.net.URL;
+import java.net.URLConnection;
 
+import javax.xml.transform.stream.StreamSource;
 import org.xml.sax.*;
 
-import nu.staldal.lagoon.util.Wildcard;
+import nu.staldal.lagoon.util.*;
+
 
 /**
  * A file in the sitemap.
@@ -62,30 +66,27 @@ class FileEntry implements SourceManager, FileTarget
 
     private final FileStorage targetStorage;
     private final File sourceRootDir;
-    private final java.net.URL sourceRootDirURL;
 
-    private final File sourceDir;
-    private final String sourceDirURL;
-    private final String sourceFile;
+    private final String sourceURL;
     private final String targetURL;
 
-    private File currentSourceFile;
-    private String currentSourceName;
+    private String currentSourceURL;
     private String currentTargetURL;
     private long targetLastMod;
     private String newTarget;
 
+	
     /**
      * Constructor.
      *
      * @param targetURL  the file to create, may contain wildcard anywhere,
-     *                   must start with '/'.
-     * @param source  the file to use, may contain wildcard in filename,
-	 *                must start with '/', may be <code>null</code>.
+     *                   must be pseudo-absolute.
+     * @param sourceURL  the file to use, may contain wildcard in filename,
+	 *                  must absolute or pseudo-absolute, may be <code>null</code>.
      * @param sourceRootDir  absolute path to the source directory
      * @param targetStorage  where to store generated files
      */
-    public FileEntry(String targetURL, String source,
+    public FileEntry(String targetURL, String sourceURL,
                      File sourceRootDir, FileStorage targetStorage)
         throws LagoonException
     {
@@ -97,59 +98,19 @@ class FileEntry implements SourceManager, FileTarget
         this.sourceRootDir = new File(absPath);
         if (!this.sourceRootDir.isDirectory())
             throw new LagoonException(
-                "sourceRootDir must be an existing directory: "
-                + sourceRootDir);
+                "sourceRootDir must be an existing directory: " + sourceRootDir);
 
-        // we should use File.toURL() here, but it's Java2
-		absPath = absPath.replace(File.separatorChar, '/');
-        if (!absPath.endsWith("/")) absPath = absPath + "/";
-        try {
-            sourceRootDirURL = new java.net.URL("file:" +
-	            ((absPath.charAt(0) == '/') ? "//" : "///") +
-		        absPath);
-        }
-        catch (java.net.MalformedURLException e)
-        {
-            throw new LagoonException(
-                "Unable to transform source root into URL: "
-                + e.getMessage());
-        }
+		if (!LagoonUtil.absoluteURL(sourceURL) 
+				&& !LagoonUtil.pseudoAbsoluteURL(sourceURL))
+		{
+        	throw new LagoonException(
+				"source must be absolute or pseudo-absolute");
+		}
 
-        if (source == null)
-        {
-            this.sourceDir = null;
-            this.sourceFile = null;
-            this.sourceDirURL = null;
-        }
-        else
-        {
-            if (source.charAt(0) != '/')
-                throw new LagoonException("source must start with \'/\'");
-            int slash = source.lastIndexOf('/');
-
-            this.sourceDirURL = source.substring(0, slash+1);
-
-            String sourcePath = source.substring(1, slash+1);
-            if (sourcePath.length() == 0)
-            {
-                this.sourceDir = this.sourceRootDir;
-            }
-            else
-            {
-                this.sourceDir = new File(sourceRootDir,
-                    sourcePath.replace('/', File.separatorChar));
-            }
-
-            String sourceFilename = source.substring(slash+1);
-            this.sourceFile = (sourceFilename.length() == 0)
-                ? null
-                : sourceFilename;
-        }
-
+		this.sourceURL = sourceURL;
         this.targetURL = targetURL;
 
-        this.currentSourceFile = null;
-        this.currentSourceName = null;
+        this.currentSourceURL = null;
         this.currentTargetURL = null;
         this.targetLastMod = -1;
         this.newTarget = null;
@@ -178,32 +139,37 @@ class FileEntry implements SourceManager, FileTarget
         // System.out.println("Building " + target + " from " + source +
         //                   (always ? " always" : ""));
 
-        if (sourceDir == null)
-        {   // no main source file
-            currentSourceFile = null;
-            currentSourceName = null;
+		if (sourceURL == null)
+        {   // no main source
+	        currentSourceURL = null;
             currentTargetURL = targetURL;
             buildFile(always);
         }
-        else if (sourceFile == null)
-        {   // main source is a directory
-            currentSourceFile = sourceDir;
-            currentSourceName = sourceFile;
+        if (LagoonUtil.absoluteURL(sourceURL))
+        {   // absolute URL
+	        currentSourceURL = sourceURL;
             currentTargetURL = targetURL;
             buildFile(always);
         }
-        else if (Wildcard.isWildcard(sourceFile))
+        else if (Wildcard.isWildcard(sourceURL))
         {   // main source is a wildcard pattern
-            String[] files = sourceDir.list();
+			int slash = sourceURL.lastIndexOf('/');
+			String sourceDirURL = sourceURL.substring(0, slash);
+			String sourceMask = sourceURL.substring(slash);
+			System.out.println("Wildcard dir: " + sourceDirURL);
+			System.out.println("Wildcard mask: " + sourceMask);
+			File sourceDir = new File(sourceRootDir, sourceDirURL); 
+            
+			String[] files = sourceDir.list();
             for (int i = 0; i < files.length; i++)
-            {
-                currentSourceFile = new File(sourceDir, files[i]);
+            {				
+                File currentSourceFile = new File(sourceDir, files[i]);
                 if (!currentSourceFile.isFile()) continue;
 
-                currentSourceName = files[i];
-
-                String part = Wildcard.matchWildcard(sourceFile, files[i]);
+                String part = Wildcard.matchWildcard(sourceMask, files[i]);
                 if (part == null) continue;
+
+				currentSourceURL = sourceDirURL + files[i];
 
                 currentTargetURL =
                     Wildcard.instantiateWildcard(targetURL, part);
@@ -212,13 +178,12 @@ class FileEntry implements SourceManager, FileTarget
         }
         else
         {   // main source is a regular file
-            currentSourceFile = new File(sourceDir, sourceFile);
-            currentSourceName = sourceFile;
+	        currentSourceURL = sourceURL;
             currentTargetURL = targetURL;
             buildFile(always);
         }
-
     }
+	
 
     private void buildFile(boolean always)
         throws IOException
@@ -251,6 +216,7 @@ class FileEntry implements SourceManager, FileTarget
             buildAlways();
         }
     }
+	
 
     /**
      * The actual building of this file.
@@ -376,7 +342,7 @@ class FileEntry implements SourceManager, FileTarget
 	}
 
 
-    public String getTargetPath()
+    public String getTargetURL()
     {
         return targetURL;
     }
@@ -389,75 +355,105 @@ class FileEntry implements SourceManager, FileTarget
         return sourceRootDir;
     }
 
-    public java.net.URL getRootDirURL()
-    {
-        return sourceRootDirURL;
-    }
-
-
-    public InputStream openSource()
+    
+    public String getSourceURL()
         throws FileNotFoundException
-    {
-        return new FileInputStream(getSource());
-    }
-
-
-    public File getSource()
-        throws FileNotFoundException
-    {
-        if (currentSourceFile == null)
+	{
+        if (currentSourceURL == null)
             throw new FileNotFoundException("no source file specified");
 
-        return currentSourceFile;
-    }
-
-    public String getSourcePath()
-        throws FileNotFoundException
-    {
-        if (currentSourceFile == null)
-            throw new FileNotFoundException("no source file specified");
-
-        return sourceDirURL + currentSourceName;
+		return currentSourceURL;		
 	}
-
-    public java.net.URL getSourceURL()
-        throws FileNotFoundException
+	
+	
+    public InputStream openFile(String url)
+        throws FileNotFoundException, IOException
     {
-        try {
-            return new java.net.URL(sourceRootDirURL,
-                getSourcePath().substring(1));
-        }
-        catch (java.net.MalformedURLException e)
-        {
-            throw new Error("Unable to create file: URL object: "
-                + getSourcePath());
-        }
-	}
-
-    public boolean sourceHasBeenUpdated(long when)
-    {
-        File file;
-        try {
-            file = getSource();
-        }
-        catch (FileNotFoundException e)
-        {
-            return false;
-        }
-
-        long sourceDate = file.lastModified();
-
-        return ((sourceDate > 0) // source exist
-                &&
-                // will also build if (when == -1) (i.e. unknown)
-                (sourceDate > when));
+		File file = getFile(url);
+		
+		if (file == null)
+		{
+			URL theUrl = new URL(url);
+			URLConnection uc = theUrl.openConnection();
+			return uc.getInputStream();
+		}
+		else
+		{
+			return new FileInputStream(file);
+		}
     }
 
 
-    public boolean fileHasBeenUpdated(String name, long when)
+    public File getFile(String url)
         throws FileNotFoundException
     {
-        File file = getFile(name);
+		if (LagoonUtil.absoluteURL(url))
+		{
+			if (url.startsWith("file:"))
+			{
+				return new File(url.substring(5));	
+			}
+			else if (url.startsWith("res:"))
+			{
+				String resDir = System.getProperty("resourceDir");
+				if (resDir == null)
+					throw new FileNotFoundException(
+						"Resource Dir is not specified");
+				return new File(new File(resDir), url.substring(5));
+			}
+			else
+			{
+				return null;
+			}
+		}
+		else
+		{
+			return new File(sourceRootDir,
+        	    getFileURL(url).substring(1).replace('/', File.separatorChar));
+		}
+    }
+
+	
+    public InputSource getFileAsInputSource(String url)
+        throws FileNotFoundException
+	{
+		InputSource is = new InputSource(url);
+		
+		File file = getFile(url);	
+		
+		if (file != null)
+		{
+			is.setByteStream(new FileInputStream(file));	
+		}
+		
+		return is;
+	}
+
+
+    public StreamSource getFileAsStreamSource(String url)
+        throws FileNotFoundException
+	{
+		File file = getFile(url);	
+		
+		if (file == null)
+			return new StreamSource(getFileURL(url));
+		else
+			return new StreamSource(file);
+	}
+	
+
+    public String getFileURL(String url)
+        throws FileNotFoundException
+    {
+		return getFileURLRelativeTo(url, getSourceURL());
+	}
+
+
+    public boolean fileHasBeenUpdated(String url, long when)
+        throws FileNotFoundException
+    {
+        File file = getFile(url);
+		if (file == null) return true;  // cannot check
         long sourceDate = file.lastModified();
 
         return ((sourceDate > 0) // source exsist
@@ -466,71 +462,38 @@ class FileEntry implements SourceManager, FileTarget
                 (sourceDate > when));
     }
 
-
-    public InputStream openFile(String name)
-        throws FileNotFoundException
-    {
-        return new FileInputStream(getFile(name));
-    }
-
-
-    public File getFile(String filename)
-        throws FileNotFoundException
-    {
-        return new File(sourceRootDir,
-            getFilePath(filename).substring(1).replace('/', File.separatorChar));
-    }
-
-
-    public String getFilePath(String filename)
-        throws FileNotFoundException
-    {
-        if (filename.charAt(0) == '/')
-            return filename;
-        else
-        {
-            if (currentSourceFile == null)
-                throw new FileNotFoundException("no source file specified");
-
-            return sourceDirURL + filename;
-        }
+	
+    public boolean canCheckFileHasBeenUpdated(String url)
+	{
+		return !LagoonUtil.absoluteURL(url) 
+			|| url.startsWith("file:")
+			|| url.startsWith("res:");
 	}
 
-    public java.net.URL getFileURL(String filename)
-        throws FileNotFoundException
-    {
-        try {
-            return new java.net.URL(sourceRootDirURL,
-                getFilePath(filename).substring(1));
-        }
-        catch (java.net.MalformedURLException e)
-        {
-            throw new Error("Unable to create file: URL object: "
-                + getFilePath(filename));
-        }
-	}
 
-    public String getFilePathRelativeTo(String name, String base)
+    public String getFileURLRelativeTo(String url, String base)
     {
-        if (name.charAt(0) == '/')
-            return name;
+        if (LagoonUtil.absoluteURL(url) || LagoonUtil.pseudoAbsoluteURL(url))
+		{
+            return url;
+		}
         else
         {
-            if (base.charAt(0) != '/')
+            if (!LagoonUtil.pseudoAbsoluteURL(base))
                 throw new IllegalArgumentException(
-                    "base must be pseudo-absolute");
+					"base must be a pseudo-absolute URL");
 
             int slash = base.lastIndexOf('/');
             String baseDir = base.substring(0, slash+1);
 
-            return baseDir + name;
+            return baseDir + url;
         }
     }
-
-
+	
+	
 	// FileTarget implemenation
 
-    public String getCurrentTargetPath()
+    public String getCurrentTargetURL()
     {
         return currentTargetURL;
     }
@@ -541,3 +504,4 @@ class FileEntry implements SourceManager, FileTarget
     }
 
 }
+

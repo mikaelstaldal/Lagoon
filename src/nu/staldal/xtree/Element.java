@@ -297,7 +297,6 @@ public class Element extends NodeWithChildren
 			atts.addAttribute(URI, local, "", (String)attrType.elementAt(i),
 				(String)attrValue.elementAt(i));
 		}
-		// *** include qName
 		sax.startElement(namespaceURI, localName, "", atts);
 	}
 

@@ -51,5 +51,6 @@ public interface Target
      * Will return the target URL <em>after</em> wildcard expansion,
      * but not affected by splitting.
      */
-    public String getCurrentTargetPath();
+    public String getCurrentTargetURL();
 }
+

@@ -6,20 +6,20 @@
 <xsl:template match="/">
 <html>
   <head>
-    <title>Directory listing</title>
+    <title>Merge of serveral files</title>
   </head>
 
   <body>
-    <h1>Directory listing</h1>
-	<ul>
-		<xsl:apply-templates select="dirlist"/>
-	</ul>
+    <h1>Merge of serveral files</h1>
+	
+    <xsl:apply-templates select="dirlist"/>
   </body>
 </html>
 </xsl:template>
 
 <xsl:template match="file">
-	<li><xsl:value-of select="@filename"/></li>
+	<p><xsl:copy-of select="document(@url)/item"/></p>
 </xsl:template>
 
 </xsl:stylesheet>
+

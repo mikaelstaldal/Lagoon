@@ -46,7 +46,7 @@ import java.io.*;
 import java.util.Hashtable;
 
 /**
- * A FileStorage which transfers files to a remote site using SSH.
+ * A FileStorage which transfers files to a remote site.
  */
 public abstract class RemoteFileStorage implements FileStorage
 {

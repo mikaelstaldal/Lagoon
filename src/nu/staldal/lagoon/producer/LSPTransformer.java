@@ -61,9 +61,9 @@ public class LSPTransformer extends Transform
     public void init()
         throws LagoonException, IOException
     {
-        if (Wildcard.isWildcard(getSourceMan().getTargetPath()))
+        if (Wildcard.isWildcard(getSourceMan().getTargetURL()))
             throw new LagoonException("Cannot use with wildcard pattern: "
-                + getSourceMan().getTargetPath());
+                + getSourceMan().getTargetURL());
 
         compiler = new LSPCompiler();
 
@@ -112,15 +112,7 @@ public class LSPTransformer extends Transform
             new URLResolver() {
                 public InputSource resolve(String url) throws IOException
                 {
-                    if (LagoonUtil.absoluteURL(url))
-                    {
-                        return new InputSource(url);
-                    }
-                    else
-                    {
-                        return new InputSource(
-							getSourceMan().getFileURL(url).toExternalForm());
-                    }
+					return getSourceMan().getFileAsInputSource(url);
                 }
             });
         next.start(ch, target);
@@ -143,18 +135,7 @@ public class LSPTransformer extends Transform
         theCompiledPage.execute(ch, new URLResolver() {
             public InputSource resolve(String url) throws IOException
             {
-                if (url.length() == 0)
-                	throw new IOException("empty URL");
-                if (LagoonUtil.absoluteURL(url))
-                {
-                    return new InputSource(url);
-                }
-                else
-                {
-                    // *** search Sitemap
-                    InputStream fis = getSourceMan().openFile(url);
-                    return new InputSource(fis);
-                }
+				return getSourceMan().getFileAsInputSource(url);
             }
         }, params);
 

@@ -56,7 +56,7 @@ public class FileSource extends Source
     public void start(ContentHandler sax, Target target)
         throws IOException, SAXException
     {
-        InputStream fis = getSourceMan().openSource();
+        InputStream fis = getSourceMan().openFile(getSourceMan().getSourceURL());
 
         XMLReader parser =
 			new org.apache.xerces.parsers.SAXParser();
@@ -80,8 +80,10 @@ public class FileSource extends Source
 	}
 
     public boolean hasBeenUpdated(long when)
-    {
-        return getSourceMan().sourceHasBeenUpdated(when);
+   		throws FileNotFoundException
+	{
+		return
+			getSourceMan().fileHasBeenUpdated(getSourceMan().getSourceURL(),when);
     }
 
 }

@@ -21,15 +21,21 @@
 	</format>
 </file>
 
-<file target="/dirlist.xml" source="/style/">
+<file target="/dirlistall.xml" source="/style/">
 	<format type="xml" indent="4">
 		<source type="dir"/>
 	</format>
 </file>
 
-<file target="/dirlist.html" source="/style/">
-	<format type="html" indent="4">
-		<transform type="xslt" stylesheet="/dir.xsl"> <!-- always="yes"-->
+<file target="/dirlistraw.xml" source="/style/">
+	<format type="xml" indent="4">
+		<source type="dir" pattern="*.xsl"/>
+	</format>
+</file>
+
+<file target="/dirlist.xml" source="/style/">
+	<format type="xml" indent="4">
+		<transform type="xslt" stylesheet="/dir.xsl">
 			<source type="dir" pattern="*.xsl"/>
 		</transform>
 	</format>
@@ -94,6 +100,25 @@
 		<source/>
 	</format>
 </file>
+
+<file target="/merge.html" source="/merge/">
+    <format type="html">
+        <transform type="xslt" stylesheet="/merge.xsl">
+            <source type="dir"/>
+        </transform>
+    </format>
+</file>
+
+<file target="/file/pic.png" source="file:D:\mikes\lagoon\sample\src\img\pic.png">
+	<read/>
+</file>
+
+<!--
+<file target="/res/pic.png" source="res:/img/pic.png">
+	<read/>
+</file>
+-->
+
 
 <!--
 <file target="/my_notes/*.html" source="/notes/*.xml">

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<!-- RELAX NG schema for Lagoon sitemap -->
+<!-- http://www.oasis-open.org/committees/relax-ng/ -->
+
+<grammar xmlns="http://relaxng.org/ns/structure/0.9">
+
+<start>
+  <element name="sitemap">
+    <attribute name="name"/>
+    <zeroOrMore>
+      <ref name="fileEntry"/>
+    </zeroOrMore>
+  </element>
+</start>
+
+<define name="fileEntry">
+  <element name="file">
+    <attribute name="target"/> <!-- Target must contain wildcard if and only if source contain wildcard -->
+    <optional>
+      <attribute name="source"/> <!-- Source may contain wildcard -->
+    </optional>
+    <ref name="byteProducer"/>  
+  </element>
+</define>
+
+<define name="byteProducer">
+  <choice>
+    <element name="read">
+      <optional>
+        <attribute name="type"/>  <!-- Ommitting uses default -->
+      </optional>
+      <zeroOrMore>
+        <attribute><anyName/></attribute>
+      </zeroOrMore>
+      <text/> <!-- any non-whitespace content is taken as a parameter with name "name" -->
+    </element>
+    <element name="process">
+      <optional>
+        <attribute name="type"/>  <!-- Ommitting uses default -->
+      </optional>
+      <zeroOrMore>
+        <attribute><anyName/></attribute>
+      </zeroOrMore>
+      <ref name="byteProducer"/>  
+    </element>      
+    <element name="format">
+      <optional>
+        <attribute name="type"/>  <!-- Ommitting uses default -->
+      </optional>
+      <zeroOrMore>
+        <attribute><anyName/></attribute>
+      </zeroOrMore>
+      <ref name="xmlProducer"/>  
+    </element>
+  </choice>
+</define>
+
+<define name="xmlProducer">
+  <choice>
+    <element name="source">
+      <optional>
+        <attribute name="type"/>  <!-- Ommitting uses default -->
+      </optional>
+      <zeroOrMore>
+        <attribute><anyName/></attribute>
+      </zeroOrMore>
+      <text/> <!-- any non-whitespace content is taken as a parameter with name "name" -->
+    </element>
+    <element name="parse">
+      <optional>
+        <attribute name="type"/>  <!-- Ommitting uses default -->
+      </optional>
+      <zeroOrMore>
+        <attribute><anyName/></attribute>
+      </zeroOrMore>
+      <ref name="byteProducer"/>  
+    </element>
+    <element name="transform">
+      <optional>
+        <attribute name="type"/>  <!-- Ommitting uses default -->
+      </optional>
+      <zeroOrMore>
+        <attribute><anyName/></attribute>
+      </zeroOrMore>
+      <ref name="xmlProducer"/>  
+    </element>      
+  </choice>
+</define>
+
+</grammar>
+
