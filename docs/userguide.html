@@ -111,7 +111,7 @@ have a JDK. The GUI part of Lagoon requires Java2.</li>
 
 <li>An XML parser and an XSLT processor with JAXP 1.1 interface.
 Lagoon has been tested with Apache Xerces version 1.4.4, Apache Crimson 
-version 1.1.3, Apache Xalan version 2.3, and with Java2 1.4. 
+version 1.1.3, Apache Xalan version 2.3.1, and with Java2 1.4. 
 You can download Xerces, Xalan and Crimson
 from <a href="http://xml.apache.org/dist/">http://xml.apache.org/dist/</a>.
 The simplest way is to download Xalan only, it includes a suitable version
@@ -161,10 +161,13 @@ unique identifies it on the system.</p>
 <p>The sitemap has entries for files, each <code>&lt;file&gt;</code>
 entry describes how that file should be created. 
 The target is the request URL for the web server, 
-and must be specified as a pseudo-absolute URL. The source URL must be specified 
-as an absolute or pseudo-absolute URL. If source is omitted, 
+and must be specified as a pseudo-absolute URL. The source URL must be 
+specified as an absolute or pseudo-absolute URL. If source is omitted, 
 it's set to the same string as target (including any wildcard). 
-The pipeline must end with a byte producer.</p>
+The pipeline must end with a byte producer. As a shortcut, an empty 
+<code>file</code> element is equvivalent to a <code>file</code> element 
+with a single <code>read</code> 
+child.</p>
 
 <p>The sitemap may also contain <code>&lt;part&gt;</code>
 entries, which defines a partial document, to be included by another document. 
@@ -535,6 +538,12 @@ may affect performance, and can in some situations cause deadlocks.</p>
   &lt;read/&gt;
 &lt;/file&gt;
 </pre>
+
+<p>Same as above:</p>
+<pre>
+&lt;file target="/john.jpeg" source="/img/john.jpeg"/&gt;
+</pre>
+
 
 <p>Format an HTML page. Note that the source HTML file must be XHTML 
 (well-formed XML and all HTML elements in the XHTML namespace):</p>

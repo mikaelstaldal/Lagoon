@@ -31,7 +31,7 @@
     <optional>
       <attribute name="source"/> <!-- Source may contain wildcard -->
     </optional>
-    <ref name="byteProducer"/>  
+    <optional><ref name="byteProducer"/></optional>  
   </element>
 </define>
 

@@ -142,7 +142,10 @@ class Sitemap
 											currentTargetName, theSource,
 											sourceDir, targetLocation,
 											processor.getTempDir());
-				
+
+				if (entry.numberOfChildren() == 0)
+					entry.addChild(new Element("", "read", 0, 0));
+											
 				depth = 0;
 				Object o = handleProducer(entry);
 				

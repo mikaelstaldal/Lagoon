@@ -171,9 +171,7 @@
     </format>
 </file>
 
-<file target="/file/pic.png" source="file:C:\home\mikes\lagoon\sample\src\img\pic.png">
-	<read/>
-</file>
+<file target="/file/pic.png" source="file:C:\home\mikes\lagoon\sample\src\img\pic.png"/>
 
 <!--
 <file target="/res/pic.png" source="res:/img/pic.png">
