@@ -4,28 +4,209 @@
 
 <property name="foo">bar</property>
 
-<file target="/picture.png" source="/batikBatik.svg">
+<!--
+<file target="/lsptest.html" source="/lsp/test.lsp">
+	<format type="xhtml">
+		<transform type="lsp" bool="BOOLEAN" hej="HEJSAN" pi="ACME"><source/></transform>
+	</format>
+</file>
+
+<part name="thePart" source="/lsp/part.lsp">
+	<transform type="lsp" foo="BAR"><source/></transform>
+</part>
+
+<part name="theSecondPart" source="/lsp/part2.lsp">
+	<transform type="lsp" foo="BAZ"><source/></transform>
+</part>
+-->
+
+<part name="largePart" source="/style/">
+    <transform type="xslt" stylesheet="/dir.xsl">
+        <source type="dir" pattern="*.xsl"/>
+    </transform>
+</part>
+
+<file target="/dirpart.html" source="part:largePart">
+	<format type="html"><source/></format>
+</file>
+
+<delete target="/remove/me.txt"/>
+
+<file target="/dtd/xmlwithdtd.xml">
+	<format type="xml">
+		<source/>
+	</format>
+</file>
+
+<file target="/island.html">
+	<format type="xml">
+		<transform type="lssi">
+			<source/>
+		</transform>
+	</format>
+</file>
+
+<file target="/db.php">
+	<format type="xhtml">
+		<transform type="lssi">
+			<source/>
+		</transform>
+	</format>
+</file>
+
+<file target="/island.xml" source="/island.html">
+	<format type="xml">
+		<source/>
+	</format>
+</file>
+
+
+<file target="/very_transformed.xml" source="/twoxsl.xml">
+	<format type="xml" indent="4">
+		<transform type="xslt" stylesheet="/style/second.xsl">
+			<transform type="xslt" stylesheet="/style/first.xsl">
+				<source/>
+			</transform>
+		</transform>
+	</format>
+</file>
+
+<file target="/split/split.sem" source="/split.xml">
+	<format type="xml" indent="4">
+		<transform type="split" namespace="" element="split" 
+				   outputname="[name].xml">
+			<source/>
+		</transform>
+	</format>
+</file>
+
+<file target="/dirlistall.xml" source="/style/">
+	<format type="xml" indent="4">
+		<source type="dir"/>
+	</format>
+</file>
+
+<file target="/dirlistraw.xml" source="/style/">
+	<format type="xml" indent="4">
+		<source type="dir" pattern="*.xsl"/>
+	</format>
+</file>
+
+<file target="/dirlist.xml" source="/style/">
+	<format type="xml" indent="4">
+		<transform type="xslt" stylesheet="/dir.xsl">
+			<source type="dir" pattern="*.xsl"/>
+		</transform>
+	</format>
+</file>
+
+<file target="/report.html" source="/work/report.xml">
+	<format type="html" html="strict" indent="yes">
+   		<transform type="xslt" stylesheet="/style/report_html.xsl">
+    	    <source/>
+    	</transform>
+	</format>
+</file>
+
+<file target="/report.fo" source="/work/report.xml">
+	<format type="xml">
+	   	<transform type="xslt" stylesheet="/style/report_print.xsl">
+    	    <source/>
+		</transform>
+    </format>
+</file>
+
+<file target="/report.pdf" source="/work/report.xml">
+	<format type="fo">
+	   	<transform type="xslt" stylesheet="/style/report_print.xsl">
+    	    <source/>
+		</transform>
+    </format>
+</file>
+
+<file target="/picture.png" source="/batikLogo.svg">
 	<format type="svg" format="png">
     	<source/>
     </format>
 </file>
 
-<file target="/picture.tiff" source="/batikBatik.svg">
+<file target="/picture.tiff" source="/batikLogo.svg">
 	<format type="svg" format="tiff">
     	<source/>
     </format>
 </file>
 
-<file target="/picture.jpeg" source="/batikBatik.svg">
-	<format type="svg" format="jpeg">
-    	<source/>
+<file target="/pic.png" source="/img/pic.png">
+	<read/>
+</file>
+
+<!--
+<file target="/test.lsp" source="/lsp/test.lsp">
+	<format type="xml">
+		<source/>
+	</format>
+</file>
+
+<file target="/test.lsp3" source="/lsp/test.lsp">
+	<format type="xml">
+		<parse>
+			<read/>
+		</parse>
+	</format>
+</file>
+-->
+
+<file target="/htmltest.html" source="/htmltest.html">
+	<format type="html">
+		<source/>
+	</format>
+</file>
+
+<file target="/htmltest.xml" source="/htmltest.html">
+	<format type="xml">
+		<source/>
+	</format>
+</file>
+
+<file target="/htmltest.xhtml" source="/htmltest.html">
+	<format type="xhtml">
+		<source/>
+	</format>
+</file>
+
+<file target="/htmltest.text" source="/htmltest.html">
+	<format type="text">
+		<source/>
+	</format>
+</file>
+
+<file target="/merge.html" source="/merge/">
+    <format type="html">
+        <transform type="xslt" stylesheet="/merge.xsl">
+            <source type="dir"/>
+        </transform>
     </format>
 </file>
 
-<file target="/anne.png" source="/anne.svg">
-	<format type="svg" format="png">
-    	<source/>
+<file target="/file/pic.png" source="file:C:\home\mikes\lagoon\sample\src\img\pic.png"/>
+
+-->
+
+<!--
+<file target="/res/pic.png" source="res:/img/pic.png">
+	<read/>
+</file>
+-->
+
+
+<!--
+<file target="/my_notes/*.html" source="/notes/*.xml">
+	<format type="html">
+		<transform type="xslt" stylesheet="/style/note_html.xsl">
+    	    <source/>
+		</transform>
     </format>
 </file>
+-->
 
 </sitemap>
