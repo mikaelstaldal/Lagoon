@@ -10,6 +10,7 @@
     <attribute name="name"/>
     <zeroOrMore>
       <choice>
+        <ref name="propertyEntry"/>
         <ref name="outputEntry"/>
         <ref name="deleteEntry"/>
         <ref name="fileEntry"/>
@@ -18,6 +19,13 @@
     </zeroOrMore>
   </element>
 </start>
+
+<define name="propertyEntry">
+  <element name="property">
+    <attribute name="name"/>
+    <text/>
+  </element>
+</define>
 
 <define name="outputEntry">
   <element name="output">

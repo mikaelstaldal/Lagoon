@@ -60,6 +60,7 @@ class Sitemap
 	private Vector entryVector;
     private Hashtable parts;
 	private Hashtable outputs;
+	private Hashtable projectProperties;
 
     // Attributes
     private LagoonProcessor processor;
@@ -105,6 +106,7 @@ class Sitemap
 		entryVector = new Vector();
 		parts = new Hashtable();
 		outputs = new Hashtable();
+		projectProperties = new Hashtable();
 	}
 	
 	public void init()
@@ -260,6 +262,20 @@ class Sitemap
 
 	            outputs.put(currentTargetName, currentFile);
 			}
+			else if (entry.getLocalName().equals("property"))
+			{
+				String propName = entry.getAttrValueOrNull("name");
+				if (propName == null
+						|| propName.length() < 1)
+				{
+					throw new LagoonException("property name missing");
+				}
+				
+	            String propValue = entry.getTextContentOrNull();
+				
+				if (propValue != null)
+					projectProperties.put(propName, propValue);
+			}
 			else
 			{
 				throw new LagoonException(
@@ -341,6 +357,20 @@ class Sitemap
         return (OutputEntry)outputs.get(name);
     }
 
+	
+	/**
+	 * Return the value of a project property in the Sitemap.
+	 *
+	 * @param key  the property name
+	 *
+	 * @return the property value, or <code>null</code> if the property is 
+	 * 	not defined.
+	 */
+	String getProperty(String key)
+	{
+		return (String)projectProperties.get(key);	
+	}
+	
 	
 	private Object handleProducer(Element parentEl)
 		throws LagoonException, java.io.IOException

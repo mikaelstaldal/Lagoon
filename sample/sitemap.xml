@@ -2,6 +2,8 @@
 
 <sitemap name="LagoonSample">
 
+<property name="foo">bar</property>
+
 <delete target="/remove/me.txt"/>
 
 <file target="/xmlwithdtd.xml">

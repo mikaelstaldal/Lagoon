@@ -196,7 +196,7 @@ public class LagoonCLI
         }
 					
         System.out.println("Lagoon initialized successfully");
-
+		
         try {
             if (build)
             {

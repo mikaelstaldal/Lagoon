@@ -55,3 +55,5 @@
 1.0 beta 16
 -----------
 * Better handling of DTDs.
+* Project properties in sitemap.
+

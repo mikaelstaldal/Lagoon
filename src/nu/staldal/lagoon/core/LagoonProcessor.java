@@ -587,4 +587,11 @@ public class LagoonProcessor implements LagoonContext
         }
     }
 
+	
+	public String getProperty(String key)
+	{
+		return sitemap.getProperty(key);	
+	}
+	
 }
+

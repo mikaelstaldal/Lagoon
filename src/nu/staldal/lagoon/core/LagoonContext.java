@@ -125,5 +125,16 @@ public interface LagoonContext
 	 * 		   (the url parameter unchanged unless it's relative)
      */
     public String getFileURLRelativeTo(String url, String base);
+	
+	
+	/**
+	 * Return the value of a project property.
+	 *
+	 * @param key  the property name
+	 *
+	 * @return the property value, or <code>null</code> if the property is 
+	 * 	not defined.
+	 */
+	public String getProperty(String key);
 }
 
