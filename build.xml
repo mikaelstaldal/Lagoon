@@ -32,8 +32,8 @@
 
   <property name="Name" value="Lagoon"/>
   <property name="name" value="lagoon"/>
-  <property name="version" value="1.0b14"/>
-  <property name="ver" value="10b14"/>
+  <property name="version" value="1.0b15"/>
+  <property name="ver" value="10b15"/>
 
   <property name="res.dir" value="resource"/>
   <property name="src.dir" value="src"/>
@@ -222,7 +222,7 @@
   		  description="Builds the distribution">
     <filter token="NAME" value="${Name}" />
     <filter token="VERSION" value="${version}" />
-    <filter token="DATE" value="${DSTAMP}" />
+    <filter token="DATE" value="${TODAY_DATE}" />
     <copy file="README" todir="${dist.dir}" 
           overwrite="true"
           filtering="on"/>
