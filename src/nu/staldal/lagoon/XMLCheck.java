@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2001, Mikael Ståldal
- * All rights reserved..
+ * Copyright (c) 2001-2002, Mikael Ståldal
+ * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without 
  * modification, are permitted provided that the following conditions 
@@ -86,7 +86,6 @@ public class XMLCheck
 
 class MyParser implements ErrorHandler
 {
-	private String filename;
 	private boolean ioError;
 
 	MyParser() {}
@@ -113,20 +112,10 @@ class MyParser implements ErrorHandler
 		parser.setErrorHandler(this);
 
 		try {
-			InputSource is;
-
-			if (input.indexOf(':') > 1) // looks like an URL
-			{
-				filename = null;
-				is = new InputSource(input);
-			}
-			else // a local filename
-			{
-				filename = input;
-				is = new InputSource(new FileInputStream(filename));
-			}
+			InputSource is = new InputSource(input);
 
 			ioError = false;
+
 			parser.parse(is);
 		}
 		catch (java.io.FileNotFoundException e)
@@ -136,7 +125,7 @@ class MyParser implements ErrorHandler
 		}
 		catch (java.io.IOException e)
 		{
-			System.err.println(e.getClass().getName() + ": " + e.getMessage());
+			System.err.println(e.toString());
 			return false;
 		}
 		catch (SAXException e)
@@ -149,21 +138,24 @@ class MyParser implements ErrorHandler
 
 	public void warning(SAXParseException e)
 	{
-		String name = (filename == null) ? e.getSystemId() : filename;
+		String name = e.getSystemId();
+		if (name.startsWith("file:")) name = name.substring(5);
 		System.err.println(name + ":" + e.getLineNumber() + ":"
 			+ e.getColumnNumber() + ": Warning: " + e.getMessage());
 	}
 
 	public void error(SAXParseException e)
 	{
-		String name = (filename == null) ? e.getSystemId() : filename;
+		String name = e.getSystemId();
+		if (name.startsWith("file:")) name = name.substring(5);
 		System.err.println(name + ":" + e.getLineNumber() + ":"
 			+ e.getColumnNumber() + ": Error: " + e.getMessage());
 	}
 
 	public void fatalError(SAXParseException e)
 	{
-		String name = (filename == null) ? e.getSystemId() : filename;
+		String name = e.getSystemId();
+		if (name != null && name.startsWith("file:")) name = name.substring(5);
 		if (name == null)
 		{
 			System.err.println(e.getMessage());
