@@ -85,10 +85,16 @@ public class TreeBuilder implements ContentHandler, ErrorHandler
 		throws SAXException, FileNotFoundException, IOException,
 		ParserConfigurationException
 	{
-		if (!xmlFile.isFile())
-			throw new FileNotFoundException(xmlFile.getAbsolutePath());
+        // we should use File.toURL() here, but it's Java2
+		String absPath = 
+			xmlFile.getCanonicalPath().replace(File.separatorChar, '/');
+        String systemId = "file:" 
+				+ ((absPath.charAt(0) == '/') ? "//" : "///") + absPath;
 
-		return parseXML(new InputSource(xmlFile.getAbsolutePath()), validate);
+		if (!xmlFile.isFile())
+			throw new FileNotFoundException(systemId);
+
+		return parseXML(new InputSource(systemId), validate);
 	}
 
 
