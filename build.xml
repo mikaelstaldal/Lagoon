@@ -37,8 +37,6 @@
   <property name="build.classes" value="${build.dir}/classes"/>
   <property name="build.testsuite" value="${build.dir}/testsuite"/>
 
-  <property name="manifest" value="src/lagoon.mf"/>
-
   <target name="init">
     <tstamp>
       <format property="TODAY_DATE" pattern="yyyy-MM-dd" locale="en"/>
@@ -98,7 +96,7 @@
   	description="Compiles Lagoon">
  
     <jar jarfile="${dist.jars}/${name}.jar"
-         manifest="${manifest}">
+         manifest="src/lagoon.mf">
       <fileset dir="${build.classes}"> 
     	 <include name="*"/>
     	 <include name="nu/staldal/lagoon/**/*"/>
@@ -133,7 +131,7 @@
     </copy>
 
     <jar jarfile="${dist.jars}/xmlutil.jar">
-         <!-- manifest="${manifest}" -->
+         <!-- manifest="src/xmlutil.mf" -->
       <fileset dir="${build.classes}"> 
     	 <include name="nu/staldal/xtree/**/*"/>
     	 <include name="nu/staldal/xmlutil/**/*"/>
@@ -163,8 +161,8 @@
       </fileset>
     </copy>
 
-    <jar jarfile="${dist.jars}/lsp.jar">
-         <!-- manifest="${manifest}" -->
+    <jar jarfile="${dist.jars}/lsp.jar"
+         manifest="src/lsp.mf">
       <fileset dir="${build.classes}"> 
          <include name="nu/staldal/lsp/**/*" />
          <include name="nu/staldal/syntax/**/*" />
@@ -192,6 +190,7 @@
            optimize="off">
     	<classpath>
             <pathelement location="${build.classes}" />
+            <pathelement location="${JUnit}" />
         </classpath>
     </javac>
 
@@ -205,7 +204,8 @@
     <junit>
         <formatter type="plain" usefile="no"/>  
         <test name="nu.staldal.util.TestEnvironment"/>
-        <test name="nu.staldal.xtree.TestXTree"/>
+        <test name="nu.staldal.util.TestUtils"/>
+   <!-- <test name="nu.staldal.xtree.TestXTree"/> -->
         <test name="nu.staldal.xtree.TestSequentialTreeBuilder"/>
         <test name="nu.staldal.lsp.TestLSPParse"/>
    <!-- <test name="nu.staldal.lagoon.filestorage.TestLocalFileStorage"/> -->
