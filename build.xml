@@ -28,12 +28,13 @@
   <property name="version" value="1.0b18"/>
   <property name="ver" value="10b18"/>
 
+  <property name="version.lsp" value="1.0b1"/>
+  <property name="ver.lsp" value="10b1"/>
+
   <property name="res.dir" value="resource"/>
   <property name="src.dir" value="src"/>
   <property name="src.testsuite" value="testsuite"/>
   <property name="build.dir" value="build"/>
-  <property name="dist.dir" value="dist"/>
-  <property name="dist.jars" value="${dist.dir}"/>
   <property name="build.classes" value="${build.dir}/classes"/>
   <property name="build.testsuite" value="${build.dir}/testsuite"/>
 
@@ -44,8 +45,7 @@
 
     <mkdir dir="${build.classes}"/>
     <mkdir dir="${build.testsuite}"/>
-    <mkdir dir="${dist.dir}"/>
-    <mkdir dir="${dist.jars}"/>
+    <mkdir dir="dist"/>
     <uptodate property="lexer.notRequired"
     		  targetfile="${basedir}/${src.dir}/nu/staldal/lsp/expr/LSPExprLexer.java">
 		<srcfiles dir="${basedir}/${src.dir}"
@@ -56,7 +56,7 @@
 
   <target name="lagoon_version_check">
     <uptodate property="lagoon_version.notRequired"
-    		  targetfile="${dist.jars}/${name}.jar">
+    		  targetfile="dist/${name}.jar">
       <srcfiles dir="${build.classes}"> 
     	 <include name="*"/>
     	 <include name="nu/staldal/lagoon/**/*"/>
@@ -87,6 +87,7 @@
         <include name="nu/staldal/lagoon/**/*" />
         <exclude name="**/*.java" />
         <exclude name="**/*.lex" />
+        <exclude name="**/package.html" />
       </fileset>
     </copy>
   </target>
@@ -95,7 +96,7 @@
     depends="init,xmlutil,lexer,lsp,lagoon_compile,lagoon_version"
   	description="Compiles Lagoon">
  
-    <jar jarfile="${dist.jars}/${name}.jar"
+    <jar jarfile="dist/${name}.jar"
          manifest="src/lagoon.mf">
       <fileset dir="${build.classes}"> 
     	 <include name="*"/>
@@ -127,10 +128,11 @@
         <include name="nu/staldal/util/**/*" />
         <exclude name="**/*.java" />
         <exclude name="**/*.lex" />
+        <exclude name="**/package.html" />
       </fileset>
     </copy>
 
-    <jar jarfile="${dist.jars}/xmlutil.jar">
+    <jar jarfile="dist/xmlutil.jar">
          <!-- manifest="src/xmlutil.mf" -->
       <fileset dir="${build.classes}"> 
     	 <include name="nu/staldal/xtree/**/*"/>
@@ -159,10 +161,11 @@
         <include name="nu/staldal/syntax/**/*" />
         <exclude name="**/*.java" />
         <exclude name="**/*.lex" />
+        <exclude name="**/package.html" />
       </fileset>
     </copy>
 
-    <jar jarfile="${dist.jars}/lsp.jar"
+    <jar jarfile="dist/lsp.jar"
          manifest="src/lsp.mf">
       <fileset dir="${build.classes}"> 
          <include name="nu/staldal/lsp/**/*" />
@@ -199,6 +202,7 @@
       <fileset dir="${src.testsuite}">
         <include name="nu/staldal/**/*" />
         <exclude name="**/*.java" />
+        <exclude name="**/package.html" />
       </fileset>
     </copy>
 
@@ -220,44 +224,87 @@
 
   <target name="docs" depends="init" 
   	description="Creates the documentation">
-  	<copy todir="${dist.dir}/docs">
+  	<copy todir="dist/docs">
       <fileset dir="docs"/>
     </copy>
-    <mkdir dir="${dist.dir}/docs/javadoc"/>
-    <javadoc packagenames="nu.staldal.lagoon.core,nu.staldal.lagoon.util,nu.staldal.xtree,nu.staldal.lsp,nu.staldal.syntax,nu.staldal.xmlutil,nu.staldal.ftp,nu.staldal.util"
+    <mkdir dir="dist/docs/javadoc"/>
+    <javadoc packagenames="nu.staldal.lagoon.core,nu.staldal.lagoon.util,nu.staldal.xtree,nu.staldal.xmlutil,nu.staldal.ftp,nu.staldal.util"
     	     sourcepath="${src.dir}"
              classpathref="lagoon.class.path"
-             classpath="${JAF};${JARV};${BCEL}"
-             destdir="${dist.dir}/docs/javadoc"
+             classpath="${JAF};${JARV}"
+             destdir="dist/docs/javadoc"
              author="true"
              version="true"
              windowtitle="${Name} API"
              doctitle="${Name}"/>
   </target>
 
-
+  
   <target name="dist" depends="lagoon,docs"
-  		  description="Builds the distribution">
+  		  description="Builds the Lagoon distribution">
     <filter token="NAME" value="${Name}" />
     <filter token="VERSION" value="${version}" />
     <filter token="DATE" value="${TODAY_DATE}" />
-    <copy file="README" todir="${dist.dir}" 
+    <copy file="README" todir="dist" 
           overwrite="true"
           filtering="on"/>
-    <copy file="LICENSE" todir="${dist.dir}" />
-    <copy file="HISTORY" todir="${dist.dir}" />
-  	<copy todir="${dist.dir}/bin">
+    <copy file="LICENSE" todir="dist" />
+    <copy file="HISTORY" todir="dist" />
+  	<copy todir="dist/bin">
       <fileset dir="bin"/>
     </copy>
 
     <zip zipfile="${name}${ver}.zip"
-    	 basedir="${dist.dir}" />
+    	 basedir="dist" />
+  </target>
+
+
+  <target name="docs-lsp" depends="init" 
+  	description="Creates the LSP documentation">
+  	<copy todir="dist-lsp/docs">
+      <fileset dir="docs" includes="lspuser.html,lsp-servlet.html,manual.css"/>
+    </copy>
+    <mkdir dir="dist-lsp/docs/javadoc"/>
+    <javadoc packagenames="nu.staldal.lsp,nu.staldal.lsp.servlet,nu.staldal.xtree,nu.staldal.xmlutil"
+    	     sourcepath="${src.dir}"
+             classpath="${Ant};${BCEL};${JAF};${JARV};${Servlet}"
+             destdir="dist-lsp/docs/javadoc"
+             author="true"
+             version="true"
+             windowtitle="LSP API"
+             doctitle="LSP"/>
+  </target>
+
+
+  <target name="dist-lsp" depends="lsp,docs-lsp"
+  		  description="Builds the LSP distribution">
+    <filter token="NAME" value="LSP" />
+    <filter token="VERSION" value="${version.lsp}" />
+    <filter token="DATE" value="${TODAY_DATE}" />
+    <copy file="README.LSP" todir="dist-lsp" 
+          overwrite="true"
+          filtering="on"/>
+    <copy file="LICENSE" todir="dist-lsp" />
+  	<copy todir="dist-lsp/bin">
+      <fileset dir="bin" includes="lspc*"/>
+    </copy>
+  	<copy todir="dist-lsp">
+      <fileset dir="dist" includes="lsp.jar xmlutil.jar"/>
+    </copy>    
+    <mkdir dir="dist-lsp/sample/servlet"/>
+  	<copy todir="dist-lsp/sample/servlet">
+      <fileset dir="sample/servlet"/>
+    </copy>
+
+    <zip zipfile="LSP${ver.lsp}.zip"
+    	 basedir="dist-lsp" />
   </target>
 
 
   <target name="clean" description="Remove built files">
     <delete dir="${build.dir}"/>
-    <delete dir="${dist.dir}"/>
+    <delete dir="dist"/>
+    <delete dir="dist-lsp"/>
   </target>
 
 </project>
