@@ -103,6 +103,35 @@ public final class Utils
     }
 
 
+ 	/**
+	 * Encode a path name or URL into a Java identifier.
+	 *
+	 * The encoding function is not intended to be inversible. 
+	 */
+    public static String encodePathAsIdentifier(String path)
+    {
+        StringBuffer sb = new StringBuffer(path.length());
+		
+        char c = path.charAt(0);
+		if (Character.isJavaIdentifierStart(c))
+			sb.append(c);
+		else
+			sb.append("_"+((int)c)+"_");
+
+		for (int i = 1; i < path.length(); i++)
+        {
+            c = path.charAt(i);
+			if (Character.isJavaIdentifierPart(c))
+				sb.append(c);
+			else
+				sb.append("_"+((int)c)+"_");
+		}
+		
+		return sb.toString();
+	}
+
+
+
     /**
      * Check whether an URL is absolute.
      * Returns true if the URL contains at least one colon, and
