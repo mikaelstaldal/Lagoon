@@ -136,12 +136,16 @@ public class ContentHandlerSnooper implements ContentHandler
     public void characters(char[] chars, int start, int length)
         throws SAXException
     {
-        ch.characters(chars, start, length);
+		if (DEBUG) out.println("characters");
+
+		ch.characters(chars, start, length);
     }
 
     public void ignorableWhitespace(char[] chars, int start, int length)
         throws SAXException
     {
+		if (DEBUG) out.println("ignorableWhitespace");
+
         ch.ignorableWhitespace(chars, start, length);
     }
 
