@@ -25,11 +25,11 @@
 
   <property name="Name" value="Lagoon"/>
   <property name="name" value="lagoon"/>
-  <property name="version" value="1.0b19"/>
-  <property name="ver" value="10b19"/>
+  <property name="version" value="1.0b20"/>
+  <property name="ver" value="10b20"/>
 
-  <property name="version.lsp" value="1.0b3"/>
-  <property name="ver.lsp" value="10b3"/>
+  <property name="version.lsp" value="1.0b4"/>
+  <property name="ver.lsp" value="10b4"/>
 
   <property name="res.dir" value="resource"/>
   <property name="src.dir" value="src"/>
@@ -153,6 +153,7 @@
        <classpath location="${Ant}" />
        <classpath location="${BCEL}" />
        <classpath location="${Servlet}" />
+       <classpath location="${Struts}" />
 	</javac>
 
     <copy todir="${build.classes}">
