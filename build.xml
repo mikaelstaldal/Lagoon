@@ -17,6 +17,7 @@
   <path id="lagoon.class.path">
     <pathelement location="${FOP}" />
     <pathelement location="${LogKit}" />
+    <pathelement location="${Ant}" />
     <fileset dir="${Batik}">
         <include name="*.jar"/>
     </fileset>

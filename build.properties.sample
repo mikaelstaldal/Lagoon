@@ -7,3 +7,4 @@ LogKit=logkit-1.0.jar
 Batik=lib
 JAF=activation.jar
 JARV=iso-relax.jar
+Ant=ant.jar

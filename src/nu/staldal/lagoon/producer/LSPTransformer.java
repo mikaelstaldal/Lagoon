@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001, Mikael Ståldal
+ * Copyright (c) 2001-2003, Mikael Ståldal
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -89,10 +89,10 @@ public class LSPTransformer extends Transform
 		}
 
 		if (DEBUG) System.out.println("Checking imported files"); 
-		for (Enumeration e = theCompiledPage.getCompileDependentFiles();
-             e.hasMoreElements(); )
+		for (Iterator e = theCompiledPage.getCompileDependentFiles();
+             e.hasNext(); )
 		{
-			String f = (String)e.nextElement();
+			String f = (String)e.next();
 			if (DEBUG) System.out.println("Checking imported file: " + f); 
 			if (getSourceMan().fileHasBeenUpdated(f, when))
 			{
@@ -161,10 +161,10 @@ public class LSPTransformer extends Transform
 
 		if (theCompiledPage.isExecuteDynamic()) return true;
 
-		for (Enumeration e = theCompiledPage.getExecuteDependentFiles();
-             e.hasMoreElements(); )
+		for (Iterator e = theCompiledPage.getExecuteDependentFiles();
+             e.hasNext(); )
 		{
-			String f = (String)e.nextElement();
+			String f = (String)e.next();
 			if (DEBUG) System.out.println("Checking " + f);
 			if (getSourceMan().fileHasBeenUpdated(f, when))
 			{
