@@ -199,6 +199,16 @@ in output like this</lsp:processing-instruction>
 <lsp:element name="apa" namespace="http://foo.com/hej">PREFIX</lsp:element>
 <lsp:element name="gurka" namespace="http://foo.com">PREFIX igen</lsp:element>
 
+
+<h2>Attribute element</h2>
+
+<p><lsp:attribute name="style" value="color: red;"/>red</p>
+<lsp:element name="p"><lsp:attribute name="style" value="color: blue;"/>blue</lsp:element>
+<p><lsp:attribute name="foo" namespace="" value="FOO"/>*FOO*</p>
+<p><lsp:attribute name="foo" namespace="http://foo.com" value="FOO"/>*FOO*</p>
+<p xmlns="http://default.com"><lsp:attribute name="style" value="color: green;"/>green</p>
+
+
 <h2>ExtFunc</h2>
 
 <!--
