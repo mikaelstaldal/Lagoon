@@ -60,6 +60,7 @@ public class XSLTransformer extends Transform
     private String xslFile;
     private SAXTransformerFactory tfactory;
     private boolean always;
+    private long stylesheetRead = 0;
 
     private StylesheetContainer container;
 
@@ -100,6 +101,16 @@ public class XSLTransformer extends Transform
         }
     }
     
+    public void afterBuild()
+        throws IOException
+    {
+        if (stylesheetRead > 0)
+        {
+            container.stylesheetRead = System.currentTimeMillis();
+            putObjectIntoRepository("stylesheet", container);
+        }
+    }
+
     private void readStylesheet(final Target target)
     	throws IOException, SAXException
     {
@@ -141,7 +152,7 @@ public class XSLTransformer extends Transform
 		
         try {
             container.stylesheet = tfactory.newTemplates(ss);
-            container.stylesheetRead = System.currentTimeMillis();
+            stylesheetRead = System.currentTimeMillis();
             putObjectIntoRepository("stylesheet", container);
         }
         catch (TransformerConfigurationException e)

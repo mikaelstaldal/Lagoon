@@ -84,3 +84,6 @@
 1.0 beta 20
 -----------
 * Better Batik integration for SVG rendering: xlinks now works.
+* Fixed problem with updated stylesheet not triggering update of multiple 
+  dependent files.
+
