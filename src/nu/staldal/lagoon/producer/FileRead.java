@@ -56,7 +56,7 @@ public class FileRead extends Read
     {
         InputStream fis = getSourceMan().openFile(getSourceMan().getSourceURL());
 
-        byte[] buf = new byte[4096];
+        byte[] buf = new byte[8192];
 
         while (true)
         {
@@ -69,10 +69,11 @@ public class FileRead extends Read
     }
 
     public boolean hasBeenUpdated(long when)
-		throws FileNotFoundException
+		throws FileNotFoundException, IOException, LagoonException
     {
         return 
 			getSourceMan().fileHasBeenUpdated(getSourceMan().getSourceURL(),when);
     }
 
 }
+

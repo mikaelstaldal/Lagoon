@@ -57,9 +57,19 @@ public abstract class Producer implements ProducerInterface
      */
     private Hashtable params = new Hashtable();
 
-    private SourceManager sourceMan = null;
+    private String entryName;
+	private SourceManager sourceMan = null;
     private LagoonProcessor processor = null;
     private int position = 0;
+
+	/**
+	 * Set the name of the sitemap entry this producer is associated with.
+	 * Used during initialization.
+	 */
+	void setEntryName(String entryName)
+	{
+        this.entryName = entryName;
+	}
 
 	/**
 	 * Set the SourceManager this producer is associated with.
@@ -158,7 +168,7 @@ public abstract class Producer implements ProducerInterface
     public InputStream readFileFromRepository(String key)
     {
         return processor.readFileFromRepository(
-            LagoonUtil.encodePath(getSourceMan().getTargetURL()),
+            LagoonUtil.encodePath(entryName),
             makeKey(key));
     }
 
@@ -174,7 +184,7 @@ public abstract class Producer implements ProducerInterface
         throws IOException
     {
         return processor.storeFileInRepository(
-            LagoonUtil.encodePath(getSourceMan().getTargetURL()),
+            LagoonUtil.encodePath(entryName),
             makeKey(key));
     }
 
@@ -190,7 +200,7 @@ public abstract class Producer implements ProducerInterface
         throws java.io.IOException
     {
         return processor.getObjectFromRepository(
-            LagoonUtil.encodePath(getSourceMan().getTargetURL()),
+            LagoonUtil.encodePath(entryName),
             makeKey(key));
     }
 
@@ -205,7 +215,7 @@ public abstract class Producer implements ProducerInterface
         throws java.io.IOException
     {
         processor.putObjectIntoRepository(
-            LagoonUtil.encodePath(getSourceMan().getTargetURL()),
+            LagoonUtil.encodePath(entryName),
             makeKey(key),
             obj);
     }

@@ -47,16 +47,6 @@ import java.io.*;
  */
 public interface SourceManager
 {
-    /**
-     * Get the current target URL.
-     * Will return a pseudo-absolute URL.
-     * Will return the target URL <em>before</em> wildcard expansion.
-     *
-     * This method doesn't conceptually belong in this interface,
-     * but I found no better place for it.
-     */
-    public String getTargetURL();
-
 
     /**
      * Get an absolute File object representing the source root directory.
@@ -105,7 +95,7 @@ public interface SourceManager
 
 
 	/**
-     * Get a SAX InputSource object representing the given file.
+     * Get a TrAX/JAXP Source object representing the given file.
 	 *
 	 * @param url  URL to the file, if relative it's searched for relative to
 	 * the main source file (or a FileNotFoundException is thrown if
@@ -113,22 +103,25 @@ public interface SourceManager
      *
      * @throws FileNotFoundException if the main source file is not specified
      */
-    public org.xml.sax.InputSource getFileAsInputSource(String url)
-        throws FileNotFoundException;
-
-
-	/**
-     * Get a TrAX/JAXP StreamSource object representing the given file.
-	 *
-	 * @param url  URL to the file, if relative it's searched for relative to
-	 * the main source file (or a FileNotFoundException is thrown if
-	 * there is no main source file).
-     *
-     * @throws FileNotFoundException if the main source file is not specified
-     */
-    public javax.xml.transform.stream.StreamSource getFileAsStreamSource(String url)
+    public javax.xml.transform.Source getFileAsJAXPSource(String url)
         throws FileNotFoundException;
 		
+
+	/**
+     * Parse the file as XML and deliver SAX2 events.
+	 *
+	 * @param url  URL to the file, if relative it's searched for relative to
+	 * the main source file (or a FileNotFoundException is thrown if
+	 * there is no main source file).
+	 * @param ch  The SAX2 ContentHandler to deliver events to.
+	 * @param target  The current target.
+     *
+     * @throws FileNotFoundException if the main source file is not specified
+     */
+	public void getFileAsSAX(String url, org.xml.sax.ContentHandler sax, 
+							 Target target)
+		throws FileNotFoundException, IOException, org.xml.sax.SAXException;	
+
 		
     /**
      * Get an URL representing the given file or directory.
@@ -138,7 +131,7 @@ public interface SourceManager
 	 * there is no main source file).
 	 *
 	 * @return an absolute or pseudo-absolute URL
-	 * 		   (the url parameter unchangen unless it's relative)
+	 * 		   (the url parameter unchanged unless it's relative)
      */
     public String getFileURL(String url)
         throws FileNotFoundException;
@@ -154,7 +147,7 @@ public interface SourceManager
      * @param when  the time
      */
     public boolean fileHasBeenUpdated(String url, long when)
-        throws FileNotFoundException;
+        throws FileNotFoundException, IOException, LagoonException;
 
 		
     /**
@@ -177,7 +170,7 @@ public interface SourceManager
 	 * @param base  base URL, must be pseudo-absolute
 	 *
 	 * @return an absolute or pseudo-absolute URL
-	 * 		   (the url parameter unchangen unless it's relative)
+	 * 		   (the url parameter unchanged unless it's relative)
      */
     public String getFileURLRelativeTo(String url, String base);
 }

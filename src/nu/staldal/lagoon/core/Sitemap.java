@@ -57,6 +57,7 @@ class Sitemap
 {
     // Associations
     protected Hashtable entries;
+    protected Hashtable parts;
 
     // Attributes
     private LagoonProcessor processor;
@@ -65,10 +66,9 @@ class Sitemap
 
     // Work attributes
     private String currentTargetName;
-    private FileEntry currentFile;
+    private EntryWithSource currentFile;
     private FileStorage targetLocation;
 	private int depth;
-
 
 	
     /**
@@ -111,6 +111,7 @@ class Sitemap
 
         this.sourceDir = sourceDir;
         entries = new Hashtable();
+		parts = new Hashtable();
 
         currentFile = null;
 	
@@ -135,7 +136,7 @@ class Sitemap
 				if (theSource == null || theSource.length() < 1)
 					theSource = currentTargetName;
 					
-				currentFile = new FileEntry(currentTargetName,
+				currentFile = new FileEntry(this, currentTargetName,
 											theSource,
 											sourceDir, targetLocation);
 				
@@ -144,7 +145,7 @@ class Sitemap
 				
 				if (o instanceof ByteStreamProducer)
 				{
-					currentFile.setMyProducer((ByteStreamProducer)o);
+					((FileEntry)currentFile).setMyProducer((ByteStreamProducer)o);
 				}
 				else
 				{
@@ -156,6 +157,37 @@ class Sitemap
 	            entries.put(currentTargetName, currentFile);
 	            currentTargetName = null;
 	            currentFile = null;
+			}
+			else if (entry.getLocalName().equals("part"))
+			{
+				currentTargetName = entry.getAttrValue("name");
+				if (currentTargetName == null
+						|| currentTargetName.length() < 1)
+				{
+					throw new LagoonException(
+						"invalid part name: " + currentTargetName);
+				}
+				
+				currentFile = new PartEntry(this, entry.getAttrValue("source"), 
+					sourceDir);
+				
+				depth = 0;
+				Object o = handleProducer(entry);
+				
+				if (o instanceof XMLStreamProducer)
+				{
+					((PartEntry)currentFile).setMyProducer((XMLStreamProducer)o);
+				}
+				else
+				{
+					throw new LagoonException(
+						"Part must contain a XML stream producer: " 
+						+ currentTargetName);
+				}
+														 				
+	            parts.put(currentTargetName, currentFile);
+	            currentTargetName = null;
+				currentFile = null;
 			}
 			else if (entry.getLocalName().equals("delete"))
 			{
@@ -208,7 +240,7 @@ class Sitemap
     /**
      * Lookup a specific entry in the sitemap.
      *
-     * @param  the target, a pseudo-absolute URL (starting with '/').
+     * @param target  the target, a pseudo-absolute URL (starting with '/').
      *
      * @returns the entry for the specified target,
      *  or <code>null</code> if not found.
@@ -216,6 +248,20 @@ class Sitemap
     public SitemapEntry lookupEntry(String target)
     {
         return (SitemapEntry)entries.get(target);
+    }
+
+
+    /**
+     * Lookup a specific part in the sitemap.
+     *
+     * @param name  the name of the part to obtain.
+     *
+     * @returns the part entry with the specified name,
+     *  or <code>null</code> if not found.
+     */
+    public PartEntry lookupPart(String name)
+    {
+        return (PartEntry)parts.get(name);
     }
 
 	
@@ -245,6 +291,7 @@ class Sitemap
 				throw new LagoonException(
 					"Producer " + prodName + " not found");
 
+			prod.setEntryName(currentTargetName);
 			prod.setProcessor(processor);
 			prod.setSourceManager(currentFile);
 			prod.setPosition(depth);

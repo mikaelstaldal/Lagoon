@@ -239,14 +239,6 @@ public class LagoonCLI
         {
             System.err.println("I/O error: " + e.getMessage());
         }
-        catch (LagoonException e)
-        {
-            System.err.println("Error: " + e.getMessage());
-        }
-        catch (org.xml.sax.SAXException e)
-        {
-            e.printStackTrace();
-        }
 	}
 
     private static String getProperty(String name)

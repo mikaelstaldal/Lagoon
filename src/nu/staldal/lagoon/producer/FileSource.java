@@ -42,47 +42,32 @@ package nu.staldal.lagoon.producer;
 
 import java.io.*;
 
-import javax.xml.parsers.*;
 import org.xml.sax.*;
 
 import nu.staldal.lagoon.core.*;
 
 public class FileSource extends Source
 {
-	private SAXParserFactory spf;	
-	
-    public void init() throws LagoonException
+
+    public void init()
     {
-		spf = SAXParserFactory.newInstance();
-		spf.setNamespaceAware(true);
-		spf.setValidating(false);
+		// nothing to do
     }
 
+	
     public void start(ContentHandler sax, Target target)
         throws IOException, SAXException
     {
-        InputStream fis = getSourceMan().openFile(getSourceMan().getSourceURL());
-
-		try {
-			XMLReader parser = spf.newSAXParser().getXMLReader(); 
-
-        	parser.setContentHandler(sax);
-
-        	parser.parse(new InputSource(fis));
-		}
-		catch (ParserConfigurationException e)
-		{
-			throw new LagoonException(e.getMessage());
-		}		
-
-        fis.close();
+		getSourceMan().getFileAsSAX(getSourceMan().getSourceURL(), sax, target);	
 	}
 
+	
     public boolean hasBeenUpdated(long when)
-   		throws FileNotFoundException
+   		throws FileNotFoundException, IOException, LagoonException
 	{
 		return
 			getSourceMan().fileHasBeenUpdated(getSourceMan().getSourceURL(),when);
     }
 
 }
+

@@ -57,14 +57,10 @@ public class LSPTransformer extends Transform
     private LSPCompiler compiler;
     private LSPPage theCompiledPage;
     private Hashtable params;
-
+		
     public void init()
         throws LagoonException, IOException
     {
-        if (Wildcard.isWildcard(getSourceMan().getTargetURL()))
-            throw new LagoonException("Cannot use with wildcard pattern: "
-                + getSourceMan().getTargetURL());
-
         compiler = new LSPCompiler();
 
         theCompiledPage = (LSPPage)getObjectFromRepository("page");
@@ -83,18 +79,22 @@ public class LSPTransformer extends Transform
 	private boolean sourceUpdated(long when)
         throws LagoonException, IOException
 	{
+		if (DEBUG) System.out.println("Checking compile dynamic"); 
         if (theCompiledPage.isCompileDynamic()) return true;
 
+		if (DEBUG) System.out.println("Checking next"); 
         if (getNext().hasBeenUpdated(when))
         {
         	return true;
 		}
 
+		if (DEBUG) System.out.println("Checking imported files"); 
 		for (Enumeration e = theCompiledPage.getCompileDependentFiles();
              e.hasMoreElements(); )
 		{
-			if (getSourceMan().fileHasBeenUpdated((String)e.nextElement(),
-                                                  when))
+			String f = (String)e.nextElement();
+			if (DEBUG) System.out.println("Checking imported file: " + f); 
+			if (getSourceMan().fileHasBeenUpdated(f, when))
 			{
 				return true;
 			}
@@ -103,16 +103,18 @@ public class LSPTransformer extends Transform
 		return false;
 	}
 
-    private void readSource(XMLStreamProducer next, Target target)
+
+    private void readSource(XMLStreamProducer next, final Target target)
         throws SAXException, IOException
     {
 		if (DEBUG) System.out.println("LSP compile");
 
         ContentHandler ch = compiler.startCompile(
             new URLResolver() {
-                public InputSource resolve(String url) throws IOException
+                public void resolve(String url, ContentHandler ch) 
+					throws IOException, SAXException
                 {
-					return getSourceMan().getFileAsInputSource(url);
+					getSourceMan().getFileAsSAX(url, ch, target);	
                 }
             });
         next.start(ch, target);
@@ -121,9 +123,13 @@ public class LSPTransformer extends Transform
     }
 
 
-    public void start(ContentHandler ch, Target target)
+    public void start(ContentHandler ch, final Target target)
         throws IOException, SAXException
     {
+        if (target instanceof FileTarget 
+				&& ((FileTarget)target).isWildcard())
+        	throw new LagoonException("Cannot use with wildcard pattern");
+
         if ((theCompiledPage == null)
                 || sourceUpdated(theCompiledPage.getTimeCompiled()))
         {
@@ -133,9 +139,10 @@ public class LSPTransformer extends Transform
         ch.startDocument();
 
         theCompiledPage.execute(ch, new URLResolver() {
-            public InputSource resolve(String url) throws IOException
+            public void resolve(String url, ContentHandler ch)
+				throws IOException, SAXException
             {
-				return getSourceMan().getFileAsInputSource(url);
+				getSourceMan().getFileAsSAX(url, ch, target);	
             }
         }, params);
 
@@ -157,8 +164,9 @@ public class LSPTransformer extends Transform
 		for (Enumeration e = theCompiledPage.getExecuteDependentFiles();
              e.hasMoreElements(); )
 		{
-			if (getSourceMan().fileHasBeenUpdated((String)e.nextElement(),
-				when))
+			String f = (String)e.nextElement();
+			if (DEBUG) System.out.println("Checking " + f);
+			if (getSourceMan().fileHasBeenUpdated(f, when))
 			{
 				return true;
 			}
@@ -168,3 +176,4 @@ public class LSPTransformer extends Transform
     }
 
 }
+

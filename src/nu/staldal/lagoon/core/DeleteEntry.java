@@ -48,7 +48,7 @@ import java.io.*;
  *
  * @see nu.staldal.lagoon.core.Sitemap
  */
-class DeleteEntry extends SitemapEntry
+class DeleteEntry implements SitemapEntry
 {
     private static final boolean DEBUG = true;
 

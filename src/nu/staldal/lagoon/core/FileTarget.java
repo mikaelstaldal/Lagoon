@@ -52,4 +52,11 @@ public interface FileTarget extends Target
      * @param filename  filename to use, must <em>not</em> start with '/'
      */
     public void newTarget(String filename);
+	
+
+    /**
+     * Determine if this file target is a wildcard.
+     */
+	public boolean isWildcard();
+	
 }

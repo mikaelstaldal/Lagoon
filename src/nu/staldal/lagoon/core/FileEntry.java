@@ -45,6 +45,8 @@ import java.util.*;
 import java.net.URL;
 import java.net.URLConnection;
 
+import javax.xml.parsers.*;
+import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import org.xml.sax.*;
 
@@ -58,17 +60,14 @@ import nu.staldal.lagoon.util.*;
  *
  * @see nu.staldal.lagoon.core.Sitemap
  */
-class FileEntry extends SitemapEntry implements SourceManager, FileTarget
+class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
 {
     private static final boolean DEBUG = true;
 
     private ByteStreamProducer myProducer;
 
     private final FileStorage targetStorage;
-    private final File sourceRootDir;
-
-    private final String sourceURL;
-    private final String targetURL;
+	private final String targetURL;
 
     private String currentSourceURL;
     private String currentTargetURL;
@@ -79,6 +78,7 @@ class FileEntry extends SitemapEntry implements SourceManager, FileTarget
     /**
      * Constructor.
      *
+     * @param sitemap  the Sitemap.
      * @param targetURL  the file to create, may contain wildcard anywhere,
      *                   must be pseudo-absolute.
      * @param sourceURL  the file to use, may contain wildcard in filename,
@@ -86,29 +86,16 @@ class FileEntry extends SitemapEntry implements SourceManager, FileTarget
      * @param sourceRootDir  absolute path to the source directory
      * @param targetStorage  where to store generated files
      */
-    public FileEntry(String targetURL, String sourceURL,
+    public FileEntry(Sitemap sitemap, String targetURL, String sourceURL,
                      File sourceRootDir, FileStorage targetStorage)
         throws LagoonException
     {
-        this.myProducer = null;
-
+		super(sitemap, sourceURL, sourceRootDir);	
+		
         this.targetStorage = targetStorage;
-
-        String absPath = sourceRootDir.getAbsolutePath();
-        this.sourceRootDir = new File(absPath);
-        if (!this.sourceRootDir.isDirectory())
-            throw new LagoonException(
-                "sourceRootDir must be an existing directory: " + sourceRootDir);
-
-		if (!LagoonUtil.absoluteURL(sourceURL) 
-				&& !LagoonUtil.pseudoAbsoluteURL(sourceURL))
-		{
-        	throw new LagoonException(
-				"source must be absolute or pseudo-absolute");
-		}
-
-		this.sourceURL = sourceURL;
-        this.targetURL = targetURL;
+		this.targetURL = targetURL;
+		
+        this.myProducer = null;
 
         this.currentSourceURL = null;
         this.currentTargetURL = null;
@@ -340,20 +327,8 @@ class FileEntry extends SitemapEntry implements SourceManager, FileTarget
 	}
 
 
-    public String getTargetURL()
-    {
-        return targetURL;
-    }
-
-
-	// SourceManager implemenation
-
-    public File getRootDir()
-    {
-        return sourceRootDir;
-    }
-
-    
+	// Partial SourceManager implemenation
+   
     public String getSourceURL()
         throws FileNotFoundException
 	{
@@ -362,131 +337,6 @@ class FileEntry extends SitemapEntry implements SourceManager, FileTarget
 
 		return currentSourceURL;		
 	}
-	
-	
-    public InputStream openFile(String url)
-        throws FileNotFoundException, IOException
-    {
-		File file = getFile(url);
-		
-		if (file == null)
-		{
-			URL theUrl = new URL(url);
-			URLConnection uc = theUrl.openConnection();
-			return uc.getInputStream();
-		}
-		else
-		{
-			return new FileInputStream(file);
-		}
-    }
-
-
-    public File getFile(String url)
-        throws FileNotFoundException
-    {
-		if (LagoonUtil.absoluteURL(url))
-		{
-			if (url.startsWith("file:"))
-			{
-				return new File(url.substring(5));	
-			}
-			else if (url.startsWith("res:"))
-			{
-				String resDir = System.getProperty("resourceDir");
-				if (resDir == null)
-					throw new FileNotFoundException(
-						"Resource Dir is not specified");
-				return new File(new File(resDir), url.substring(5));
-			}
-			else
-			{
-				return null;
-			}
-		}
-		else
-		{
-			return new File(sourceRootDir,
-        	    getFileURL(url).substring(1).replace('/', File.separatorChar));
-		}
-    }
-
-	
-    public InputSource getFileAsInputSource(String url)
-        throws FileNotFoundException
-	{
-		InputSource is = new InputSource(url);
-		
-		File file = getFile(url);	
-		
-		if (file != null)
-		{
-			is.setByteStream(new FileInputStream(file));	
-		}
-		
-		return is;
-	}
-
-
-    public StreamSource getFileAsStreamSource(String url)
-        throws FileNotFoundException
-	{
-		File file = getFile(url);	
-		
-		if (file == null)
-			return new StreamSource(getFileURL(url));
-		else
-			return new StreamSource(file);
-	}
-	
-
-    public String getFileURL(String url)
-        throws FileNotFoundException
-    {
-		return getFileURLRelativeTo(url, getSourceURL());
-	}
-
-
-    public boolean fileHasBeenUpdated(String url, long when)
-        throws FileNotFoundException
-    {
-        File file = getFile(url);
-		if (file == null) return true;  // cannot check
-        long sourceDate = file.lastModified();
-
-        return ((sourceDate > 0) // source exsist
-                &&
-                // will also build if (when == -1) (i.e. unknown)
-                (sourceDate > when));
-    }
-
-	
-    public boolean canCheckFileHasBeenUpdated(String url)
-	{
-		return !LagoonUtil.absoluteURL(url) 
-			|| url.startsWith("file:")
-			|| url.startsWith("res:");
-	}
-
-
-    public String getFileURLRelativeTo(String url, String base)
-    {
-        if (LagoonUtil.absoluteURL(url) || LagoonUtil.pseudoAbsoluteURL(url))
-		{
-            return url;
-		}
-        else
-        {
-            if (!LagoonUtil.pseudoAbsoluteURL(base))
-                throw new IllegalArgumentException(
-					"base must be a pseudo-absolute URL");
-
-            int slash = base.lastIndexOf('/');
-            String baseDir = base.substring(0, slash+1);
-
-            return baseDir + url;
-        }
-    }
 	
 	
 	// FileTarget implemenation
@@ -500,6 +350,11 @@ class FileEntry extends SitemapEntry implements SourceManager, FileTarget
     {
         this.newTarget = filename;
     }
+
+	public boolean isWildcard()
+    {
+        return Wildcard.isWildcard(sourceURL);
+	}
 
 }
 

@@ -41,24 +41,45 @@
 package nu.staldal.lagoon.core;
 
 import java.io.*;
+import java.util.*;
+import java.net.URL;
+import java.net.URLConnection;
+
+import nu.staldal.lagoon.util.*;
 
 
 /**
- * An entry in the sitemap used to build a file.
- *
- * Contains information on how to (re)build a single entry in a website.
+ * A part entry in the sitemap.
  *
  * @see nu.staldal.lagoon.core.Sitemap
  */
-interface SitemapEntry
+class PartEntry extends EntryWithSource
 {
+    private XMLStreamProducer myProducer;
 
+	
+    public PartEntry(Sitemap sitemap, String sourceURL, File sourceRootDir)
+        throws LagoonException
+	{
+		super(sitemap, sourceURL, sourceRootDir);
+		myProducer = null;
+	}
+
+	
     /**
-     * Builds this particular entry.
-     *
-     * @param always  always build the entry, overriding dependency checking
+     * Set the ByteStreamProducer that produces the final output for this
+     * PartEntry.
+     * Used during initialization.
      */
-    public abstract void build(boolean always)
-        throws IOException;
+    void setMyProducer(XMLStreamProducer prod)
+    {
+        myProducer = prod;
+    }
+
+	
+	public XMLStreamProducer getXMLProducer()
+	{
+		return myProducer;
+	}
 }
 

@@ -126,7 +126,7 @@ public class XSLTransformer extends Transform
 	                    container.importedFiles.put(thisFile, "");
 					}
 				
-					return getSourceMan().getFileAsStreamSource(thisFile);
+					return getSourceMan().getFileAsJAXPSource(thisFile);
 				}
 				catch (FileNotFoundException e)
 				{
@@ -135,7 +135,7 @@ public class XSLTransformer extends Transform
             }
         });
 
-		StreamSource ss = getSourceMan().getFileAsStreamSource(xslPath);
+		Source ss = getSourceMan().getFileAsJAXPSource(xslPath);
 		
         try {
             container.stylesheet = tfactory.newTemplates(ss);
@@ -230,7 +230,8 @@ public class XSLTransformer extends Transform
 							getSourceMan().getFileURL(href), "");
 					}
 					
-					return getSourceMan().getFileAsStreamSource(href);
+					// *** <part> ???
+					return getSourceMan().getFileAsJAXPSource(href);
 					}
 				catch (FileNotFoundException e)
 				{
@@ -268,8 +269,8 @@ public class XSLTransformer extends Transform
 		for (Enumeration e = container.readFiles.keys();
              e.hasMoreElements(); )
 		{
-			if (getSourceMan().fileHasBeenUpdated((String)e.nextElement(), 
-				when))
+			String f = (String)e.nextElement();
+			if (getSourceMan().fileHasBeenUpdated(f, when))
 			{
 				return true;
 			}
