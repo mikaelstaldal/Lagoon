@@ -119,10 +119,14 @@ in output like this</lsp:processing-instruction>
 <!-- <h4>A list of <lsp:value-of select="count($foo)"/> elements</h4> -->
 
 <ul>
-
-<!-- <lsp:for-each select="$foo" var="i">
-<li><lsp:value-of select="$i"/></li>
-</lsp:for-each> -->
+<lsp:for-each select="seq(5.6,15.4,0.5)" var="i" status="stat">
+<li><lsp:value-of select="$stat.index"/>: <lsp:value-of select="$i"/> 
+ first:<lsp:value-of select="$stat.first"/>     
+ last:<lsp:value-of select="$stat.last"/>     
+ even:<lsp:value-of select="$stat.even"/>     
+ odd:<lsp:value-of select="$stat.odd"/>     
+</li>
+</lsp:for-each>
 </ul>
 
 <hr/>
