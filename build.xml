@@ -22,7 +22,7 @@
   <property name="src.testsuite" value="testsuite"/>
   <property name="build.dir" value="build"/>
   <property name="dist.dir" value="dist"/>
-  <property name="dist.jars" value="${dist.dir}/lib"/>
+  <property name="dist.jars" value="${dist.dir}"/>
   <property name="build.classes" value="${build.dir}/classes"/>
   <property name="build.testsuite" value="${build.dir}/testsuite"/>
 
