@@ -201,7 +201,7 @@ class Sitemap
 						"invalid target specification: " + currentTargetName);
 				}
 				
-				DeleteEntry currentEnt = new DeleteEntry(currentTargetName,
+				DeleteEntry currentEnt = new DeleteEntry(processor, currentTargetName,
 														 targetLocation);
 				
 	            entries.put(currentTargetName, currentEnt);
