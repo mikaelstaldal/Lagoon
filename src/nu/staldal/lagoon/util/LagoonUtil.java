@@ -66,4 +66,53 @@ public final class LagoonUtil
         return colon < slash;
     }
 
+ 
+ 	/**
+	 * Encode a path name into a filename.
+	 */
+    public static String encodePath(String path)
+    {
+        StringBuffer sb = new StringBuffer(path.length());
+
+        for (int i = 0; i < path.length(); i++)
+        {
+            char c = path.charAt(i);
+            switch (c)
+            {
+                case '-':
+                    sb.append("--");
+                    break;
+                case '_':
+                    sb.append("__");
+                    break;
+                case '$':
+                    sb.append("$$");
+                    break;
+                case '~':
+                    sb.append("~~");
+                    break;
+                case '/':
+                    sb.append('-');
+                    break;
+                case '\\':
+                    sb.append('-');
+                    break;
+                case '*':
+                    sb.append('_');
+                    break;
+                case '?':
+                    sb.append('$');
+                    break;
+                case ':':
+                    sb.append('~');
+                    break;
+                default:
+                    sb.append(c);
+            }
+        }
+
+        return sb.toString();
+    }
+	
+	
 }

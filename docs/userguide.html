@@ -143,7 +143,8 @@ to your Java <code>CLASSPATH</code>.</li>
 the structure of the website. The sitemap is in XML format, see
 the <a href="sitemap.dtd">the pseudo-DTD</a> The sitemap has entries
 for files, each file entry describes how that file should be
-created.</p>
+created. Each sitemap must have a name which unique identifies it on the 
+system.</p>
 
 <p>A file is created with a pipeline of connected <em>producers</em>. A
 producer is a component which produces a stream of bytes (implemented
@@ -546,16 +547,15 @@ cause normal build, 'f' will cause a force build and just pressing
 
 <h3>The property file</h3>
 
-<p>The property file specifies the sitemap file, the source directory,
-the repository directory, the target and the password to access the
-target (if nessesary). The file is a standard Java property file, i.e.
+<p>The property file specifies the sitemap file, the source directory, 
+the target and the password to access the target (if nessesary). 
+The file is a standard Java property file, i.e.
 a text file with one keyword-value pair on each line, separated by ':';
 lines beginning with '#' are ignored.</p>
 
-<p>The sitemap file, source directory and repository directory are
-specified using platform-dependent paths (e.g. use '\' as path
-separator in Windows). They may be absolute or relative (to the current
-working directory).</p>
+<p>The sitemap file and source directory are specified using platform-dependent 
+paths (e.g. use '\' as path separator in Windows). They may be absolute or 
+relative (to the current working directory).</p>
 
 <p>Sample property file:</p>
 <pre>
@@ -563,21 +563,9 @@ working directory).</p>
 
 sitemapFile: C:\joe_files\webbsite\sitemap.xml
 sourceDir: C:\joe_files\webbsite\src
-repositoryDir: C:\joe_files\webbsite\repository
 targetURL: ftp://joe@ftp.acme.com/public_html/
 password: secret
 </pre>
-
-
-<h3>The repository</h3>
-
-<p>The repository is used to store cached data and dependency
-information. There must be one repository directory for each sitemap.
-It's safe to remove the repository when Lagoon is not running, it will
-be recreated next time Lagoon is run. However, emptying the repository
-may cause unnecessary rebuilds next time Lagoon is run. If Lagoon
-suddenly start giving unexpected behavior, emptying the repository
-might remedy the problem.</p>
 
 
 <h3>The target specification</h3>
@@ -603,6 +591,21 @@ path is relative to your home directory. You need to have an RSA key
 properly setup before using this (you should be able to login without
 entering any password), do not specify the password in the property
 file.</p>
+
+
+<h3>The working directory</h3>
+
+<p>Lagoon will create a working directory that is used to store cached data 
+and dependency information. This directory is named ".lagoon" and is created 
+in the user's home directory (as pointed out by the Java system property 
+"user.home", you can change this by passing "-Duser.home=<em>/some/other/dir</em>" 
+on the <em>java</em> command line).</p>
+
+<p>It's safe to remove the working directory when Lagoon is not running, it will
+be recreated next time Lagoon is run. If Lagoon suddenly start giving 
+unexpected behavior, removing the working directory might remedy the problem. 
+However, removing the working directory may cause unnecessary rebuilds next time 
+Lagoon is run, especially if you use a FTP or SSH target.</p>
 
 
 <h2>Adapting your web site for Lagoon</h2>

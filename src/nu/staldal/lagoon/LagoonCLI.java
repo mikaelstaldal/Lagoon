@@ -104,7 +104,6 @@ public class LagoonCLI
             System.out.println("Initializing Lagoon...");
 
             File sitemapFile = new File(getProperty("sitemapFile"));
-            InputStream sitemapStream = new FileInputStream(sitemapFile);
 
             processor = new LagoonProcessor(getProperty("targetURL"));
 
@@ -117,13 +116,9 @@ public class LagoonCLI
                         "Password is required but not specified");
             }
 
-            processor.init(sitemapStream,
-                           sitemapFile.lastModified(),
+            processor.init(sitemapFile,
                            new File(getProperty("sourceDir")),
-                           new File(getProperty("repositoryDir")),
                            password);
-
-            sitemapStream.close();
         }
         catch (AuthenticationException e)
         {
@@ -149,7 +144,15 @@ public class LagoonCLI
             System.err.println(e.getMessage());
             return;
         }
-
+        catch (javax.xml.parsers.ParserConfigurationException e)
+        {
+            System.err.println("Error while initializing Lagoon:");
+            System.err.println(e.toString());
+            return;
+        }
+			
+		
+		
         System.out.println("Lagoon initialized successfully");
 
         try {

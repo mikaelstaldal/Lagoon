@@ -44,7 +44,8 @@ import java.util.*;
 
 import org.xml.sax.*;
 
-import nu.staldal.lagoon.util.XMLConfig;
+import nu.staldal.xtree.*;
+
 
 /**
  * Contains the information needed to (re)build a website.
@@ -52,217 +53,57 @@ import nu.staldal.lagoon.util.XMLConfig;
  * Initialized with a sitemap description file.
  * Can then be used to (re)build the website several times.
  */
-class Sitemap extends XMLConfig
+class Sitemap
 {
-    protected String getPublicId()
-    {
-        return null;
-    }
-
-    protected java.io.InputStream getDTD()
-    {
-        return null;
-    }
-
     // Associations
     protected Hashtable entries;
 
     // Attributes
     private LagoonProcessor processor;
     private java.io.File sourceDir;
+	private String siteName;
 
     // Work attributes
-    private StringBuffer charData;
-    private Stack prodStack;
-    private Stack prodNameStack;
     private String currentTargetName;
     private FileEntry currentFile;
     private FileStorage targetLocation;
+	private int depth;
 
 
-    // SAX ContentHandler implementation
-
-    public void startElement(String namespaceURI, String localName,
-                             String qname, Attributes atts)
-        throws SAXException
-    {
-        if (localName.equals("sitemap"))
-        {
-            // nothing to do
-        }
-        else if (localName.equals("file"))
-        {
-            currentTargetName = atts.getValue("","target");
-            if (currentTargetName == null
-                    || currentTargetName.length() < 1
-                    || currentTargetName.charAt(0) != '/')
-            {
-                throw new LagoonException(
-                    "invalid target specification: " + currentTargetName);
-            }
-			
-			String theSource = atts.getValue("","source");
-			if (theSource == null || theSource.length() < 1)
-				theSource = currentTargetName;
-				
-            currentFile = new FileEntry(currentTargetName,
-                                        theSource,
-                                        sourceDir, targetLocation);
-        }
-        else if (localName.equals("format") || localName.equals("transform") ||
-                 localName.equals("source") || localName.equals("read") ||
-                 localName.equals("parse") || localName.equals("process"))
-        {
-            String type = atts.getValue("","type");
-            if (type == null)
-                type = "";
-
-            String prodName = localName + '-' +
-                                ((type.length() == 0) ?
-                                 "(default)" :
-                                 type);
-            Producer prod = processor.createProducer(localName, type);
-            if (prod == null)
-                throw new LagoonException(
-                    "Producer " + prodName + " not found");
-
-            prod.setProcessor(processor);
-            prod.setSourceManager(currentFile);
-            prod.setPosition(prodStack.size());
-
-			for (int i = 0; i < atts.getLength(); i++)
-			{
-				if (atts.getLocalName(i).equals("type"))
-					continue;
-
-				prod.addParam(atts.getLocalName(i), atts.getValue(i));
-			}
-
-            prodStack.push(prod);
-            prodNameStack.push(prodName);
-
-            charData = new StringBuffer();
-        }
-        else
-        {
-            throw new LagoonException("Error in Sitemap, unexpected element: "
-            + localName);
-        }
-    }
-
-    public void endElement(String namespaceURI, String localName,
-                           String qname)
-        throws SAXException
-    {
-        if (localName.equals("sitemap"))
-            ;
-        else if (localName.equals("file"))
-        {
-            entries.put(currentTargetName ,currentFile);
-            currentTargetName = null;
-            currentFile = null;
-        }
-        else if (localName.equals("format") || localName.equals("transform") ||
-                 localName.equals("source") || localName.equals("read") ||
-                 localName.equals("parse") || localName.equals("process"))
-        {
-            Producer prod = (Producer)prodStack.pop();
-            String prodName = (String)prodNameStack.pop();
-            String nameParam = (charData == null) ? "" : charData.toString().trim();
-            if (nameParam.length() > 0)
-                prod.addParam("name", nameParam);
-
-            charData = null;
-
-            try {
-                if (prodStack.empty())
-                {
-                    currentFile.setMyProducer((ByteStreamProducer)prod);
-                }
-                else
-                {
-                    Producer lastProd = (Producer)prodStack.peek();
-
-                    if (lastProd instanceof ByteStreamConsumer)
-                    {
-                        ((ByteStreamConsumer)lastProd).
-                            setNext((ByteStreamProducer)prod);
-                    }
-                    else if (lastProd instanceof XMLStreamConsumer)
-                    {
-                        ((XMLStreamConsumer)lastProd).
-                            setNext((XMLStreamProducer)prod);
-                    }
-                    else
-                    {
-                        throw new ClassCastException();
-                    }
-                }
-            }
-            catch (ClassCastException e)
-            {
-                throw new LagoonException(prodName +
-                                          ": Inconsistent Producer chain");
-            }
-
-            try {
-                prod.init();
-            }
-            catch (LagoonException e)
-            {
-                throw new LagoonException(prodName + ": " + e.getMessage());
-            }
-            catch (java.io.IOException e)
-            {
-                throw new SAXException(e);
-            }
-        }
-    }
-
-    public void startPrefixMapping(String prefix, String uri)
-    {
-        // nothing to do
-    }
-
-    public void endPrefixMapping(String prefix)
-    {
-        // nothing to do
-    }
-
-    public void characters(char ch[], int start, int length)
-    {
-        if (charData != null)
-            charData.append(ch, start, length);
-    }
-
-    public void ignorableWhitespace(char ch[], int start, int length)
-    {
-        // nothing to do
-    }
-
-    public void processingInstruction(String target, String data)
-    {
-        // nothing to do
-    }
-
-    public void skippedEntity(String name)
-    {
-        // nothing to do
-    }
-
-
+	
     /**
-     * Constructor.
+     * The constructor
+     *
+     * @param input  XTree representation of the sitemap
+	 */
+	public Sitemap(Element sitemapTree)
+		throws LagoonException
+	{
+        if (!sitemapTree.getLocalName().equals("sitemap"))
+		{
+			throw new LagoonException("root element must be <sitemap>");	
+		}
+						
+		siteName = sitemapTree.getAttrValue("name");
+		if (siteName == null || siteName.length() < 1)
+		{
+			throw new LagoonException("no site name found in sitemap");
+		}
+	}
+	
+	
+    /**
+     * Initialize this sitemap.
      *
      * @param processor  the processor
-     * @param input  where to read the sitemap from
+     * @param input  XTree representation of the sitemap
      * @param sourceDir  where the source files are
      * @param targetLoc  where to store generated files
      */
-    public Sitemap(LagoonProcessor processor,
-                   java.io.InputStream input,
-                   java.io.File sourceDir,
-				   FileStorage targetLoc)
+    public void init(LagoonProcessor processor,
+                     Element sitemapTree,
+                     java.io.File sourceDir,
+				     FileStorage targetLoc)
         throws java.io.IOException, LagoonException
     {
         this.processor = processor;
@@ -271,46 +112,64 @@ class Sitemap extends XMLConfig
         this.sourceDir = sourceDir;
         entries = new Hashtable();
 
-        prodStack = new Stack();
-        prodNameStack = new Stack();
-        charData = null;
         currentFile = null;
+	
+		for (int i = 0; i<sitemapTree.numberOfChildren(); i++)
+		{
+			Node node = sitemapTree.getChild(i);
+			if (!(node instanceof Element)) continue;
+			Element entry = (Element)node;
+				
+			if (entry.getLocalName().equals("file"))
+			{
+				currentTargetName = entry.getAttrValue("target");
+				if (currentTargetName == null
+						|| currentTargetName.length() < 1
+						|| currentTargetName.charAt(0) != '/')
+				{
+					throw new LagoonException(
+						"invalid target specification: " + currentTargetName);
+				}
+				
+				String theSource = entry.getAttrValue("source");
+				if (theSource == null || theSource.length() < 1)
+					theSource = currentTargetName;
+					
+				currentFile = new FileEntry(currentTargetName,
+											theSource,
+											sourceDir, targetLocation);
+				
+				depth = 0;
+				Object o = handleProducer(entry);
+				
+				if (o instanceof ByteStreamProducer)
+				{
+					currentFile.setMyProducer((ByteStreamProducer)o);
+				}
+				else
+				{
+					throw new LagoonException(
+						"Target must contain a byte stream producer: " 
+						+ currentTargetName);
+				}
 
-        try {
-            parseXML(input, false);
-        }
-        catch (LagoonException e)
-        {
-            throw e;
-        }
-        catch (SAXException e)
-        {
-            Exception ee = e.getException();
-            if (ee == null)
-            {
-                e.printStackTrace();
-                throw new LagoonException(e.getMessage());
-            }
-            else if (ee instanceof java.io.IOException)
-                throw (java.io.IOException)ee;
-            else
-            {
-                ee.printStackTrace();
-                throw new LagoonException(ee.getMessage());
-            }
-        }
-
-        if (!prodStack.empty())
-            throw new LagoonException(
-                "Error in Sitemap, prodStack is not empty");
-
-        prodStack = null;
-        prodNameStack = null;
-        charData = null;
-        currentFile = null;
+	            entries.put(currentTargetName, currentFile);
+	            currentTargetName = null;
+	            currentFile = null;
+			}
+		}
     }
 
 
+    /**
+     * Get the site name.
+     */
+    public String getSiteName()
+    {
+        return siteName;
+    }
+
+	
     /**
      * Get an Enumeration of all targets in this sitemap.
      */
@@ -342,4 +201,99 @@ class Sitemap extends XMLConfig
         return (FileEntry)entries.get(target);
     }
 
+	
+	private Object handleProducer(Element parentEl)
+		throws LagoonException, java.io.IOException
+    {
+		Element el = parentEl.getFirstChildElement();
+		if (el == null)
+			return parentEl.getTextContent();
+		
+		if (el.getLocalName().equals("format") 
+				|| el.getLocalName().equals("transform") 
+				|| el.getLocalName().equals("source") 
+				|| el.getLocalName().equals("read") 
+				|| el.getLocalName().equals("parse") 
+				|| el.getLocalName().equals("process"))
+		{
+			String type = el.getAttrValue("type");
+			if (type == null) type = "";
+
+			String prodName = el.getLocalName() + '-' +
+								((type.length() == 0) 
+								? "(default)" 
+								: type);
+			Producer prod = processor.createProducer(el.getLocalName(), type);
+			if (prod == null)
+				throw new LagoonException(
+					"Producer " + prodName + " not found");
+
+			prod.setProcessor(processor);
+			prod.setSourceManager(currentFile);
+			prod.setPosition(depth);
+
+			for (int i = 0; i < el.numberOfAttributes(); i++)
+			{
+				if ((el.getAttributeNamespaceURI(i).length() > 0)
+						|| el.getAttributeLocalName(i).equals("type"))
+					continue;
+
+				prod.addParam(
+					el.getAttributeLocalName(i), 
+					el.getAttributeValue(i));
+			}
+
+			depth++;
+			Object o = handleProducer(el);
+			if (o instanceof String)
+			{
+				String nameParam = ((String)o).trim();
+				if (nameParam.length() > 0)
+					prod.addParam("name", nameParam);
+			}
+			else if (o instanceof Producer)
+			{
+				try {
+					Producer nextProd = (Producer)o;
+
+					if (prod instanceof ByteStreamConsumer)
+					{
+						((ByteStreamConsumer)prod).
+							setNext((ByteStreamProducer)nextProd);
+					}
+					else if (prod instanceof XMLStreamConsumer)
+					{
+						((XMLStreamConsumer)prod).
+							setNext((XMLStreamProducer)nextProd);
+					}
+					else
+					{
+						throw new ClassCastException();
+					}
+				}
+				catch (ClassCastException e)
+				{
+					throw new LagoonException(prodName 
+						+ ": Inconsistent Producer chain");
+				}
+			}
+
+			try {
+				prod.init();
+			}
+			catch (LagoonException e)
+			{
+				throw new LagoonException(prodName + ": " + e.getMessage());
+			}
+
+			return prod;
+		}
+		else
+		{
+			throw new LagoonException(
+				"Error in Sitemap, unexpected element: " + el.getLocalName());
+		}
+    }
+
 }
+

@@ -29,6 +29,8 @@ read: ? -> byte-stream
 -->
 
 <!ELEMENT sitemap (file)* >
+<!ATTLIST sitemap
+    name NMTOKEN #REQUIRED >
 
 <!ELEMENT file (format|read|process) >
 <!ATTLIST file

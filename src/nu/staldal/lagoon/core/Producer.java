@@ -43,6 +43,9 @@ package nu.staldal.lagoon.core;
 import java.io.*;
 import java.util.*;
 
+import nu.staldal.lagoon.util.LagoonUtil;
+
+
 /**
  * A Producer is one step in the pipeline process to build a
  * file in a website.
@@ -137,40 +140,6 @@ public abstract class Producer implements ProducerInterface
         return params.keys();
     }
 
-    private String makeDirName(String path)
-    {
-        StringBuffer sb = new StringBuffer(path.length());
-
-        for (int i = 0; i < path.length(); i++)
-        {
-            char c = path.charAt(i);
-            switch (c)
-            {
-                case '-':
-                    sb.append("--");
-                    break;
-                case '_':
-                    sb.append("__");
-                    break;
-                case '$':
-                    sb.append("$$");
-                    break;
-                case '/':
-                    sb.append('-');
-                    break;
-                case '*':
-                    sb.append('_');
-                    break;
-                case '?':
-                    sb.append('$');
-                    break;
-                default:
-                    sb.append(c);
-            }
-        }
-
-        return sb.toString();
-    }
 
     private String makeKey(String key)
     {
@@ -189,7 +158,7 @@ public abstract class Producer implements ProducerInterface
     public InputStream readFileFromRepository(String key)
     {
         return processor.readFileFromRepository(
-            makeDirName(getSourceMan().getTargetPath()),
+            LagoonUtil.encodePath(getSourceMan().getTargetPath()),
             makeKey(key));
     }
 
@@ -205,7 +174,7 @@ public abstract class Producer implements ProducerInterface
         throws IOException
     {
         return processor.storeFileInRepository(
-            makeDirName(getSourceMan().getTargetPath()),
+            LagoonUtil.encodePath(getSourceMan().getTargetPath()),
             makeKey(key));
     }
 
@@ -221,7 +190,7 @@ public abstract class Producer implements ProducerInterface
         throws java.io.IOException
     {
         return processor.getObjectFromRepository(
-            makeDirName(getSourceMan().getTargetPath()),
+            LagoonUtil.encodePath(getSourceMan().getTargetPath()),
             makeKey(key));
     }
 
@@ -236,7 +205,7 @@ public abstract class Producer implements ProducerInterface
         throws java.io.IOException
     {
         processor.putObjectIntoRepository(
-            makeDirName(getSourceMan().getTargetPath()),
+            LagoonUtil.encodePath(getSourceMan().getTargetPath()),
             makeKey(key),
             obj);
     }

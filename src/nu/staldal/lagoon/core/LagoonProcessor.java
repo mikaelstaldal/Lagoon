@@ -43,11 +43,17 @@ package nu.staldal.lagoon.core;
 import java.io.*;
 import java.util.*;
 
+import org.xml.sax.SAXException;
+
+import nu.staldal.xtree.*;
+import nu.staldal.lagoon.util.LagoonUtil;
+
+
 /**
  * The main worker class of the Lagoon core.
  *
  * Initialized with InputStream for sitemap,
- * a source dir, a repository dir and a target storage URL.
+ * a source dir and a target storage URL.
  * Then building the website may be done several times,
  * until destroy() is invoked.
  *
@@ -71,7 +77,7 @@ public class LagoonProcessor
 
 
     /**
-     * Constructor. Reads the configuration file.
+     * Constructor.
      *
      * @param targetURL  where to put the generated files,
 	 *                   must be an absolute URL or a local file path
@@ -103,39 +109,81 @@ public class LagoonProcessor
 	 * The InputStream for the sitemap is not used after
 	 * this method returns.
      *
-     * @param sitemap  the Sitemap file
-     * @param sitemapLastUpdated  when the Sitemap was last updated,
-     *                            or -1 if unknown
+     * @param sitemapFile  the Sitemap file
      * @param sourceDir  where the source files are
-     * @param repositoryDir  where to put the repository
      * @param password  password to access the target storage, or
      *                  <code>null</code> if not nessesary.
      */
-    public void init(InputStream sitemap,
-                     long sitemapLastUpdated,
+    public void init(File sitemapFile,
                      File sourceDir,
-                     File repositoryDir,
                      String password)
-        throws IOException, LagoonException, AuthenticationException
+        throws IOException, LagoonException, AuthenticationException,
+			javax.xml.parsers.ParserConfigurationException
     {
-        if (!repositoryDir.exists())
+		Element sitemapTree;
+		try {
+			sitemapTree = TreeBuilder.parseXMLFile(sitemapFile, false);
+		}
+		catch (SAXException e)
+        {
+            Exception ee = e.getException();
+            if (ee == null)
+            {
+                e.printStackTrace();
+                throw new LagoonException(e.getMessage());
+            }
+            else if (ee instanceof java.io.IOException)
+			{
+                throw (java.io.IOException)ee;
+			}
+            else
+            {
+                ee.printStackTrace();
+                throw new LagoonException(ee.getMessage());
+            }
+        }
+   		sitemap = new Sitemap(sitemapTree);
+
+		File workDir = new File(System.getProperty("user.home"), ".lagoon");
+		
+		if (!workDir.exists())
+		{
+			if (!workDir.mkdir())
+				throw new IOException("Unable to create directory: "
+					+ workDir);
+		}
+		else
+		{
+			if (!workDir.isDirectory())
+			{
+				throw new IOException(
+					"Unable to create directory (a file with that name exists): "
+					+ workDir);
+			}
+		}
+		
+		repositoryDir = new File(workDir, sitemap.getSiteName());
+		if (!repositoryDir.exists())
 		{
 			if (!repositoryDir.mkdir())
-				throw new IOException("Unable to create repository directory: "
+				throw new IOException("Unable to create directory: "
 					+ repositoryDir);
 		}
 		else
 		{
 			if (!repositoryDir.isDirectory())
-        	    throw new LagoonException("repositoryDir must be a directory: "
-        	        + repositoryDir);
+			{
+				throw new IOException(
+					"Unable to create directory (a file with that name exists): "
+					+ repositoryDir);
+			}
 		}
-        this.repositoryDir = repositoryDir;
 
         targetLocation.open(targetURL, this, password);
 
-        this.sitemap = new Sitemap(this, sitemap, sourceDir, targetLocation);
-        this.sitemapLastUpdated = sitemapLastUpdated;
+   		sitemap.init(this, sitemapTree, sourceDir, targetLocation);
+		sitemapTree = null;		
+        sitemapLastUpdated = sitemapFile.lastModified();
     }
 
     /**
@@ -268,6 +316,10 @@ public class LagoonProcessor
             if (DEBUG) System.out.println(e);
             return null;
         }
+		finally
+		{
+			is.close();	
+		}
     }
 
     /**
@@ -288,7 +340,13 @@ public class LagoonProcessor
         OutputStream os = storeFileInRepository(dir, key);
 
         ObjectOutputStream oos = new ObjectOutputStream(os);
-        oos.writeObject(obj);
+        try {
+			oos.writeObject(obj);
+		}
+		finally
+		{
+			oos.close();
+		}
     }
 
 
