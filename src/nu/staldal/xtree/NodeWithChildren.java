@@ -79,10 +79,10 @@ public abstract class NodeWithChildren extends Node
 	 *
 	 * @param index  index of the node to get, the first child is 0.
 	 *
-	 * @throws ArrayIndexOutOfBoundException  if no such child exist.
+	 * @throws IndexOutOfBoundsException  if no such child exist.
 	 */
     public Node getChild(int index)
-        throws ArrayIndexOutOfBoundsException
+        throws IndexOutOfBoundsException
     {
         return (Node)children.elementAt(index);
     }
@@ -105,10 +105,10 @@ public abstract class NodeWithChildren extends Node
 	 * @param index  index of the child to replace
 	 *
 	 * @return  the replaced child
-	 * @throws ArrayIndexOutOfBoundsException  if no such child exist
+	 * @throws IndexOutOfBoundsException  if no such child exist
 	 */
     public Node replaceChild(Node newChild, int index)
-        throws ArrayIndexOutOfBoundsException
+        throws IndexOutOfBoundsException
     {
         Node oldChild = (Node)children.elementAt(index);
         oldChild.setParent(null);
@@ -124,10 +124,10 @@ public abstract class NodeWithChildren extends Node
 	 * @param index  index of the child to replace
 	 *
 	 * @return  the removed child
-	 * @throws ArrayIndexOutOfBoundsException  if no such child exist
+	 * @throws IndexOutOfBoundsException  if no such child exist
      */
     public Node removeChild(int index)
-        throws ArrayIndexOutOfBoundsException
+        throws IndexOutOfBoundsException
     {
         Node child = (Node)children.elementAt(index);
         children.removeElementAt(index);
@@ -148,10 +148,10 @@ public abstract class NodeWithChildren extends Node
 	 * @param newChild  the new child
 	 * @param index  index of the new child
 	 *
-	 * @throws ArrayIndexOutOfBoundsException  if the index is invalid.
+	 * @throws IndexOutOfBoundsException  if the index is invalid.
      */
     public void insertChild(Node newChild, int index)
-        throws ArrayIndexOutOfBoundsException
+        throws IndexOutOfBoundsException
     {
         newChild.setParent(this);
         children.insertElementAt(newChild, index);

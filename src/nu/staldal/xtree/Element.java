@@ -191,10 +191,10 @@ public class Element extends NodeWithChildren
 	 * This method is a bit inefficient.
 	 *
 	 * @param index  the index as returned from {@link #lookupAttribute}
-	 * @throws ArrayIndexOutOfBoundException  if no such attribute exist.
+	 * @throws IndexOutOfBoundException  if no such attribute exist.
 	 */
     public void removeAttribute(int index)
-        throws ArrayIndexOutOfBoundsException
+        throws IndexOutOfBoundsException
     {
         attrName.removeElementAt(index);
         attrType.removeElementAt(index);
@@ -215,11 +215,13 @@ public class Element extends NodeWithChildren
 	 * Get the namespace URI for the attribute at the specified index.
 	 *
 	 * @param index  the index as returned from {@link #lookupAttribute}
-	 * @return the namespace URI, may be (and is usually) the empty string
-	 * @throws ArrayIndexOutOfBoundException  if no such attribute exist.
+     *
+	 * @return the namespace URI, may be (and is usually) the empty string,
+	 *         or <code>null</code> if index is -1
+	 * @throws IndexOutOfBoundsException  if no such attribute exist.
 	 */
 	public String getAttributeNamespaceURI(int index)
-        throws ArrayIndexOutOfBoundsException
+        throws IndexOutOfBoundsException
 	{
         if (index == -1) return null;
 		String s = (String)attrName.elementAt(index);
@@ -231,10 +233,13 @@ public class Element extends NodeWithChildren
 	 * Get the name of the attribute at the specified index.
 	 *
 	 * @param index  the index as returned from {@link #lookupAttribute}
-	 * @throws ArrayIndexOutOfBoundException  if no such attribute exist.
+	 *
+	 * @return the localName,
+	 *         or <code>null</code> if index is -1
+	 * @throws IndexOutOfBoundsException  if no such attribute exist.
 	 */
 	public String getAttributeLocalName(int index)
-        throws ArrayIndexOutOfBoundsException
+        throws IndexOutOfBoundsException
 	{
         if (index == -1) return null;
 		String s = (String)attrName.elementAt(index);
@@ -249,11 +254,13 @@ public class Element extends NodeWithChildren
 	 * "CDATA", "ID", "IDREF", "IDREFS", "NMTOKEN", "NMTOKENS", 
 	 * "ENTITY", "ENTITIES", or "NOTATION" (always in upper case).
 	 *
+	 * @return the attribute type,
+	 *         or <code>null</code> if index is -1
 	 * @param index  the index as returned from {@link #lookupAttribute}
-	 * @throws ArrayIndexOutOfBoundException  if no such attribute exist.
+	 * @throws IndexOutOfBoundsException  if no such attribute exist.
 	 */
 	public String getAttributeType(int index)
-        throws ArrayIndexOutOfBoundsException
+        throws IndexOutOfBoundsException
 	{
         if (index == -1) return null;
 		return (String)attrType.elementAt(index);
@@ -263,11 +270,13 @@ public class Element extends NodeWithChildren
 	/**
 	 * Get the value of the attribute at the specified index.
 	 *
+	 * @return the attribute value,
+	 *         or <code>null</code> if index is -1
 	 * @param index  the index as returned from {@link #lookupAttribute}
-	 * @throws ArrayIndexOutOfBoundException  if no such attribute exist.
+	 * @throws IndexOutOfBoundsException  if no such attribute exist.
 	 */
 	public String getAttributeValue(int index)
-        throws ArrayIndexOutOfBoundsException
+        throws IndexOutOfBoundsException
 	{
         if (index == -1) return null;
 		return (String)attrValue.elementAt(index);
@@ -306,10 +315,10 @@ public class Element extends NodeWithChildren
 	 * Return a namespace mapping at the specified index.
 	 *
 	 * @return a String[] with [0] = prefix, [1] = namespace URI
-	 * @throws ArrayIndexOutOfBoundException  if no such mapping exist.	 
+	 * @throws IndexOutOfBoundsException  if no such mapping exist.	 
 	 */
 	public String[] getNamespaceMapping(int index)
-		throws ArrayIndexOutOfBoundsException
+		throws IndexOutOfBoundsException
 	{
 		return new String[] {
 			(String)namespacePrefixes.elementAt(index),
@@ -460,16 +469,35 @@ public class Element extends NodeWithChildren
 		outputEndElement(sax);
 	}
 
-
+	
     /**
-     * Shortcut method for getting the value of an attribute without
-     * namespace.
+     * Shortcut method for getting the value of an attribute without 
+	 * namespace.
      *
-     * @return <code>null</code> if not present
+     * @return the attrubute value, or <code>null</code>
+	 * 		if the attribute doesn't exist
      */
-	public String getAttrValue(String localName)
+	public String getAttrValueOrNull(String localName)
 	{
         return getAttributeValue(lookupAttribute("", localName));
+	}
+
+
+    /**
+     * Shortcut method for getting the value of an attribute without 
+	 * namespace.
+     *
+     * @return the attrubute value, never <code>null</code>
+	 * @throws SAXParseException if the attribute doesn't exist
+     */
+	public String getAttrValue(String localName)
+		throws SAXParseException
+	{
+        String v = getAttrValueOrNull(localName);
+		if (v == null)
+			throw new SAXParseException("Attribute " + localName + " expected", this);
+		else
+			return v;
 	}
 
 
@@ -477,11 +505,30 @@ public class Element extends NodeWithChildren
      * Shortcut method for getting the value of an attribute with
      * namespace.
      *
-     * @return <code>null</code> if not present
+     * @return the attrubute value, or <code>null</code>
+	 * 		if the attribute doesn't exist
      */
-	public String getAttrValue(String namespaceURI, String localName)
+	public String getAttrValueOrNull(String namespaceURI, String localName)
 	{
         return getAttributeValue(lookupAttribute(namespaceURI, localName));
+	}
+
+
+    /**
+     * Shortcut method for getting the value of an attribute with
+     * namespace.
+     *
+     * @return the attrubute value, never <code>null</code>
+	 * @throws SAXParseException if the attribute doesn't exist
+     */
+	public String getAttrValue(String namespaceURI, String localName)
+		throws SAXParseException
+	{
+        String v = getAttrValueOrNull(namespaceURI, localName);
+		if (v == null)
+			throw new SAXParseException("Attribute {" + namespaceURI + "}" + localName + " expected", this);
+		else
+			return v;
 	}
 
 
@@ -490,9 +537,12 @@ public class Element extends NodeWithChildren
      *
      * @return if there is a single Text child, return its value,
      *         if there is no children, return "",
-     *         otherwise return <code>null</code>.
+     *         never <code>null</code>.
+	 * @throws SAXParseException 
+	 *         if there are more than one children or one non-Text child
      */
     public String getTextContent()
+		throws SAXParseException
     {
         if (numberOfChildren() == 0)
         {
@@ -500,13 +550,13 @@ public class Element extends NodeWithChildren
         }
         else if (numberOfChildren() > 1)
         {
-            return null;
+			throw new SAXParseException("No text content", this);
         }
         else
         {
             Node node = getChild(0);
             if (!(node instanceof Text))
-                return null;
+			throw new SAXParseException("No text content", this);
 
             return ((Text)node).getValue();
         }
@@ -518,9 +568,9 @@ public class Element extends NodeWithChildren
      * specified name.
      *
      * @return  the first child Element with the specified name,
-     *          or <code>null</code> if no such child exists.
+     *          or <code>null</code> if there is no such child.
      */
-    public Element getFirstChildElement(String namespaceURI, String localName)
+    public Element getFirstChildElementOrNull(String namespaceURI, String localName)
     {
 		for (int i = 0; i < numberOfChildren(); i++)
 		if (getChild(i) instanceof Element)
@@ -534,16 +584,38 @@ public class Element extends NodeWithChildren
 		}
 
 		return null;
-    }
+	}
+
+
+    /**
+     * Shortcut method for getting the first Element child with a
+     * specified name.
+     *
+     * @return  the first child Element with the specified name,
+     *          never <code>null</code>.
+	 * @throws SAXParseException 
+	 *         if there is no such child.
+     */
+    public Element getFirstChildElement(String namespaceURI, String localName)
+		throws SAXParseException
+    {
+		Element e = getFirstChildElementOrNull(namespaceURI, localName);
+
+		if (e == null)
+			throw new SAXParseException(
+				"Element {" + namespaceURI + "}" + localName + " expected", this);
+		else
+			return e;
+	}
 
 	
     /**
      * Shortcut method for getting the first Element children with any name.
      *
      * @return  the first child Element
-     *          or <code>null</code> if no child Element exists.
+     *          or <code>null</code> if there are no Element children.
      */
-    public Element getFirstChildElement()
+    public Element getFirstChildElementOrNull()
     {
 		for (int i = 0; i < numberOfChildren(); i++)
 		if (getChild(i) instanceof Element)
@@ -554,4 +626,25 @@ public class Element extends NodeWithChildren
 		return null;
     }
 	
+
+    /**
+     * Shortcut method for getting the first Element children with any name.
+     *
+     * @return  the first child Element
+     *          never <code>null</code>.
+	 * @throws SAXParseException 
+	 *         if there are no Element children.
+     */
+    public Element getFirstChildElement()
+		throws SAXParseException
+    {
+		Element e = getFirstChildElementOrNull();
+		
+		if (e == null)
+			throw new SAXParseException(
+				"Element expected", this);
+		else
+			return e;
+    }
 }
+

@@ -48,11 +48,13 @@ import org.xml.sax.*;
 /**
  * Base class for a node in an XTree. 
  */
-public abstract class Node implements java.io.Serializable
+public abstract class Node implements java.io.Serializable, Locator
 {
-    private String systemId;
-    private int line;
-    private int column;
+    private String publicId = null;
+    private String systemId = null;
+    private int line = -1;
+    private int column = -1;
+
     protected NodeWithChildren parent = null;
 	
 	
@@ -61,6 +63,11 @@ public abstract class Node implements java.io.Serializable
         parent = n;
     }
 	
+	public void setPublicId(String publicId)
+	{
+		this.publicId = publicId;	
+	}
+
 	public void setSystemId(String systemId)
 	{
 		this.systemId = systemId;	
@@ -98,7 +105,22 @@ public abstract class Node implements java.io.Serializable
 		throws SAXException;
 
 
-    /**
+	/**
+     * Return the public identifier for this node. Useful for error reporting.
+     *
+     * The return value is the public identifier of the document
+     * entity or of the external parsed entity.
+     *
+     * @return A string containing the public identifier, or null
+     *         if none is available.
+     */
+    public String getPublicId()
+    {
+    	return publicId;
+	}
+
+		
+	/**
      * Return the system identifier for this node. Useful for error reporting.
      *
      * The return value is the system identifier of the document
