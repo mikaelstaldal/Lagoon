@@ -150,6 +150,7 @@
            optimize="off" debug="on">
        <classpath location="${Ant}" />
        <classpath location="${BCEL}" />
+       <classpath location="${Servlet}" />
 	</javac>
 
     <copy todir="${build.classes}">

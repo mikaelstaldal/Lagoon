@@ -10,3 +10,5 @@ JARV=iso-relax.jar
 Ant=ant.jar
 BCEL=bcel.jar
 JUnit=junit.jar
+Servlet=servlet.jar
+
