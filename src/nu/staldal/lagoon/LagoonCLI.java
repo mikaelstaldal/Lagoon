@@ -236,9 +236,11 @@ public class LagoonCLI
                 while (true)
                 {
                     System.out.println("Ready");
-                    String yn = in.readLine();
-					if (yn.length() < 1) break;
-                    if (yn.charAt(0) == 'b')
+                    String s = in.readLine();
+					if (s.length() < 1) continue;
+					char c = Character.toLowerCase(s.charAt(0));
+                    
+					if (c == 'b')
                     {
                         System.out.println("Building website...");
                         long timeBefore = System.currentTimeMillis();
@@ -247,7 +249,7 @@ public class LagoonCLI
                         long timeElapsed = System.currentTimeMillis()-timeBefore;
 	                	showTime(timeElapsed);
                     }
-                    else if (yn.charAt(0) == 'f')
+                    else if (c == 'f')
                     {
                         System.out.println("Force building website...");
                         long timeBefore = System.currentTimeMillis();
@@ -256,7 +258,8 @@ public class LagoonCLI
                         long timeElapsed = System.currentTimeMillis()-timeBefore;
 	                	showTime(timeElapsed);
                     }
-                    else break;
+                    else if (c == 'q')
+						break;
                 }
             }
 
