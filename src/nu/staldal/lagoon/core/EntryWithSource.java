@@ -77,7 +77,8 @@ abstract class EntryWithSource implements SourceManager
      * @param processor the LagoonProcessor.
      * @param sitemap  the Sitemap.
      * @param sourceURL  the file to use, may contain wildcard in filename,
-	 *                   must absolute or pseudo-absolute, may be <code>null</code>.
+	 *                   must absolute or pseudo-absolute, 
+	 *					 may be <code>null</code>.
      * @param sourceRootDir  absolute path to the source directory
      */
     public EntryWithSource(LagoonProcessor processor, Sitemap sitemap, 
@@ -133,9 +134,16 @@ abstract class EntryWithSource implements SourceManager
 		
 		if (file == null)
 		{
-			URL theUrl = new URL(url);
-			URLConnection uc = theUrl.openConnection();
-			return uc.getInputStream();
+			if (url.startsWith("res:"))
+			{
+				return getClass().getResourceAsStream(url.substring(4));
+			}
+			else
+			{
+				URL theUrl = new URL(url);
+				URLConnection uc = theUrl.openConnection();
+				return uc.getInputStream();
+			}
 		}
 		else
 		{
@@ -152,14 +160,6 @@ abstract class EntryWithSource implements SourceManager
 			if (url.startsWith("file:"))
 			{
 				return new File(url.substring(5));	
-			}
-			else if (url.startsWith("res:"))
-			{
-				String resDir = processor.getProperty("resourceDir");
-				if (resDir == null)
-					throw new FileNotFoundException(
-						"Resource Dir is not specified");
-				return new File(new File(resDir), url.substring(5));
 			}
 			else
 			{
@@ -192,12 +192,19 @@ abstract class EntryWithSource implements SourceManager
 					public void parse(InputSource is) 
 						throws SAXException, IOException
 					{
-						pe.getXMLProducer().start(contentHandler, target);							
+						pe.getXMLProducer().start(contentHandler, target);
 					}					
 				}, new InputSource());
 			}
-			else
+			else if (LagoonUtil.absoluteURL(url) && url.startsWith("res:"))
+			{
+				return new StreamSource(
+					getClass().getResourceAsStream(url.substring(4)));
+			}
+			else				
+			{
 				return new StreamSource(getFileURL(url));
+			}
 		}
 		else
 			return new StreamSource(file);
@@ -216,16 +223,26 @@ abstract class EntryWithSource implements SourceManager
 			pe.getXMLProducer().start(ch, target);
 			return;				
 		}
-			
-		InputSource is = new InputSource(getFileURL(url));
+		
+		InputSource is;
 		InputStream istream = null;
 		
-		File file = getFile(url);	
-		
-		if (file != null)
+		if (LagoonUtil.absoluteURL(url) && url.startsWith("res:"))
 		{
-			istream = new FileInputStream(file);
-			is.setByteStream(istream);	
+			is = new InputSource(
+				getClass().getResourceAsStream(url.substring(4)));
+		}
+		else 
+		{
+			is = new InputSource(getFileURL(url));
+		
+			File file = getFile(url);	
+		
+			if (file != null)
+			{
+				istream = new FileInputStream(file);
+				is.setByteStream(istream);	
+			}
 		}
 
 		try {
@@ -263,9 +280,14 @@ abstract class EntryWithSource implements SourceManager
 			{
 				PartEntry pe = sitemap.lookupPart(url.substring(5));
 				if (pe == null)
-					throw new FileNotFoundException("Part " + url + " not found");
+					throw new FileNotFoundException(
+						"Part " + url + " not found");
 
 				return pe.getXMLProducer().hasBeenUpdated(when);
+			}
+			else if (LagoonUtil.absoluteURL(url) && url.startsWith("res:"))
+			{
+				return false;  // cannot check
 			}
 			else
 				return true;  // cannot check

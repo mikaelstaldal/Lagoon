@@ -66,8 +66,6 @@ public class LagoonProcessor
     private final FileStorage targetLocation;
     private File repositoryDir;
 	private File tempDir;
-	private File lagoonPropertyFile;
-	private Properties lagoonProperties;
 
     private final Hashtable classDict;
     private final Hashtable paramDict;
@@ -136,15 +134,6 @@ public class LagoonProcessor
 					"Unable to create directory (a file with that name exists): "
 					+ workDir);
 			}
-		}
-
-		lagoonProperties = new Properties();
-		lagoonPropertyFile = new File(workDir, "lagoon.properties");
-		if (lagoonPropertyFile.exists())
-		{
-			FileInputStream fis = new FileInputStream(lagoonPropertyFile);
-			lagoonProperties.load(fis);
-			fis.close();
 		}
 		
 		repositoryDir = new File(workDir, sitemap.getSiteName());
@@ -222,36 +211,6 @@ public class LagoonProcessor
 	public File getTempDir()
 	{
 		return tempDir;
-	}
-	
-	
-	/**
-	 * Get a Lagoon property.
-	 */
-	public String getProperty(String key)
-	{
-		return lagoonProperties.getProperty(key);	
-	}
-
-
-	/**
-	 * Set a Lagoon property.
-	 */
-	public void setProperty(String key, String value)
-	{
-		lagoonProperties.put(key, value);	
-	}
-	
-	
-	/**
-	 * Store the Lagoon properties persistently.
-	 */
-	public void storeProperties()
-		throws IOException
-	{
-		FileOutputStream fos = new FileOutputStream(lagoonPropertyFile);
-		lagoonProperties.save(fos, "Lagoon properties");
-		fos.close();		
 	}
 	
 	

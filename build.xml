@@ -17,6 +17,7 @@
   <property name="version" value="1.0b12"/>
   <property name="ver" value="10b12"/>
 
+  <property name="res.dir" value="resource"/>
   <property name="src.dir" value="src"/>
   <property name="src.testsuite" value="testsuite"/>
   <property name="build.dir" value="build"/>
@@ -27,13 +28,14 @@
 
   <property name="manifest" value="src/lagoon.mf"/>
 
-
+<!--
   <taskdef name="lagoon" classname="nu.staldal.lagoon.LagoonAntTask">
     <classpath>
       <pathelement location="${dist.jars}/lagoon.jar" />
       <pathelement location="${dist.jars}/xmlutil.jar" />
     </classpath>
   </taskdef>  
+-->
 
   <target name="init">
     <tstamp/>
@@ -85,7 +87,8 @@
     	 <include name="nu/staldal/lagoon/**/*"/>
     	 <include name="nu/staldal/syntax/**/*"/>
     	 <include name="nu/staldal/lsp/**/*"/>
-      </fileset>	 
+      </fileset>
+      <fileset dir="${res.dir}"/>
     </jar>
 
   </target>
@@ -100,7 +103,8 @@
 
     <copy todir="${build.classes}">
       <fileset dir="${src.dir}">
-        <include name="nu/staldal/xtree/**/*,nu/staldal/xmlutil/**/*" />
+        <include name="nu/staldal/xtree/**/*" />
+        <include name="nu/staldal/xmlutil/**/*" />
         <exclude name="**/*.java" />
       </fileset>
     </copy>
@@ -182,9 +186,6 @@
     <copy file="HISTORY" todir="${dist.dir}" />
   	<copy todir="${dist.dir}/bin">
       <fileset dir="bin"/>
-    </copy>
-  	<copy todir="${dist.dir}/resource">
-      <fileset dir="resource"/>
     </copy>
 
     <zip zipfile="${name}${ver}.zip"

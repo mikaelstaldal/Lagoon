@@ -211,19 +211,20 @@ in several versions of Java is broken. These URLs must be written in the form
 (Note that this is <em>not</em> according to the definition of 
 <code>file</code> URLs in RFC 1738.)</p>
 
-<p>The <code>res</code> scheme is used to point out a file in the 
-<code>resource</code> directory in the Lagoon distribution. You can add your 
-own files to this directory. See the <a href="resource.html">Resource Guide</a>
-for information about the included resources.
-E.g. <code>res:/style/imageindex.xsl</code></p>
+<p>The <code>res</code> scheme is used to point out resources included in 
+the Lagoon distribution. These resources are loaded from the Java <code>CLASSPATH</code>, 
+you can add your own resources by adding them to the Java <code>CLASSPATH</code>.
+See the <a href="resource.html">Resource Guide</a> for information about 
+the included resources. E.g. <code>res:/style/imageindex.xsl</code></p>
 
 <p>The <code>part</code> scheme is used to point out &lt;part&gt; defined in the 
 sitemap. E.g. <code>part:thePart</code>.</p>
 
 <p>Dependency checking of sources works for relative, pesudo-absolute and 
-absolute URLs with <code>file</code>, <code>res</code> or <code>part</code> 
+absolute URLs with <code>file</code> or <code>part</code> 
 schemes. However, it does <em>not</em> work with absolute URLs with other 
-schemes, if any such is used as source, it causes rebuilding each time.</p> 
+schemes, if any such is used as source, it causes rebuilding each time.
+Absolute URLs with <code>res</code> scheme <em>never</em> causes rebuilding.</p>
 
 
 <h3>Producers</h3>

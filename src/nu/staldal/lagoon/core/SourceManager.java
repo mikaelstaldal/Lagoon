@@ -104,7 +104,8 @@ public interface SourceManager
      *
      * @throws FileNotFoundException if the main source file is not specified
      */
-    public javax.xml.transform.Source getFileAsJAXPSource(String url, Target target)
+    public javax.xml.transform.Source getFileAsJAXPSource(
+			String url, Target target)
         throws FileNotFoundException;
 		
 
