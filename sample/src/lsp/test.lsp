@@ -187,6 +187,13 @@ in output like this</lsp:processing-instruction>
 </test:foo>
 </p>
 
+<h2>Element element</h2>
+
+<lsp:element name="foo">FOO</lsp:element>
+<lsp:element name="bar"><b>BAR</b></lsp:element>
+<lsp:element name="apa" namespace="http://foo.com/hej">PREFIX</lsp:element>
+<lsp:element name="gurka" namespace="http://foo.com">PREFIX igen</lsp:element>
+
 <h2>ExtFunc</h2>
 
 <!--
