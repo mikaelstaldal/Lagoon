@@ -41,3 +41,4 @@
 -----------
 * Updated support for Apache Batik 1.1.1.
 * Updated LSP.
+* Checks for broken FTP connection (timeout) and reconnect.

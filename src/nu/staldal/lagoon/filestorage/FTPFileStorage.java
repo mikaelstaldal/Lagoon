@@ -57,6 +57,8 @@ public class FTPFileStorage extends RemoteFileStorage
 	private static final boolean DEBUG = false;
 
 	private FTPClient ftp;
+	private String url;
+	private String password;
 
 
     /**
@@ -82,6 +84,9 @@ public class FTPFileStorage extends RemoteFileStorage
         throws MalformedURLException, UnknownHostException,
         FTPException, IOException, AuthenticationException
     {
+		this.url = url;
+		this.password = password;
+		
 		ftp = new FTPClient(url, password);
 		
         openDateFile(processor);
@@ -111,7 +116,18 @@ public class FTPFileStorage extends RemoteFileStorage
     public OutputHandler createFile(String pathname)
         throws IOException
     {
-		OutputStream os = ftp.store(pathname);
+		OutputStream os;
+		try {
+			os = ftp.store(pathname);
+		}
+		catch (IOException e)
+		{
+			if (DEBUG) 
+				System.out.println("FTP reconnecting: " + e.toString());
+			try { ftp.close(); } catch (IOException ignore) {}
+			ftp = new FTPClient(url, password);
+			os = ftp.store(pathname);
+		}
 		
 		return new FTPOutputHandler(pathname, os);
     }
@@ -126,7 +142,17 @@ public class FTPFileStorage extends RemoteFileStorage
     public void deleteFile(String pathname)
         throws java.io.IOException
     {
-		ftp.deleteFile(pathname);
+		try {
+			ftp.deleteFile(pathname);
+		}
+		catch (IOException e)
+		{
+			if (DEBUG) 
+				System.out.println("FTP reconnecting: " + e.toString());
+			try { ftp.close(); } catch (IOException ignore) {}
+			ftp = new FTPClient(url, password);
+			ftp.deleteFile(pathname);
+		}
 	}
 
 
