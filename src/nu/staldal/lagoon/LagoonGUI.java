@@ -400,7 +400,15 @@ public class LagoonGUI extends Frame implements WindowListener
 				prop.setProperty("sourceDir", sourceDir.getValue());
 				prop.setProperty("targetURL", targetURL.getValue());
 				if (password != null)
-					prop.setProperty("password", password);
+				{
+					YesNoQueryDialog ynDialog = 
+						new YesNoQueryDialog(this, "Save password",
+							"Save password in property file?", "Yes", "No");
+					ynDialog.show(); // blocking
+					
+					if (ynDialog.getResult())
+						prop.setProperty("password", password);
+				}
 
 				prop.store(fos, "Lagoon properties");
 				fos.close();
@@ -408,8 +416,8 @@ public class LagoonGUI extends Frame implements WindowListener
 			}
 			catch (IOException e)
 			{
-				MessageDialog ed = new MessageDialog(this, "Error writing property file",
-					e.toString());
+				MessageDialog ed = new MessageDialog(this, 
+					"Error writing property file",	e.toString());
 				ed.show(); // blocking
 			}
 		}	
@@ -555,6 +563,47 @@ class PasswordDialog extends Dialog
 }
 
 
+class YesNoQueryDialog extends Dialog
+{
+	private Label theLabel;
+	private Panel buttonPanel;
+	private Button yesButton;
+	private Button noButton;
+	
+	private boolean result;	
+	
+	public YesNoQueryDialog(Frame parent, String title, String label,
+							String yes, String no)
+	{
+		super(parent, title, true);
+		add(theLabel = new Label(label), BorderLayout.NORTH);
+		add(buttonPanel = new Panel(), BorderLayout.SOUTH);
+		buttonPanel.add(yesButton = new Button(yes));
+		yesButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				result = true;
+				hide();
+			}
+		});
+		buttonPanel.add(noButton = new Button(no));
+		noButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				result = false;
+				hide();
+			}
+		});
+		pack();
+		Point pl = parent.getLocation();
+		setLocation(pl.x+50, pl.y+50);
+	}
+	
+	public boolean getResult()
+	{
+		return result;	
+	}
+}
+
+
 class MessageDialog extends Dialog
 {
 	private Label theLabel;
@@ -613,3 +662,4 @@ class TextAreaWriter extends Writer
 	}
 	
 }
+
