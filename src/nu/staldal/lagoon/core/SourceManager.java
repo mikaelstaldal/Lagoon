@@ -109,7 +109,7 @@ public interface SourceManager
 	 * @param url  URL to the file, if relative it's searched for relative to
 	 * the main source file (or a FileNotFoundException is thrown if
 	 * there is no main source file).
-	 * @param ch  The SAX2 ContentHandler to deliver events to.
+	 * @param sax  The SAX2 ContentHandler to deliver events to.
 	 * @param target  The current target.
      *
      * @throws FileNotFoundException if the main source file is not specified

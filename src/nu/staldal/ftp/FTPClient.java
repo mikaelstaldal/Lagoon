@@ -173,7 +173,7 @@ public class FTPClient
 	 * Connect to an FTP server and login.
 	 *
 	 * @param host  the host to connect to, may be a domain name or IP address
-	 * @param post  the control channel port (default 21)
+	 * @param port  the control channel port (default 21)
 	 * @param username  the username to use for logging in
 	 * @param password  the password to use for logging in
 	 * @param path  initial path, realtive to home directory unless starting with '/',
