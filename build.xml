@@ -15,7 +15,7 @@
   <property name="Batik" value="C:\javaInstall\batik\lib"/>
   <property name="Ant" value="C:\javaInstall\ant\lib\ant.jar"/>
   <property name="JAF" value="C:\javaInstall\jaf\activation.jar"/>
-  <property name="JARV" value="C:\javaInstall\isorelax.jar"/>
+  <property name="JARV" value="C:\javaInstall\iso-relax.jar"/>
 
   <path id="lagoon.class.path">
     <pathelement location="${Ant}" />
@@ -121,7 +121,7 @@
   <target name="xmlutil" depends="init"
   	description="Compiles XML Utils">
     <javac srcdir="${src.dir}"
-    	   includes="nu/staldal/xtree/**/*,nu/staldal/xmlutil/**/*,nu/staldal/ftp/**/*"
+    	   includes="nu/staldal/xtree/**/*,nu/staldal/xmlutil/**/*,nu/staldal/ftp/**/*,nu/staldal/util/**/*"
            destdir="${build.classes}"
            optimize="off" debug="on">
     	<classpath>
@@ -135,6 +135,7 @@
         <include name="nu/staldal/xtree/**/*" />
         <include name="nu/staldal/xmlutil/**/*" />
         <include name="nu/staldal/ftp/**/*" />
+        <include name="nu/staldal/util/**/*" />
         <exclude name="**/*.java" />
       </fileset>
     </copy>
@@ -145,6 +146,7 @@
     	 <include name="nu/staldal/xtree/**/*"/>
     	 <include name="nu/staldal/xmlutil/**/*"/>
     	 <include name="nu/staldal/ftp/**/*"/>
+    	 <include name="nu/staldal/util/**/*"/>
       </fileset>	 
     </jar>
   </target>
@@ -189,7 +191,7 @@
       <fileset dir="docs"/>
     </copy>
     <mkdir dir="${dist.dir}/docs/javadoc"/>
-    <javadoc packagenames="nu.staldal.lagoon.core,nu.staldal.lagoon.util,nu.staldal.xtree,nu.staldal.lsp,nu.staldal.syntax,nu.staldal.xmlutil,nu.staldal.ftp"
+    <javadoc packagenames="nu.staldal.lagoon.core,nu.staldal.lagoon.util,nu.staldal.xtree,nu.staldal.lsp,nu.staldal.syntax,nu.staldal.xmlutil,nu.staldal.ftp,nu.staldal.util"
     	     sourcepath="${src.dir}"
              classpathref="lagoon.class.path"
              classpath="${JAF}"
