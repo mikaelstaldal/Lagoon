@@ -18,3 +18,9 @@
 * General support for XML islands
 * LSP extension elements and functions.
 * Better documentation.
+
+
+1.0 beta 11
+-----------
+* Support for non-reentrant FileStorages: XML islands works together with FTP.
+* Documentation of the plugin API for FileStorages.

@@ -38,15 +38,15 @@
  * http://www.gnu.org/philosophy/license-list.html
  */
 
-package nu.staldal.lagoon.filestorage;
-
-import nu.staldal.lagoon.core.*;
+package nu.staldal.lagoon.core;
 
 import java.io.*;
 import java.util.Hashtable;
 
+
 /**
- * A FileStorage which transfers files to a remote site.
+ * Helper class to implement a FileStorage which stores file modification
+ * dates locally in the Lagoon working directory.
  */
 public abstract class RemoteFileStorage implements FileStorage
 {
@@ -55,7 +55,11 @@ public abstract class RemoteFileStorage implements FileStorage
     private LagoonProcessor processor;
     private Hashtable lastModTable;
 
-    protected void openDateFile(LagoonProcessor processor)
+    /**
+	 * Open the file to store last update dates locally.
+	 * Invoke this from the {@link nu.staldal.lagoon.core.FileStorage#open} method.
+	 */
+	protected void openDateFile(LagoonProcessor processor)
         throws IOException
     {
         if (DEBUG) System.out.println("RemoteFileStorage.init()");
@@ -74,6 +78,10 @@ public abstract class RemoteFileStorage implements FileStorage
 		}
     }
 
+    /**
+	 * Close the file to store last update dates locally.
+	 * Invoke this in the {@link nu.staldal.lagoon.core.FileStorage#close} method.
+	 */
     protected void closeDateFile()
         throws IOException
     {
@@ -81,6 +89,11 @@ public abstract class RemoteFileStorage implements FileStorage
             "nu.staldal.lagoon.filestorage.RemoteFileStorage", lastModTable);
     }
 
+	/**
+	 * Signals that a file has been created or updated.
+	 * Invoke this after successful commitment in the 
+	 * {@link nu.staldal.lagoon.core.OutputHandler#commit} method.
+	 */
     protected void fileModified(String pathname)
     {
         lastModTable.put(pathname, new Long(System.currentTimeMillis()));
@@ -94,7 +107,7 @@ public abstract class RemoteFileStorage implements FileStorage
      * @return  the time when the file was last modified,
      * or -1 if that information is not avaliable.
      */
-    public long fileLastModified(String pathname)
+    public final long fileLastModified(String pathname)
         // throws java.io.IOException
     {
 		Long l = (Long)lastModTable.get(pathname);

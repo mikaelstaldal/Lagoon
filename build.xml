@@ -25,7 +25,6 @@
   <property name="dist.jars" value="${dist.dir}/lib"/>
   <property name="build.classes" value="${build.dir}/classes"/>
   <property name="build.testsuite" value="${build.dir}/testsuite"/>
-  <property name="build.javadoc" value="${build.dir}/javadoc"/>
 
   <!-- <property name="manifest" value="src/manifest"/> -->
  
@@ -180,12 +179,15 @@
   </target>
 
 
-  <target name="javadoc" depends="init" 
-  	description="Creates the API documentation">
-    <mkdir dir="${build.javadoc}"/>
+  <target name="docs" depends="init" 
+  	description="Creates the documentation">
+  	<copy todir="${dist.dir}/docs">
+      <fileset dir="docs"/>
+    </copy>
+    <mkdir dir="${dist.dir}/docs/javadoc"/>
     <javadoc packagenames="nu.staldal.lagoon.core,nu.staldal.lagoon.util,nu.staldal.xtree,nu.staldal.lsp,nu.staldal.syntax"
     	     sourcepath="${src.dir}"
-             destdir="${build.javadoc}"
+             destdir="${dist.dir}/docs/javadoc"
              author="true"
              version="true"
              windowtitle="${Name} API"
@@ -193,7 +195,7 @@
   </target>
 
 
-  <target name="dist" depends="lagoon,javadoc"
+  <target name="dist" depends="lagoon,docs"
   		  description="Builds the distribution">
     <filter token="NAME" value="${Name}" />
     <filter token="VERSION" value="${version}" />
@@ -203,12 +205,6 @@
           filtering="on"/>
     <copy file="LICENSE" todir="${dist.dir}" />
     <copy file="HISTORY" todir="${dist.dir}" />
-  	<copy todir="${dist.dir}/docs">
-      <fileset dir="docs"/>
-    </copy>
-  	<copy todir="${dist.dir}/docs/javadoc">
-      <fileset dir="${build.javadoc}"/>
-    </copy>
   	<copy todir="${dist.dir}/bin">
       <fileset dir="bin"/>
     </copy>

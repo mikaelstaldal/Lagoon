@@ -22,7 +22,26 @@ use of this.</p>
 
 <h2>FileStorages</h2>
 
-<p><em>To be done...</em></p>
+<p>To implement a plugin for uploading vith some protocol, you need to 
+implement the interface <code>nu.staldal.lagoon.core.FileStorage</code>. 
+This implementation must have a public no-arg constructor to enable 
+instantiation by <code>Class.newInstance()</code>. See the API docs for 
+description of the methods you need to implement.</p>
+
+<p>If feasible, make the implementation <em>reentrant</em>, i.e. able to
+start a new file before the last one is commited. If the FileStorage is not
+reentrant, Lagoon will have to use temporary files.</p>
+
+<p>If it's not feasible to check the last update date of a file, extend 
+<code>nu.staldal.lagoon.core.RemoteFileStorage</code> to store that
+information locally in the Lagoon working directory. See the API docs about 
+when you need to invoke the methods of the superclass.</p>
+
+<p>Choose an URL scheme for your implementation, and plug it in to Lagoon by
+making a file 
+<code>nu/staldal/lagoon/filestorage/FileStorage-<em>URLscheme</em></code>
+visible in the CLASSPATH. That file should contain the fully qualified class
+name of your implementation.</p>
 
 
 <h2>Embeeding Lagoon in other applications</h2>

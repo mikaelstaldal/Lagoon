@@ -42,6 +42,7 @@ package nu.staldal.lagoon.filestorage;
 
 import nu.staldal.lagoon.core.FileStorage;
 import nu.staldal.lagoon.core.OutputHandler;
+import nu.staldal.lagoon.core.RemoteFileStorage;
 import nu.staldal.lagoon.core.LagoonProcessor;
 
 import java.io.*;
