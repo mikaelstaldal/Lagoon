@@ -1,6 +1,11 @@
 <!-- Ant build file for Lagoon -->
+
 <!-- You need Apache Ant, version 1.4.1 or later, to use it -->
-<!-- Get it from http://jakarta.apache.org/ant/ -->
+<!-- Get Ant from http://jakarta.apache.org/ant/ -->
+
+<!-- To compile and run the testcases, you need JUnit 3.7 and 
+     the Ant optional tasks installed -->
+<!-- Get Junit from http://sourceforge.net/projects/junit/ -->
 
 <!-- Assumes that you have support for JAXP 1.1, 
      e.g. Apache Xerces and Xalan, in your CLASSPATH -->
@@ -9,16 +14,13 @@
 
   <!-- Change these to match your system, 
   	   or override with -D command line options -->
-  <property name="JUnit" value="C:\javaInstall\JUnit\junit.jar"/>
   <property name="JLex" value="C:\javaInstall\JLex"/>
   <property name="FOP" value="C:\javaInstall\fop\fop.jar"/>
   <property name="Batik" value="C:\javaInstall\batik\lib"/>
-  <property name="Ant" value="C:\javaInstall\ant\lib\ant.jar"/>
   <property name="JAF" value="C:\javaInstall\jaf\activation.jar"/>
   <property name="JARV" value="C:\javaInstall\iso-relax.jar"/>
 
   <path id="lagoon.class.path">
-    <pathelement location="${Ant}" />
     <pathelement location="${FOP}" />
     <fileset dir="${Batik}">
         <include name="*.jar"/>
@@ -163,7 +165,6 @@
     	  tofile="${basedir}/${src.dir}/nu/staldal/lsp/expr/LSPExprLexer.java"/>
   </target>
 
-
   <target name="testsuite" depends="init,xmlutil,lagoon"
   	description="Compiles testsuite">
     <javac srcdir="${src.testsuite}"
@@ -171,7 +172,6 @@
            destdir="${build.testsuite}"
            optimize="off">
     	<classpath>
-            <pathelement location="${JUnit}" />
             <pathelement location="${build.classes}" />
         </classpath>
     </javac>
@@ -182,6 +182,19 @@
         <exclude name="**/*.java" />
       </fileset>
     </copy>
+
+    <junit>
+        <formatter type="plain" usefile="no"/>  
+        <test name="nu.staldal.util.TestEnvironment"/>
+        <test name="nu.staldal.xtree.TestXTree"/>
+        <test name="nu.staldal.xtree.TestSequentialTreeBuilder"/>
+        <test name="nu.staldal.lsp.TestLSPParse"/>
+   <!-- <test name="nu.staldal.lagoon.filestorage.TestLocalFileStorage"/> -->
+        <classpath>
+            <pathelement location="${build.classes}" />
+            <pathelement location="${build.testsuite}" />
+        </classpath>
+    </junit>
   </target>
 
 

@@ -14,7 +14,7 @@ public class TestXTree extends TestCase
     {
         super(name);
     }
-
+	
     public void testXTree() throws Exception
 	{
 		Element el = TreeBuilder.parseXML(
@@ -36,5 +36,10 @@ public class TestXTree extends TestCase
 		fos.close();
 	}
 
+	public void tearDown()
+	{
+		new File("xtree.ser").delete();	
+		new File("xtree.out").delete();	
+	}
 }
 

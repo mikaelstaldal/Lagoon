@@ -4,42 +4,38 @@ import java.io.*;
 
 import org.xml.sax.*;
 
-// import junit.framework.*;
+import junit.framework.*;
 
-public class TestSequentialTreeBuilder // extends TestCase
+public class TestSequentialTreeBuilder extends TestCase
 {
     public TestSequentialTreeBuilder(String name)
     {
-        // super(name);
+        super(name);
     }
 
     public void testSequentialTreeBuilder() throws Exception
 	{
-		System.out.println("----- BEGIN");
 		Element root = SequentialTreeBuilder.parseXMLSequential(
 			new InputSource(getClass().getResourceAsStream("xtree.xml")), false,
 			new ElementHandler() {
 				public void processElement(Element el) throws SAXException
 				{
-					System.out.println("Element  localName=" 
-						+ el.getLocalName()	
-						+ "  ns=" + el.getNamespaceURI());
+					if (el.getLocalName().equals("Distributor"))
+						assertEquals("foo", el.getNamespaceURI());
+					else if (el.getLocalName().equals("News"))
+						assertEquals("bar", el.getNamespaceURI());
+					else
+						fail("localName should be Distributor or News");
 					
-					System.out.println("Root element  localName=" 
-						+ ((Element)el.getParent()).getLocalName()	
-						+ "  ns=" + ((Element)el.getParent()).getNamespaceURI());			
+					assertEquals("Information", 
+						((Element)el.getParent()).getLocalName());
+					assertEquals("foo", 
+						((Element)el.getParent()).getNamespaceURI()); 
 				}
 			});
-		System.out.println("----- END");
-		System.out.println("Root element  localName=" + root.getLocalName() 
-			+ "  ns=" + root.getNamespaceURI());
 		
-	}
-
-	
-	public static void main(String[] args) throws Exception
-	{
-		(new TestSequentialTreeBuilder("foo")).testSequentialTreeBuilder();
+		assertEquals("Information", root.getLocalName());
+		assertEquals("foo", root.getNamespaceURI()); 
 	}
 }
 
