@@ -43,7 +43,7 @@ package nu.staldal.lagoon.core;
 import java.io.*;
 import java.util.*;
 
-import nu.staldal.lagoon.util.LagoonUtil;
+import nu.staldal.util.Utils;
 
 
 /**
@@ -174,7 +174,7 @@ public abstract class Producer implements ProducerInterface
     public InputStream readFileFromRepository(String key)
     {
         return processor.readFileFromRepository(
-            LagoonUtil.encodePath(entryName),
+            Utils.encodePath(entryName),
             makeKey(key));
     }
 
@@ -191,7 +191,7 @@ public abstract class Producer implements ProducerInterface
         throws IOException
     {
         return processor.storeFileInRepository(
-            LagoonUtil.encodePath(entryName),
+            Utils.encodePath(entryName),
             makeKey(key));
     }
 
@@ -207,7 +207,7 @@ public abstract class Producer implements ProducerInterface
         throws java.io.IOException
     {
         return processor.getObjectFromRepository(
-            LagoonUtil.encodePath(entryName),
+            Utils.encodePath(entryName),
             makeKey(key));
     }
 
@@ -225,7 +225,7 @@ public abstract class Producer implements ProducerInterface
         throws java.io.IOException
     {
         return processor.putObjectIntoRepository(
-            LagoonUtil.encodePath(entryName),
+            Utils.encodePath(entryName),
             makeKey(key),
             obj);
     }

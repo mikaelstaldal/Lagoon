@@ -49,7 +49,7 @@ import org.xml.sax.*;
 import org.xml.sax.helpers.AttributesImpl;
 
 import nu.staldal.xmlutil.*;
-import nu.staldal.lagoon.util.*;
+import nu.staldal.util.Utils;
 
 public class BuildSitemap
 {
@@ -91,7 +91,7 @@ public class BuildSitemap
 		
 		ch.startDocument();
 		AttributesImpl atts = new AttributesImpl();
-		atts.addAttribute("","name","","CDATA", LagoonUtil.encodePath(args[0]));
+		atts.addAttribute("","name","","CDATA", Utils.encodePath(args[0]));
 		ch.startElement("", "sitemap", "", atts);
 
 		processDirectory(null, ch);

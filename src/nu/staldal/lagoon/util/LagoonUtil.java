@@ -75,58 +75,6 @@ public final class LagoonUtil
     public static boolean pseudoAbsoluteURL(String url)
     {
         return (url.length() > 0) && (url.charAt(0) == '/');
-    }
-
-
- 	/**
-	 * Encode a path name or URL into a filename.
-	 *
-	 * The encoding function is not intended to be inversible. 
-	 */
-    public static String encodePath(String path)
-    {
-        StringBuffer sb = new StringBuffer(path.length());
-
-        for (int i = 0; i < path.length(); i++)
-        {
-            char c = path.charAt(i);
-            switch (c)
-            {
-                case '-':
-                    sb.append("--");
-                    break;
-                case '_':
-                    sb.append("__");
-                    break;
-                case '$':
-                    sb.append("$$");
-                    break;
-                case '~':
-                    sb.append("~~");
-                    break;
-					
-                case '/':
-                    sb.append('-');
-                    break;
-                case '\\':
-                    sb.append('-');
-                    break;
-                case '*':
-                    sb.append('_');
-                    break;
-                case '?':
-                    sb.append('$');
-                    break;
-                case ':':
-                    sb.append('~');
-                    break;
-                default:
-                    sb.append(c);
-            }
-        }
-
-        return sb.toString();
-    }
-	
+    }	
 	
 }
