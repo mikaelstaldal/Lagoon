@@ -141,6 +141,11 @@ in output like this</lsp:processing-instruction>
 
 <hr/>
 
+<h2>Part</h2>
+
+<lsp:import file="part:theSecondPart"/>
+<lsp:include file="part:thePart"/>
+
 <p>---End of LSP Test---</p>
 
 </body>

@@ -6,16 +6,16 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 version="1.0">
 
-<!-- Output as HTML -->
-<xsl:output method="html" encoding="iso-8859-1"/>
+<xsl:import href="/imp.xsl"/>
+
+<xsl:import href="imphere.xsl"/>
 
 <xsl:include href="/inc.xsl"/>
 
 <xsl:include href="inchere.xsl"/>
 
-<xsl:import href="/imp.xsl"/>
-
-<xsl:import href="imphere.xsl"/>
+<!-- Output as HTML -->
+<xsl:output method="html" encoding="iso-8859-1"/>
 
 <xsl:template match="/">
   <!-- Build the main structure of the produced HTML -->
@@ -23,6 +23,8 @@
     <head>
         <title><xsl:value-of select="$myparam"/></title>
         <meta name="Author" content="{$theparam}"/>
+
+		<!-- <xsl:copy-of select="document('part:thePart')"/> -->
 
 		<xsl:copy-of select="document('includehere.xml')"/>
 

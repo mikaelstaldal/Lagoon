@@ -8,9 +8,10 @@
 
   <!-- Change these to match your system, 
   	   or override with -D command line options -->
-  <property name="JUnit" value="D:\javaInstall\JUnit\junit.jar"/>
-  <property name="JLex" value="D:\javaInstall\JLex"/>
-  <property name="FOP" value="D:\javaInstall\fop\fop.jar"/>
+  <property name="JUnit" value="C:\javaInstall\JUnit\junit.jar"/>
+  <property name="JLex" value="C:\javaInstall\JLex"/>
+  <property name="FOP" value="C:\javaInstall\fop\fop.jar"/>
+  <property name="Batik" value="C:\home\mikes\projects\xml-batik\classes"/>
 
   <property name="Name" value="Lagoon"/>
   <property name="name" value="lagoon"/>
@@ -53,6 +54,7 @@
            optimize="off">
     	<classpath>
             <pathelement location="${FOP}" />
+            <pathelement location="${Batik}" />
         </classpath>
 	</javac>           
 

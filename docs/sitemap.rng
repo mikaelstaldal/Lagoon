@@ -12,6 +12,7 @@
       <choice>
       <ref name="deleteEntry"/>
       <ref name="fileEntry"/>
+      <ref name="partEntry"/>
       </choice>
     </zeroOrMore>
   </element>
@@ -31,6 +32,14 @@
       <attribute name="source"/> <!-- Source may contain wildcard -->
     </optional>
     <ref name="byteProducer"/>  
+  </element>
+</define>
+
+<define name="partEntry">
+  <element name="part">
+    <attribute name="name"/>
+    <attribute name="source"/>
+    <ref name="xmlProducer"/>  
   </element>
 </define>
 

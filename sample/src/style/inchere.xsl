@@ -3,9 +3,10 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 version="1.0">
 
+<xsl:import href="inc2imp.xsl"/>
+
 <xsl:param name="theparam"/>
 
-<xsl:import href="inc2imp.xsl"/>
 <xsl:include href="inc2inc.xsl"/>
 
 </xsl:stylesheet>

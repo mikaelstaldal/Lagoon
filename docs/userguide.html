@@ -120,6 +120,10 @@ of Xerces.</li>
 version 0.19 (version 0.20 currently doesn't work). You can download it from 
 <a href="http://xml.apache.org/dist/">http://xml.apache.org/dist/</a>.</li>
 
+<li>To use SVG rendering, you need Apache Batik version 1.1. You can download it from 
+<a href="http://xml.apache.org/dist/">http://xml.apache.org/dist/</a>. Note that
+Apache Batik requires Java2.</li>
+
 <li>To use SSH, you need a command-line based SSH client. Most (but
 not all) SSH clients for Windows are GUI based, and will not work. A
 SSH client will probably work with Lagoon if and only if it works with
@@ -131,8 +135,8 @@ CVS.</li>
 
 <ol>
 <li>Make sure that your JRE is properly installed and working.</li>
-<li>Add the distribution JAR files from Xerces, Xalan and (if you use it) FOP 
-to your Java <code>CLASSPATH</code>.</li>
+<li>Add the distribution JAR files from Xerces, Xalan and (if you use it) Batik and FOP 
+to your Java <code>CLASSPATH</code>. You should put Batik before FOP.</li> 
 <li>Add the <code>bin</code> directory to your <code>PATH</code> and set an 
 environment variable <code>LAGOON_HOME</code> to the directory where you 
 installed Lagoon (there are scripts for Windows, OS/2 and UNIX based systems, 
@@ -154,7 +158,14 @@ entry describes how that file should be created.
 The target is the request URL for the web server, 
 and must be specified as a pseudo-absolute URL. The source URL must be specified 
 as an absolute or pseudo-absolute URL. If source is omitted, 
-it's set to the same string as target (including any wildcard).</p>
+it's set to the same string as target (including any wildcard). 
+The pipeline must end with a byte producer.</p>
+
+<p>The sitemap may also contain <code>&lt;part&gt;</code>
+entries, which defines a partial document, to be included by another document. 
+A <code>part</code> has a name, which is not an URL. The source URL must be 
+specified as an absolute or pseudo-absolute URL. The pipeline must end with an 
+XML producer.</p>
 
 <p>The sitemap may also contain <code>&lt;delete&gt;</code> entries, which are
 used to delete the target.</p>
@@ -183,8 +194,8 @@ relative to the local source root directory.</li>
 <p>Absolute URLs are handled by the <code>java.net.URLConnection</code>
 class in Java. It has a pluggable API and it's possible to install custom 
 handlers for any scheme (see the Java documentation for information about 
-this). However, two schemes are handled specially by Lagoon, 
-<code>file</code> and <code>res</code>.</p>
+this). However, three schemes are handled specially by Lagoon, 
+<code>file</code>, <code>res</code> and <code>part</code>.</p>
 
 <p>The <code>file</code> scheme is used to point out a file anywhere in the 
 local file system. Lagoon handles this by itself because the support for it
@@ -201,10 +212,14 @@ own files to this directory. See the <a href="resource.html">Resource Guide</a>
 for information about the included resources.
 E.g. <code>res:/style/imageindex.xsl</code></p>
 
+<p>The <code>part</code> scheme is used to point out &lt;part&gt; defined in the 
+sitemap. E.g. <code>part:thePart</code>. URL:s with this scheme can only be
+used in LSP documents.</p>
+
 <p>Dependency checking of sources works for relative, pesudo-absolute and 
-absolute URLs with <code>file</code> or <code>res</code> schemes. However, 
-it does <em>not</em> work with absolute URLs with other schemes, if any such
-is used as source, it causes rebuilding each time.</p> 
+absolute URLs with <code>file</code>, <code>res</code> or <code>part</code> 
+schemes. However, it does <em>not</em> work with absolute URLs with other 
+schemes, if any such is used as source, it causes rebuilding each time.</p> 
 
 
 <h3>Producers</h3>
@@ -212,10 +227,9 @@ is used as source, it causes rebuilding each time.</p>
 <p>A file is created with a pipeline of connected <em>producers</em>. A
 producer is a component which produces a stream of bytes (implemented
 using a Java OutputStream) or a stream of XML data (implemented using
-SAX events). A producer may additionally take a stream of bytes or XML
+SAX2 events). A producer may additionally take a stream of bytes or XML
 data as input (if it does not, it is a <em>source producer</em>). A
-pipeline is a chain of connected producers with a byte producer in one
-end and a source producer in the other end.</p>
+pipeline is a chain of connected producers.</p>
 
 <p>Lagoon has defined six types of producers:</p>
 
@@ -404,11 +418,13 @@ Guide</a>.</p>
 <p>Any parameters to this producers are used as parameters to the LSP
 page.</p>
 
-<p>Any relative URL imported from the LSP page is searched for relative
-to the source file.</p>
+<p>Any relative URL imported or included from the LSP page is searched 
+for relative to the source file.</p>
 
-<p>Any relative URL included from the LSP page is searched for relative
-to the source file.</p>
+<p><code>part</code> URL:s may be used when including and importing. 
+Imported parts must be well-formed (i.e. have a single root element), 
+which is not nessesary the case if it's generated by LSP or XSLT. Included parts
+need not to be well-formed.</p> 
 
 <p>This producer will check all files (and other resources) the LSP
 page depends on, and signal the need for rebuilding if any of them are
@@ -481,6 +497,17 @@ encoding to use, default is iso-8859-1.</p>
 
 <p>Formats XSL:FO into PDF using Apache FOP.</p>
 
+<h3>&lt;format type="svg"&gt;</h3>
+
+<p>Formats SVG into an bitmap image using Apache Batik.</p>
+
+<p>A mandatory parameter "format" specifies the format of the image, it may be 
+"jpeg", "png" or "tiff".</p>
+
+<p>For JPEG images, an additional parameter "quality" may be used to specify the
+compression rate, it's a floating point number between 0 and 1 where a larger 
+number means better quality but less compression (larger file). The default 
+quality is 0.8.</p>
 
 <h3>&lt;parse&gt;</h3>
 
@@ -551,6 +578,24 @@ to the LSP page):</p>
     &lt;transform type="lsp" showpicture="yes"&gt;
       &lt;source/&gt;
     &lt;/transform&gt;
+  &lt;/format&gt;
+&lt;/file&gt;
+</pre>
+
+<p>Define a partial page to be included by another page:</p>
+<pre>
+&lt;part name="header" source="/header.lsp"&gt;
+  &lt;transform type="lsp" menu="yes"&gt;
+    &lt;source/&gt;
+  &lt;/transform&gt;
+&lt;/part&gt;
+</pre>
+
+<p>Render a JPEG image from SVG:</p>
+<pre>
+&lt;file target="/picture.jpeg" source="/picture.svg"&gt;
+  &lt;format type="svg" format="jpeg" quality="0.5"&gt;
+    &lt;source/&gt;
   &lt;/format&gt;
 &lt;/file&gt;
 </pre>

@@ -53,6 +53,7 @@
 	</format>
 </file>
 
+
 <file target="/report.pdf" source="/work/report.xml">
 	<format type="fo">
 	   	<transform type="xslt" stylesheet="/style/report_print.xsl">
@@ -61,6 +62,30 @@
     </format>
 </file>
 
+
+<!--
+<file target="/picture.jpeg" source="/test.svg">
+	<format type="svg" format="jpeg" quality="0.5">
+    	<source/>
+    </format>
+</file>
+-->
+
+<!--
+<file target="/picture.png" source="/test.svg">
+	<format type="svg" format="png">
+    	<source/>
+    </format>
+</file>
+-->
+
+<!--
+<file target="/picture.tiff" source="/test.svg">
+	<format type="svg" format="tiff">
+    	<source/>
+    </format>
+</file>
+-->
 <file target="/pic.png" source="/img/pic.png">
 	<read/>
 </file>
@@ -84,6 +109,15 @@
 		<transform type="lsp" bool="BOOLEAN" hej="HEJSAN" pi="ACME"><source/></transform>
 	</format>
 </file>
+
+<part name="thePart" source="/lsp/part.lsp">
+	<transform type="lsp" foo="BAR"><source/></transform>
+</part>
+
+<part name="theSecondPart" source="/lsp/part2.lsp">
+	<transform type="lsp" foo="BAZ"><source/></transform>
+</part>
+
 
 <file target="/htmltest.html" source="/htmltest.html">
 	<format type="html">
@@ -117,7 +151,7 @@
     </format>
 </file>
 
-<file target="/file/pic.png" source="file:D:\mikes\lagoon\sample\src\img\pic.png">
+<file target="/file/pic.png" source="file:C:\home\mikes\lagoon\sample\src\img\pic.png">
 	<read/>
 </file>
 
