@@ -101,7 +101,7 @@
   </target>
 
   <target name="lagoon" 
-    depends="init,xmlutil,lsp,lexer,lagoon_compile,lagoon_version"
+    depends="init,xmlutil,lexer,lsp,lagoon_compile,lagoon_version"
   	description="Compiles Lagoon">
  
     <jar jarfile="${dist.jars}/${name}.jar"
@@ -151,7 +151,7 @@
   </target>
 
 
-  <target name="lsp" depends="init,xmlutil"
+  <target name="lsp" depends="init,xmlutil,lexer"
   	description="Compiles LSP">
     <javac srcdir="${src.dir}"
     	   includes="nu/staldal/lsp/**/*,nu/staldal/syntax/**/*"
