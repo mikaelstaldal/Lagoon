@@ -14,11 +14,12 @@
   <property name="FOP" value="C:\javaInstall\fop\fop.jar"/>
   <property name="Batik" value="C:\home\mikes\projects\xml-batik\classes\"/>
   <property name="Ant" value="C:\javaInstall\ant\lib\ant.jar"/>
+  <property name="JAF" value="C:\javaInstall\jaf\activation.jar"/>
 
   <property name="Name" value="Lagoon"/>
   <property name="name" value="lagoon"/>
-  <property name="version" value="1.0b13"/>
-  <property name="ver" value="10b13"/>
+  <property name="version" value="1.0b14"/>
+  <property name="ver" value="10b14"/>
 
   <property name="res.dir" value="resource"/>
   <property name="src.dir" value="src"/>
@@ -89,11 +90,15 @@
 
 
   <target name="xmlutil" depends="init"
-  	description="Compiles XTree">
+  	description="Compiles XML Utils">
     <javac srcdir="${src.dir}"
     	   includes="nu/staldal/xtree/**/*,nu/staldal/xmlutil/**/*"
            destdir="${build.classes}"
-           optimize="off" debug="on"/>
+           optimize="off" debug="on">
+    	<classpath>
+            <pathelement location="${JAF}" />
+        </classpath>
+	</javac>
 
     <copy todir="${build.classes}">
       <fileset dir="${src.dir}">
@@ -187,4 +192,3 @@
   </target>
 
 </project>
-
