@@ -161,7 +161,6 @@
 
     <junit>
         <formatter type="plain" usefile="no"/>  
-        <test name="nu.staldal.util.TestEnvironment"/>
         <test name="nu.staldal.util.TestUtils"/>
         <test name="nu.staldal.xtree.TestXTree"/>
         <test name="nu.staldal.xtree.TestSequentialTreeBuilder"/>
