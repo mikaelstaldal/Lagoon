@@ -61,13 +61,14 @@ public class BatikFormatter extends Format
 	private static boolean DEBUG = true;
 
 	private ImageTranscoder transcoder;
+	private String xmlReaderClassName;
 	
     public void init() throws LagoonException
     {
 		try {
 			SAXParserFactory spf = SAXParserFactory.newInstance();
 			XMLReader parser = spf.newSAXParser().getXMLReader();
-			String xmlReaderClassName = parser.getClass().getName();
+			xmlReaderClassName = parser.getClass().getName();
 			if (DEBUG) System.out.println("xmlReaderClassName: " + xmlReaderClassName);
 			org.apache.batik.util.XMLResourceDescriptor.setXMLParserClassName(
 				 xmlReaderClassName);
@@ -110,8 +111,8 @@ public class BatikFormatter extends Format
     public void start(OutputStream out, final Target target)
         throws IOException, SAXException
     {
-		SAXSVGDocumentFactory docFactory = new SAXSVGDocumentFactory();
-		docFactory.prepareDocument();
+		SAXSVGDocumentFactory docFactory = new SAXSVGDocumentFactory(xmlReaderClassName);
+		// docFactory.prepareDocument();
 		getNext().start(docFactory, target);
 		
 		URL sourceURL;
@@ -127,8 +128,9 @@ public class BatikFormatter extends Format
 							
 		if (DEBUG) System.out.println("The source URL: " + sourceURL);
 		
-		SVGOMDocument doc = docFactory.getDocument(sourceURL); 
-
+		// *** will not work!
+		SVGOMDocument doc = docFactory.createDocument(sourceURL.toString());
+		
 		if (DEBUG) System.out.println("Batik SVG DOM building complete");
         TranscoderInput input = new TranscoderInput(doc);
 		input.setURI(sourceURL.toString());

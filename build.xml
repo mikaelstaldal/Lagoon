@@ -1,5 +1,5 @@
 <!-- Ant build file for Lagoon -->
-<!-- You need Apache Ant, version 1.2 or later, to use it -->
+<!-- You need Apache Ant, version 1.4.1 or later, to use it -->
 <!-- Get it from http://jakarta.apache.org/ant/ -->
 
 <!-- Assumes that you have support for JAXP 1.1, 
@@ -12,9 +12,18 @@
   <property name="JUnit" value="C:\javaInstall\JUnit\junit.jar"/>
   <property name="JLex" value="C:\javaInstall\JLex"/>
   <property name="FOP" value="C:\javaInstall\fop\fop.jar"/>
-  <property name="Batik" value="C:\home\mikes\projects\xml-batik\classes\"/>
+  <property name="Batik" value="C:\javaInstall\batik\lib"/>
   <property name="Ant" value="C:\javaInstall\ant\lib\ant.jar"/>
   <property name="JAF" value="C:\javaInstall\jaf\activation.jar"/>
+
+  <path id="lagoon.class.path">
+    <pathelement location="${Ant}" />
+    <pathelement location="${FOP}" />
+    <fileset dir="${Batik}">
+        <include name="*.jar"/>
+    </fileset>
+  </path>
+
 
   <property name="Name" value="Lagoon"/>
   <property name="name" value="lagoon"/>
@@ -52,11 +61,7 @@
     	   includes="nu/staldal/lagoon/**/*,nu/staldal/lsp/**/*,nu/staldal/syntax/**/*"
            destdir="${build.classes}"
            optimize="off" debug="on">
-    	<classpath>
-            <pathelement location="${FOP}" />
-            <pathelement location="${Batik}" />
-            <pathelement location="${Ant}" />
-        </classpath>
+    	<classpath refid="lagoon.class.path"/>
 	</javac>           
 
     <copy todir="${build.classes}">
