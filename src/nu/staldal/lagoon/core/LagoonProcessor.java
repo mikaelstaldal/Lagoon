@@ -58,7 +58,7 @@ import nu.staldal.lagoon.util.LagoonUtil;
  * This class is not thread-safe. The methods must not
  * be invoked concurrently from different threads.
  */
-public class LagoonProcessor
+public class LagoonProcessor implements LagoonContext
 {
 	private static final boolean DEBUG = false;
 
@@ -66,6 +66,7 @@ public class LagoonProcessor
     private final FileStorage targetLocation;
     private File repositoryDir;
 	private File tempDir;
+	private File sourceRootDir;
 
     private final Hashtable classDict;
     private final Hashtable paramDict;
@@ -114,7 +115,13 @@ public class LagoonProcessor
 			throw new AuthenticationMissingException();	
 		}
 		
-   		sitemap = new Sitemap(this, sitemapTree, sourceDir);
+		String absPath = sourceDir.getAbsolutePath();
+        this.sourceRootDir = new File(absPath);
+        if (!this.sourceRootDir.isDirectory())
+            throw new LagoonException(
+                "sourceDir must be an existing directory: " + sourceDir);   		
+		
+		sitemap = new Sitemap(this, sitemapTree, sourceRootDir);
 
 		File workDir = new File(System.getProperty("user.home"), ".lagoon");
 		
@@ -167,6 +174,8 @@ public class LagoonProcessor
 					+ tempDir);
 			}
 		}
+		
+		sitemap.init();
 				
         targetLocation.open(targetURL, this, password);
     }
@@ -227,25 +236,12 @@ public class LagoonProcessor
 		targetLocation.close();
 	}
 
-	
-	/**
-	 * Get the temp directory.
-	 */
 	public File getTempDir()
 	{
 		return tempDir;
 	}
 	
 	
-    /**
-     * Read from a file in the repository.
-     * Read from the returned InputStream and close() it.
-     *
-     * @param key  the key to locate the file
-     *
-     * @return an InputStream to read the file from, or <code>null</code>
-     * if the file wasn't found.
-     */
     public InputStream readFileFromRepository(String key)
     {
         return readFileFromRepository(null, key);
@@ -256,9 +252,13 @@ public class LagoonProcessor
         File theDir = (dir == null)
                     ? repositoryDir
                     : new File(repositoryDir, dir);
+					
+		File theFile = new File(theDir, key);
+		
+		if (DEBUG) System.out.println("readFileFromRepository: " + theFile);			
 
         try {
-            return new FileInputStream(new File(theDir, key));
+            return new FileInputStream(theFile);
         }
         catch (FileNotFoundException e)
         {
@@ -266,14 +266,6 @@ public class LagoonProcessor
         }
     }
 
-    /**
-     * Store a file in the repository.
-     * Write to the returned OutputStream and close() it.
-     *
-     * @param key  the key to locate the file
-     *
-     * @return  an OutputStream to write to the file
-     */
     public OutputStream storeFileInRepository(String key)
         throws IOException
     {
@@ -288,16 +280,13 @@ public class LagoonProcessor
                     : new File(repositoryDir, dir);
         theDir.mkdir();
 
-        return new FileOutputStream(new File(theDir, key));
+		File theFile = new File(theDir, key);
+		
+		if (DEBUG) System.out.println("storeFileInRepository: " + theFile);			
+		
+        return new FileOutputStream(theFile);
     }
 
-    /**
-     * Get an object from the repository.
-     *
-     * @param key  the key to locate the object
-     *
-     * @return  the object, or <code>null</code> if not found
-     */
     public Object getObjectFromRepository(String key)
         throws IOException
     {
@@ -340,12 +329,6 @@ public class LagoonProcessor
 		}
     }
 
-    /**
-     * Store an object into the repository.
-     *
-     * @param key  the key to locate the object
-     * @param obj  the object to store, must be Serializable
-     */
     public void putObjectIntoRepository(String key, Object obj)
         throws IOException
     {
@@ -568,5 +551,20 @@ public class LagoonProcessor
                 + e.getMessage());
         }
     }
+
+
+	public boolean canCheckFileHasBeenUpdated(String url)
+	{
+		return !LagoonUtil.absoluteURL(url) 
+			|| url.startsWith("part:")
+			|| url.startsWith("file:")
+			|| url.startsWith("res:");
+	}
+
+
+    public File getSourceRootDir()
+	{
+		return sourceRootDir;		
+	}
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001, Mikael Ståldal
+ * Copyright (c) 2001-2002, Mikael Ståldal
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -68,13 +68,13 @@ public interface FileStorage
 	 * Open and initialize this file storage.
      *
      * @param url  The URL to the file storage,
-     * @param processor  the LagoonProcessor.
+     * @param context  the LagoonContext.
      * @param password the password nessesary to access this file storage,
      *        or <code>null</code> if no password is nessesary.
      *
      * @throws AuthenticationException  if password was needed but incorrect.
 	 */
-	public void open(String url, LagoonProcessor processor, String password)
+	public void open(String url, LagoonContext context, String password)
         throws java.net.MalformedURLException, java.io.IOException,
                AuthenticationException;
 
