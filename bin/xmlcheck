@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# UNIX shell script for running Lagoon
+
+# export LAGOON_HOME=/usr/local/lagoon
+
+java -classpath ${CLASSPATH};${LAGOON_HOME}/lib/lagoon.jar;${LAGOON_HOME}/lib/xtree.jar nu.staldal.lagoon.XMLCheck %1 %2 %3 %4 %5 %6 %7 %8 %9

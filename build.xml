@@ -19,7 +19,6 @@
 
   <property name="src.dir" value="src"/>
   <property name="src.testsuite" value="testsuite"/>
-  <property name="docs.dir" value="docs"/>
   <property name="build.dir" value="build"/>
   <property name="dist.dir" value="dist"/>
   <property name="dist.jars" value="${dist.dir}/lib"/>
@@ -175,11 +174,23 @@
 
   <target name="docs">
   	<copy todir="${dist.dir}/docs">
-      <fileset dir="${docs.dir}"/>
+      <fileset dir="docs"/>
     </copy>
   </target>
 
-  <target name="dist" depends="lagoon,docs"
+  <target name="resource">
+  	<copy todir="${dist.dir}/resource">
+      <fileset dir="resource"/>
+    </copy>
+  </target>
+
+  <target name="bin">
+  	<copy todir="${dist.dir}/bin">
+      <fileset dir="bin"/>
+    </copy>
+  </target>
+
+  <target name="dist" depends="lagoon,docs,resource,bin"
   		  description="Builds the distribution">
     <filter token="NAME" value="${Name}" />
     <filter token="VERSION" value="${version}" />

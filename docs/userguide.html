@@ -134,8 +134,12 @@ CVS.</li>
 (you need both <code>fop.jar</code> and <code>w3c.jar</code>) to your Java
 <code>CLASSPATH</code>.</li>
 <li>Add all the <code>.jar</code> files in the <code>lib</code> directory
-to your Java <code>CLASSPATH</code>.</li>
+to your Java <code>CLASSPATH</code>. Or, add the <code>bin</code> directory 
+to your <code>PATH</code> and set an environment variable 
+<code>LAGOON_HOME</code> to the directory where you installed Lagoon (there are
+scripts for Windows, OS/2 and UNIX based systems).</li>
 </ol>
+
 
 <h2>The sitemap</h2>
 
@@ -562,7 +566,12 @@ to the LSP page):</p>
 
 <p><em>java</em> is your Java interpreter, usually just "java". It's
 not recommended to use "javaw" in Sun JDK for Windows, since Lagoon
-will write error messages and other information to standard out.</p>
+will write error messages and other information to standard out. If you have 
+setup a script for running Lagoon, you can use the syntax (the resourceDir is handled by the script):</p>
+<pre>
+lagoon <em>property_file</em> <em>how_to_run</em>
+lagoon <em>sitemap_file</em> <em>how_to_run</em>
+</pre>
 
 <p>The <em>property_file</em> and <em>sitemap_file</em> is specified using 
 a platform-dependent path (e.g. use '\' as path separator in Windows), 
@@ -670,6 +679,7 @@ is:</p>
 
 <pre>
 <em>java</em> nu.staldal.lagoon.XMLCheck [-v] <em>xml_file</em>
+xmlcheck [-v] <em>xml_file</em>
 </pre>
 
 <p><em>xml_file</em> is the file to check, can be specified with a
@@ -683,6 +693,7 @@ structure. The syntax for this tool is:</p>
 
 <pre>
 <em>java</em> nu.staldal.lagoon.BuildSitemap <em>source_dir</em> <em>sitemap_file</em>
+buildsitemap <em>source_dir</em> <em>sitemap_file</em>
 </pre>
 
 <p>The <em>source_dir</em> directory will be recursively processed, and
