@@ -45,6 +45,10 @@ import java.util.*;
 import org.xml.sax.*;
 import org.xml.sax.helpers.*;
 
+
+/**
+ * An adapter to convert from SAX2 ContentHandler to SAX1 DocumentHandler. 
+ */
 public class DocumentHandlerAdapter implements ContentHandler
 {
 	private static final boolean DEBUG = false;
@@ -54,6 +58,11 @@ public class DocumentHandlerAdapter implements ContentHandler
     private boolean contextPushed;
 
 
+	/**
+	 * Constructs an adapter.
+	 *
+	 * @param dh  the SAX1 DocumentHandler to fire events on.
+	 */
     public DocumentHandlerAdapter(DocumentHandler dh)
     {
         this.dh = dh;

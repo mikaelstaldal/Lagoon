@@ -133,8 +133,6 @@ public class LagoonCLI
                 password = properties.getProperty("password");
 			}
 			
-            processor = new LagoonProcessor(targetURL);
-
 			Element sitemapTree;
 			try {
 				sitemapTree = TreeBuilder.parseXMLFile(sitemapFile, false);
@@ -157,15 +155,15 @@ public class LagoonCLI
 					throw new LagoonException(ee.getMessage());
 				}
 			}				
-			
-            if (processor.needPassword())
-            {
-                if (password == null)
-                    throw new LagoonException(
-                        "Password is required but not specified");
-            }			
-			
-            processor.init(sitemapTree, sourceDir, password);
+
+            processor = 
+				new LagoonProcessor(targetURL, sitemapTree, sourceDir, password);
+        }
+        catch (AuthenticationMissingException e)
+        {
+            System.err.println("Error while initializing Lagoon:");
+            System.err.println("Password is required but not specified");
+            return;
         }
         catch (AuthenticationException e)
         {

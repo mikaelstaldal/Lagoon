@@ -42,8 +42,9 @@ package nu.staldal.lagoon.core;
 
 import java.io.*;
 
+
 /**
- * 
+ * Handler for a file to be stored into a FileStorage. 
  */
 public abstract class OutputHandler
 {

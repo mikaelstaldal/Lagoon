@@ -40,9 +40,14 @@
 
 package nu.staldal.lagoon.core;
 
+
+/**
+ * Indicates that authentication failed.
+ */
 public class AuthenticationException extends Exception
 {
     public AuthenticationException()
     {
     }
 }
+

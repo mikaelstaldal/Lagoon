@@ -42,14 +42,12 @@ package nu.staldal.lagoon.core;
 
 
 /**
- * A general Lagoon exception.
+ * Indicates that authentication was required, but missing.
  */
-public class LagoonException extends org.xml.sax.SAXException
+public class AuthenticationMissingException extends AuthenticationException
 {
-    public LagoonException(String msg)
+    public AuthenticationMissingException()
     {
-        super(msg);
     }
-
 }
 

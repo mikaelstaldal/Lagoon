@@ -41,7 +41,7 @@
 package nu.staldal.lagoon.util;
 
 /**
- * Some static utility methods.
+ * Some utility methods. All methods in this class are static.
  */
 public final class LagoonUtil
 {
@@ -79,7 +79,9 @@ public final class LagoonUtil
 
 
  	/**
-	 * Encode a path name into a filename.
+	 * Encode a path name or URL into a filename.
+	 *
+	 * The encoding function is not intended to be inversible. 
 	 */
     public static String encodePath(String path)
     {

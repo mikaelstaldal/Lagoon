@@ -40,6 +40,8 @@
 
 package nu.staldal.xtree;
 
+import java.net.URL;
+
 import org.xml.sax.*;
 
 

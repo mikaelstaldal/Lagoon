@@ -45,17 +45,28 @@ import org.xml.sax.helpers.*;
 
 import java.util.Enumeration;
 
+
+/**
+ * An adapter to convert from SAX1 DocumentHandler to SAX2 ContentHandler.
+ */
 public class ContentHandlerAdapter implements DocumentHandler
 {
 	private ContentHandler ch;
 	private NamespaceSupport sup;
 
+
+	/**
+	 * Constructs an adapter.
+	 *
+	 * @param ch  the SAX2 ContentHandler to fire events on.
+	 */
 	public ContentHandlerAdapter(ContentHandler ch)
     {
 		this.ch = ch;
 		sup = new NamespaceSupport();
     }
 
+	
     // DocumentHandler implementation
 
     public void setDocumentLocator(Locator locator)

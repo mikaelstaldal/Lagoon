@@ -40,19 +40,34 @@
 
 package nu.staldal.lagoon.util;
 
+import java.io.PrintWriter;
+
 import org.xml.sax.*;
 
 
+/**
+ * A filter to print messages to a PrintWriter for the events of a 
+ * SAX2 ContentHandler. Useful for debugging.
+ */
 public class ContentHandlerSnooper implements ContentHandler
 {
 	private static final boolean DEBUG = true;
 
     private ContentHandler ch;
+	private PrintWriter out;
 
-    public ContentHandlerSnooper(ContentHandler ch)
+
+	/**
+	 * Constructs a filter.
+	 *
+	 * @param ch  the SAX2 ContentHandler to fire events on.
+	 * @param out  where to print the messages
+	 */
+    public ContentHandlerSnooper(ContentHandler ch, PrintWriter out)
     {
         this.ch = ch;
-		if (DEBUG) System.out.println("New ContentHandlerSnooper");
+		this.out = out;
+		if (DEBUG) out.println("New ContentHandlerSnooper");
     }
 
 
@@ -66,14 +81,14 @@ public class ContentHandlerSnooper implements ContentHandler
     public void startDocument()
         throws SAXException
     {
-		if (DEBUG) System.out.println("startDocument");
+		if (DEBUG) out.println("startDocument");
         ch.startDocument();
     }
 
     public void endDocument()
         throws SAXException
     {
-		if (DEBUG) System.out.println("endDocument");
+		if (DEBUG) out.println("endDocument");
         ch.endDocument();
     }
 
@@ -81,7 +96,7 @@ public class ContentHandlerSnooper implements ContentHandler
                              String qname, Attributes atts)
         throws SAXException
     {
-		if (DEBUG) System.out.println("startElement("+namespaceURI+
+		if (DEBUG) out.println("startElement("+namespaceURI+
             ','+localName+','+qname+')');
 			
 		ch.startElement(namespaceURI, localName, qname, atts);
@@ -92,7 +107,7 @@ public class ContentHandlerSnooper implements ContentHandler
                            String qname)
         throws SAXException
     {
-		if (DEBUG) System.out.println("endElement("+namespaceURI+','+
+		if (DEBUG) out.println("endElement("+namespaceURI+','+
             localName+','+qname+')');
 			
 		ch.endElement(namespaceURI, localName, qname);
@@ -102,7 +117,7 @@ public class ContentHandlerSnooper implements ContentHandler
     public void startPrefixMapping(String prefix, String uri)
         throws SAXException
     {
-		if (DEBUG) System.out.println("startPrefixMapping("+
+		if (DEBUG) out.println("startPrefixMapping("+
 			((prefix.length() == 0) ? "<default>" : prefix) +','+uri+')');
 			
 		ch.startPrefixMapping(prefix, uri);
@@ -111,7 +126,7 @@ public class ContentHandlerSnooper implements ContentHandler
     public void endPrefixMapping(String prefix)
         throws SAXException
     {
-		if (DEBUG) System.out.println("endPrefixMapping("+
+		if (DEBUG) out.println("endPrefixMapping("+
 			((prefix.length() == 0) ? "<default>" : prefix)+')');
 			
 		ch.endPrefixMapping(prefix);
@@ -132,7 +147,7 @@ public class ContentHandlerSnooper implements ContentHandler
     public void processingInstruction(String target, String data)
         throws SAXException
     {
-		if (DEBUG) System.out.println("processingInstruction("+target+','+
+		if (DEBUG) out.println("processingInstruction("+target+','+
 			data+')');
 
         ch.processingInstruction(target, data);
@@ -141,7 +156,7 @@ public class ContentHandlerSnooper implements ContentHandler
     public void skippedEntity(String name)
         throws SAXException
     {
-		if (DEBUG) System.out.println("skippedEntity("+name+')');
+		if (DEBUG) out.println("skippedEntity("+name+')');
 
         ch.skippedEntity(name);
     }

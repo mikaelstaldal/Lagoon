@@ -45,6 +45,11 @@ import java.util.*;
 import org.xml.sax.*;
 import org.xml.sax.helpers.*;
 
+
+/**
+ * A filter to add missing qName parameters to SAX2 ContentHandler
+ * events for elements and attributes.
+ */
 public class ContentHandlerFixer implements ContentHandler
 {
 	private static final boolean DEBUG = false;
@@ -57,12 +62,23 @@ public class ContentHandlerFixer implements ContentHandler
 	private int prefixNum;
 
 
+	/**
+	 * Constructs a filter.
+	 *
+	 * @param ch  the SAX2 ContentHandler to fire events on.
+	 */
     public ContentHandlerFixer(ContentHandler ch)
     {
 		this(ch, false);
     }
 
 
+	/**
+	 * Constructs a filter.
+	 *
+	 * @param ch  the SAX2 ContentHandler to fire events on.
+	 * @param nsDecl  add namespace declarationa as explicit 'xmlns' attributes.
+	 */
     public ContentHandlerFixer(ContentHandler ch, boolean nsDecl)
     {
 		this.ch = ch;

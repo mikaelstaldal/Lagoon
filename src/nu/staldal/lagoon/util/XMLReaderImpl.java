@@ -42,6 +42,11 @@ package nu.staldal.lagoon.util;
 
 import org.xml.sax.*;
 
+
+/**
+ * Helper class to implement the SAX2 interface XMLReader.
+ * Useful to send a SAX2 stream into a TrAX processor.
+ */
 public abstract class XMLReaderImpl implements XMLReader
 {
 	protected EntityResolver resolver;

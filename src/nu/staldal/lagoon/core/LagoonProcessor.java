@@ -52,7 +52,7 @@ import nu.staldal.lagoon.util.LagoonUtil;
 /**
  * The main worker class of the Lagoon core.
  *
- * Initialized with InputStream for sitemap,
+ * Initialized with the sitemap,
  * a source dir and a target storage URL.
  * Then building the website may be done several times,
  * until destroy() is invoked.
@@ -76,13 +76,19 @@ public class LagoonProcessor
 
 
     /**
-     * Constructor.
+     * Constructs and initializes a LagoonProcessor.
      *
      * @param targetURL  where to put the generated files,
 	 *                   must be an absolute URL or a local file path
+     * @param sitemapTree  the Sitemap as an XTree
+     * @param sourceDir  where the source files are
+     * @param password  password to access the target storage, or
+     *                  <code>null</code> if not nessesary.
      */
-    public LagoonProcessor(String targetURL)
-        throws IOException, LagoonException
+    public LagoonProcessor(String targetURL, Element sitemapTree, 
+						   File sourceDir, String password)
+        throws IOException, LagoonException, AuthenticationException, 
+			AuthenticationMissingException
     {
         this.targetURL = targetURL;
 
@@ -91,26 +97,20 @@ public class LagoonProcessor
         filestorageDict = new Hashtable();
 
         targetLocation = createFileStorage(targetURL);
+		
+		if (targetLocation.needPassword() && (password == null))
+		{
+			throw new AuthenticationMissingException();	
+		}
+		
+		init(sitemapTree, sourceDir, password);
     }
 
-    /**
-     * Ask if the file storage needs a password.
-     *
-     */
-    public boolean needPassword()
-    {
-        return targetLocation.needPassword();
-    }
-
+		
     /**
      * Initialize this processor.
-	 *
-     * @param sitemapTree  the Sitemap as an XTree
-     * @param sourceDir  where the source files are
-     * @param password  password to access the target storage, or
-     *                  <code>null</code> if not nessesary.
      */
-    public void init(Element sitemapTree, File sourceDir, String password)
+    private void init(Element sitemapTree, File sourceDir, String password)
         throws IOException, LagoonException, AuthenticationException			
     {
    		sitemap = new Sitemap(sitemapTree);
