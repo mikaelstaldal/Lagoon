@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001, Mikael Ståldal
+ * Copyright (c) 2001-2002, Mikael Ståldal
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -184,7 +184,8 @@ public class LagoonCLI
         catch (IOException e)
         {
             System.err.println("Error while initializing Lagoon:");
-            System.err.println("I/O error: " + e.getMessage());
+            System.err.println("I/O error: " + e.toString());
+			if (DEBUG) e.printStackTrace();
             return;
         }
         catch (LagoonException e)
@@ -269,8 +270,8 @@ public class LagoonCLI
         }
         catch (IOException e)
         {
+            System.err.println("I/O error: " + e.toString());
 			if (DEBUG) e.printStackTrace();
-            System.err.println("I/O error: " + e.getMessage());
         }
 	}
 

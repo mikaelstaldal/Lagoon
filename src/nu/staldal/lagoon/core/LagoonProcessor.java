@@ -319,6 +319,11 @@ public class LagoonProcessor
             if (DEBUG) System.out.println(e);
             return null;
         }
+        catch (EOFException e)
+        {
+            if (DEBUG) System.out.println(e);
+            return null;
+        }
 		finally
 		{
 			is.close();	
