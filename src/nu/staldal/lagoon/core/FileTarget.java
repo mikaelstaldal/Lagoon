@@ -46,7 +46,7 @@ package nu.staldal.lagoon.core;
 public interface FileTarget extends Target
 {
     /**
-     * Open a new target file.
+     * Open a new target file, and close the current one.
      * Used for splitting.
      *
      * @param filename  filename to use, must <em>not</em> start with '/'
@@ -54,6 +54,15 @@ public interface FileTarget extends Target
     public void newTarget(String filename);
 	
 
+    /**
+     * Open a new target file, without closing the current one.
+     * Used for splitting.
+     *
+     * @param filename  filename to use, must <em>not</em> start with '/'
+     */
+    public java.io.OutputStream newIndependentTarget(String filename);
+
+	
     /**
      * Determine if this file target is a wildcard.
      */

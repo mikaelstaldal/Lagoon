@@ -676,14 +676,18 @@ The directory will be created if it doesn't exist.</p>
 
 <p>To use FTP, specify an absolute URL in the form
 <code>ftp://<em>login</em>@<em>host</em>/<em>path</em>/</code>.
-The path is relative to your home directory. Note that this will send
-everything, including your password, in clear-text over the network. If
+The path is relative to your home directory on the remote machine 
+(to start from root, do like <code>ftp://joe@foo.bar.com//abs/path/</code>). 
+Note that this will send everything, including your password, 
+in clear-text over the network. If
 security is important, use SSH instead. This requires you to
 specify the password in the property file.</p>
 
 <p>To use SSH, specify an absolute URL in the form
 <code>ssh://<em>login</em>@<em>host</em>/<em>path</em>/</code>. The
-path is relative to your home directory. You need to have an RSA key
+path is relative to your home directory on the remote machine
+(to start from root, do like <code>ftp://joe@foo.bar.com//abs/path/</code>). 
+You need to have an RSA key
 properly setup before using this (you should be able to login without
 entering any password), do not specify the password in the property
 file.</p>

@@ -2,7 +2,10 @@
 
 <!-- Lagoon Server Page -->
 
-<html xmlns:lsp="http://staldal.nu/LSP/core">
+<html xmlns:lsp="http://staldal.nu/LSP/core" 
+	  xmlns:svg="java:nu.staldal.lsp.ext.BatikSVGExtension"
+	  xmlns:test="java:nu.staldal.lsp.ext.TestExtension"
+	  xmlns:stringtest="java:nu.staldal.lsp.ext.StringExtension">
 <head>
 <title>LSP test</title>
 </head>
@@ -145,6 +148,14 @@ in output like this</lsp:processing-instruction>
 
 <lsp:import file="part:theSecondPart"/>
 <lsp:include file="part:thePart"/>
+
+<h2>ExtElement</h2>
+
+<test:foo>
+	<lsp:if test="5 &gt; 3"><bar>apa</bar></lsp:if>
+</test:foo>
+
+<stringtest:hej>apa</stringtest:hej>
 
 <p>---End of LSP Test---</p>
 

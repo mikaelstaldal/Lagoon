@@ -50,7 +50,7 @@ import org.apache.batik.dom.svg.*;
 import org.apache.batik.dom.util.SAXDocumentFactory;
 
 import nu.staldal.lagoon.core.*;
-import nu.staldal.lagoon.util.LagoonUtil;
+import nu.staldal.lagoon.util.*;
 
 /**
  * Uses Apache Batik version 1.1rc1.
@@ -93,7 +93,7 @@ public class BatikFormatter extends Format
 			throw new LagoonException("Unknown image format: " + format);
     }
 
-    public void start(OutputStream out, Target target)
+    public void start(OutputStream out, final Target target)
         throws IOException, SAXException
     {
 		SAXSVGDocumentFactory docFactory = new SAXSVGDocumentFactory();
@@ -116,11 +116,23 @@ public class BatikFormatter extends Format
 		SVGOMDocument doc = docFactory.getDocument(sourceURL); 
 
 		if (DEBUG) System.out.println("Batik SVG DOM building complete");
-				
         TranscoderInput input = new TranscoderInput(doc);
+
+/*
+		TranscoderInput input = new TranscoderInput(
+			new XMLReaderImpl() {
+					public void parse(InputSource is) 
+						throws SAXException, IOException
+					{
+						getNext().start(contentHandler, target);							
+					}					
+				});			
+*/				
         TranscoderOutput output = new TranscoderOutput(out);
         try {
+			if (DEBUG) System.out.println("about to transcode");
 			transcoder.transcode(input, output);
+			if (DEBUG) System.out.println("transcoding complete");
 		} catch(TranscoderException e) {
 			throw new SAXException(e);
 		}
