@@ -58,6 +58,8 @@ public class LagoonCLI
 
     private static Properties properties;
 
+
+
     /**
      * The application main method
      */
@@ -157,7 +159,7 @@ public class LagoonCLI
                 long timeBefore = System.currentTimeMillis();
                 processor.build(false);
                 long timeElapsed = System.currentTimeMillis()-timeBefore;
-                System.out.println("in " + timeElapsed + " ms");
+                showTime(timeElapsed);
             }
             else if (force)
             {
@@ -165,7 +167,7 @@ public class LagoonCLI
                 long timeBefore = System.currentTimeMillis();
                 processor.build(true);
                 long timeElapsed = System.currentTimeMillis()-timeBefore;
-                System.out.println("in " + timeElapsed + " ms");
+                showTime(timeElapsed);
             }
             else if (interval > 0)
             {
@@ -175,7 +177,7 @@ public class LagoonCLI
                     long timeBefore = System.currentTimeMillis();
                     processor.build(false);
                     long timeElapsed = System.currentTimeMillis()-timeBefore;
-                    System.out.println("in " + timeElapsed + " ms");
+	                showTime(timeElapsed);
                     if (timeElapsed < interval)
                     try { Thread.sleep(interval-timeElapsed); } catch (InterruptedException e) {}
                 }
@@ -194,7 +196,7 @@ public class LagoonCLI
                         long timeBefore = System.currentTimeMillis();
                         processor.build(false);
                         long timeElapsed = System.currentTimeMillis()-timeBefore;
-                        System.out.println("in " + timeElapsed + " ms");
+	                	showTime(timeElapsed);
                     }
                     else if (yn.charAt(0) == 'f')
                     {
@@ -202,7 +204,7 @@ public class LagoonCLI
                         long timeBefore = System.currentTimeMillis();
                         processor.build(true);
                         long timeElapsed = System.currentTimeMillis()-timeBefore;
-                        System.out.println("in " + timeElapsed + " ms");
+	                	showTime(timeElapsed);
                     }
                     else break;
                 }
@@ -239,4 +241,11 @@ public class LagoonCLI
         return value.trim();
     }
 
+	private static void showTime(long ms)
+	{
+		if (ms < 10000)
+			System.out.println("in " + ms + " ms");
+		else
+			System.out.println("in " + ms/1000 + " s");
+	}
 }

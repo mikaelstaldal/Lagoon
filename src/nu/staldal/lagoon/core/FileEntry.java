@@ -227,7 +227,7 @@ class FileEntry implements SourceManager, FileTarget
 
         targetLastMod = targetStorage.fileLastModified(currentTargetURL);
 
-        if (always)
+        if (always || (targetLastMod <= 0))
         {
             buildAlways();
             return;

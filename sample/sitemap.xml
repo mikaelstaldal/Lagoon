@@ -73,7 +73,7 @@
 
 <file target="/lsptest.xml" source="/lsp/test.lsp">
 	<format type="xml" indent="yes">
-		<transform type="lsp" hej="HEJSAN" pi="ACME"><source/></transform>
+		<transform type="lsp" bool="BOOLEAN" hej="HEJSAN" pi="ACME"><source/></transform>
 	</format>
 </file>
 

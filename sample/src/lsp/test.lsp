@@ -13,16 +13,21 @@
 
 <?pi param="processing instructions are ignored"?>
 
-<lsp:processing-instruction name="{$pi}">Create a processing instrunction in output like this</lsp:processing-instruction>
+<lsp:processing-instruction name="{$pi}">Create a processing instrunction 
+in output like this</lsp:processing-instruction>
 
-<a href="{$hej}">{$foo}</a>
+<a href="{$hej}">Foo: {$foo} bar</a>
 
 <lsp:raw>
 <a href="{$hej}">{$foo}</a>
 </lsp:raw>
 
+<lsp:root>
+<a href="{$hej}">{$foo}bar{$hej}</a>
+</lsp:root>
+
 <lsp:if test="$bool">
-<p>The parameter $bool was set to a non-empty string</p>
+<p>The parameter $bool was set to a non-empty string, namly "{$bool}"</p>
 </lsp:if>
 
 <hr/>
