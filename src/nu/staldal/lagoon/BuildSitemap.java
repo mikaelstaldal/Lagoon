@@ -42,11 +42,13 @@ package nu.staldal.lagoon;
 
 import java.io.*;
 
-import org.apache.xml.serialize.*;
+import javax.xml.transform.*;
+import javax.xml.transform.sax.*;
+import javax.xml.transform.stream.StreamResult;
 import org.xml.sax.*;
 import org.xml.sax.helpers.AttributesImpl;
 
-import nu.staldal.lagoon.util.LagoonUtil;
+import nu.staldal.lagoon.util.*;
 
 public class BuildSitemap
 {
@@ -63,15 +65,27 @@ public class BuildSitemap
             return;
         }
 
-		OutputFormat of = new OutputFormat();
-		of.setDoctype(null, null);
-		of.setEncoding("iso-8859-1");
-		of.setIndenting(true);
-
 		FileOutputStream fos = new FileOutputStream(args[1]);
-		XMLSerializer ser = new XMLSerializer(fos, of);
-		ContentHandler ch = ser.asContentHandler();
 
+		TransformerFactory tf = TransformerFactory.newInstance();
+        if (!(tf.getFeature(SAXTransformerFactory.FEATURE)
+              	&& tf.getFeature(StreamResult.FEATURE)))
+        {
+            throw new SAXException("The transformer factory "
+                + tf.getClass().getName() + " doesn't support SAX");
+        }
+            
+		SAXTransformerFactory tfactory = (SAXTransformerFactory)tf;
+		TransformerHandler th = tfactory.newTransformerHandler();
+		th.setResult(new StreamResult(fos));
+		
+		Transformer trans = th.getTransformer();
+		trans.setOutputProperty(OutputKeys.METHOD, "xml");
+		trans.setOutputProperty(OutputKeys.ENCODING, "iso-8859-1");
+		trans.setOutputProperty(OutputKeys.INDENT, "yes");
+		
+		ContentHandler ch = new ContentHandlerFixer(th);
+		
 		baseDir = new File(args[0]);		
 		
 		ch.startDocument();

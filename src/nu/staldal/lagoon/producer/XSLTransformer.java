@@ -43,11 +43,11 @@ package nu.staldal.lagoon.producer;
 import java.io.*;
 import java.util.*;
 
-import org.xml.sax.*;
 import javax.xml.transform.*;
 import javax.xml.transform.Source;
 import javax.xml.transform.sax.*;
 import javax.xml.transform.stream.StreamSource;
+import org.xml.sax.*;
 
 import nu.staldal.lagoon.core.*;
 import nu.staldal.lagoon.util.*;
@@ -239,7 +239,7 @@ public class XSLTransformer extends Transform
             } 
         });
 
-        getNext().start(th, target);
+        getNext().start(new ContentHandlerFixer(th), target);
 
         putObjectIntoRepository("stylesheet", container);
 

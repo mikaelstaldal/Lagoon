@@ -1,0 +1,6 @@
+1.0 beta 8
+----------
+* Documentation of resouces.
+* <delete> entry in sitemap.
+* JAXP interface to XML parser and XSLT processor, 
+  no dependency on Xerces or Xalan anymore.

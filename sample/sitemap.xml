@@ -103,6 +103,12 @@
 	</format>
 </file>
 
+<file target="/htmltest.text" source="/htmltest.html">
+	<format type="text">
+		<source/>
+	</format>
+</file>
+
 <file target="/merge.html" source="/merge/">
     <format type="html">
         <transform type="xslt" stylesheet="/merge.xsl">

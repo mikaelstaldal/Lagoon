@@ -41,23 +41,35 @@
 package nu.staldal.lagoon.producer;
 
 import java.io.*;
+import java.util.Properties;
 
+import javax.xml.transform.*;
+import javax.xml.transform.sax.*;
+import javax.xml.transform.stream.StreamResult;
 import org.xml.sax.*;
-import org.apache.xml.serialize.*;
 
 import nu.staldal.lagoon.core.*;
-import nu.staldal.lagoon.util.DocumentHandlerAdapter;
+import nu.staldal.lagoon.util.ContentHandlerFixer;
 
-// *** Testa med Xalan2's serialiserare
 
 public class XMLFormatter extends Format
 {
-    BaseMarkupSerializer ser;
-    OutputFormat of;
-
+	private SAXTransformerFactory tfactory;
+	private Properties outputProperties;
+	
     public void init() throws LagoonException
     {
-        of = new OutputFormat();
+		TransformerFactory tf = TransformerFactory.newInstance();
+        if (!(tf.getFeature(SAXTransformerFactory.FEATURE)
+              	&& tf.getFeature(StreamResult.FEATURE)))
+        {
+            throw new LagoonException("The transformer factory "
+                + tf.getClass().getName() + " doesn't support SAX");
+        }
+            
+		tfactory = (SAXTransformerFactory)tf;
+
+        outputProperties = new Properties();
 
         String method = getParam("method");
         if (method == null)
@@ -78,81 +90,104 @@ public class XMLFormatter extends Format
 
         if (method.equals("XML"))
         {
-            ser = new XMLSerializer();
-            of.setDoctype(null, null);
-            of.setEncoding("UTF-8");
+			outputProperties.setProperty(OutputKeys.METHOD, "xml");
+			outputProperties.setProperty(OutputKeys.ENCODING, "UTF-8");
         }
         else if (method.equals("HTML"))
         {
-            ser = new HTMLSerializer();
+			outputProperties.setProperty(OutputKeys.METHOD, "html");
             switch (_html)
             {
-            case 1: of.setDoctype("-//W3C//DTD HTML 4.01 Transitional//EN",
-                   	        	  "http://www.w3.org/TR/html4/loose.dtd");
-                    break;
-            case 2: of.setDoctype("-//W3C//DTD HTML 4.01 Frameset//EN",
-                   	        	  "http://www.w3.org/TR/html4/frameset.dtd");
-                    break;
-            case 3: of.setDoctype("-//W3C//DTD HTML 4.01//EN",
-                   	        	  "http://www.w3.org/TR/html4/strict.dtd");
-                    break;
+            case 1:
+				outputProperties.setProperty(OutputKeys.DOCTYPE_PUBLIC,
+					"-//W3C//DTD HTML 4.01 Transitional//EN");
+				outputProperties.setProperty(OutputKeys.DOCTYPE_SYSTEM,
+                   	"http://www.w3.org/TR/html4/loose.dtd");
+                break;
+            case 2:
+				outputProperties.setProperty(OutputKeys.DOCTYPE_PUBLIC,
+					"-//W3C//DTD HTML 4.01 Frameset//EN");
+				outputProperties.setProperty(OutputKeys.DOCTYPE_SYSTEM,
+                   	"http://www.w3.org/TR/html4/frameset.dtd");
+                break;
+            case 3: 
+				outputProperties.setProperty(OutputKeys.DOCTYPE_PUBLIC,
+					"-//W3C//DTD HTML 4.01//EN");
+				outputProperties.setProperty(OutputKeys.DOCTYPE_SYSTEM,
+                   	"http://www.w3.org/TR/html4/strict.dtd");
+                break;
             }
-            of.setEncoding("iso-8859-1");
+			outputProperties.setProperty(OutputKeys.ENCODING, "iso-8859-1");
         }
         else if (method.equals("XHTML"))
         {
-            ser = new XHTMLSerializer();
+			outputProperties.setProperty(OutputKeys.METHOD, "xhtml");
             switch (_html)
             {
-            case 1: of.setDoctype("-//W3C//DTD XHTML 1.0 Transitional//EN",
-                                  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd");
-                    break;
-            case 2: of.setDoctype("-//W3C//DTD XHTML 1.0 Frameset//EN",
-                   	        	  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd");
-                    break;
-            case 3: of.setDoctype("-//W3C//DTD XHTML 1.0 Strict//EN",
-                   	        	  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd");
-                    break;
+            case 1: 
+				outputProperties.setProperty(OutputKeys.DOCTYPE_PUBLIC,
+					"-//W3C//DTD XHTML 1.0 Transitional//EN");
+				outputProperties.setProperty(OutputKeys.DOCTYPE_SYSTEM,
+                    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd");
+                break;
+            case 2: 
+				outputProperties.setProperty(OutputKeys.DOCTYPE_PUBLIC,				
+					"-//W3C//DTD XHTML 1.0 Frameset//EN");
+				outputProperties.setProperty(OutputKeys.DOCTYPE_SYSTEM,
+                   	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd");
+                break;
+            case 3: 
+				outputProperties.setProperty(OutputKeys.DOCTYPE_PUBLIC,
+					"-//W3C//DTD XHTML 1.0 Strict//EN");
+				outputProperties.setProperty(OutputKeys.DOCTYPE_SYSTEM,
+                	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd");
+                break;
             }
-            of.setEncoding("iso-8859-1");
+			outputProperties.setProperty(OutputKeys.ENCODING, "iso-8859-1");
         }
         else if (method.equals("TEXT"))
         {
-            ser = new TextSerializer();
-            of.setEncoding("iso-8859-1");
+			outputProperties.setProperty(OutputKeys.METHOD, "text");
+			outputProperties.setProperty(OutputKeys.ENCODING, "iso-8859-1");
         }
         else
             throw new LagoonException("Unknown serializing method");
 
         String enc = getParam("encoding");
-        if (enc != null) of.setEncoding(enc);
+        if (enc != null) 
+			outputProperties.setProperty(OutputKeys.ENCODING, enc);
 
         String docPub = getParam("doctype-public");
+		if (docPub != null)
+			outputProperties.setProperty(OutputKeys.DOCTYPE_PUBLIC, docPub);
+			
         String docSys = getParam("doctype-system");
-        if ((docPub != null) || (docSys != null))
-            of.setDoctype(docPub, docSys);
+        if (docSys != null)
+			outputProperties.setProperty(OutputKeys.DOCTYPE_SYSTEM, docSys);
 
         String indent = getParam("indent");
         if (indent != null)
-        try
-        {
-			of.setIndent(Integer.parseInt(indent));
-		}
-		catch (NumberFormatException e)
-		{
-			of.setIndenting(true);
-		}
+			outputProperties.setProperty(OutputKeys.INDENT, "yes");
+		else
+			outputProperties.setProperty(OutputKeys.INDENT, "no");
     }
 
     public void start(OutputStream bytes, Target target)
         throws IOException, SAXException
     {
-        ser.reset();
-        ser.setOutputFormat(of);
-        ser.setOutputByteStream(bytes);
-
-        getNext().start(new DocumentHandlerAdapter(ser.asDocumentHandler()), 
-			target);
+		try {
+			TransformerHandler th = tfactory.newTransformerHandler();
+			th.setResult(new StreamResult(bytes));
+		
+			Transformer trans = th.getTransformer();
+			trans.setOutputProperties(outputProperties);
+				
+        	getNext().start(new ContentHandlerFixer(th), target);
+		}
+		catch (TransformerConfigurationException e)
+		{
+			throw new LagoonException(e.getMessage());
+		}
 	}
 
     public boolean hasBeenUpdated(long when)

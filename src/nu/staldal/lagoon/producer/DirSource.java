@@ -67,9 +67,6 @@ public class DirSource extends Source
         File root = getSourceMan().getRootDir();
 
         File dir = getSourceMan().getFile(getSourceMan().getSourceURL());
-		if (dir == null)
-			throw new IOException("The source is an absolute URL");
-			
         if (!dir.isDirectory())
             throw new IOException("The source is not a directory");
 
@@ -84,8 +81,7 @@ public class DirSource extends Source
         putObjectIntoRepository("dirlist", ht);
 
         sax.startDocument();
-        // sax.startElement("", "dirlist", "", new AttributesImpl());
-        sax.startElement("", "dirlist", "dirlist", new AttributesImpl());
+        sax.startElement("", "dirlist", "", new AttributesImpl());
 
         for (int i = 0; i < files.length; i++)
         {
@@ -96,10 +92,8 @@ public class DirSource extends Source
             File file = new File(dir, files[i]);
 
             AttributesImpl atts = new AttributesImpl();
-            // atts.addAttribute("", "filename", "", "CDATA", files[i]);
-            atts.addAttribute("", "filename", "filename", "CDATA", files[i]);
-            // atts.addAttribute("", "url", "", "CDATA",
-            atts.addAttribute("", "url", "url", "CDATA",
+            atts.addAttribute("", "filename", "", "CDATA", files[i]);
+            atts.addAttribute("", "url", "", "CDATA",
                 getSourceMan().getFileURL(files[i]) 
 				+ (file.isDirectory() ? "/" : ""));
 				
@@ -110,45 +104,36 @@ public class DirSource extends Source
      			new SimpleDateFormat("HH:mm:ss");
 			Date date = new Date(timestamp);
 			
-	        // atts.addAttribute("", "timestamp", "", "CDATA",
-	        atts.addAttribute("", "timestamp", "timestamp", "CDATA",
+	        atts.addAttribute("", "timestamp", "", "CDATA",
 				String.valueOf(timestamp));
-	        // atts.addAttribute("", "date", "", "CDATA",
-	        atts.addAttribute("", "date", "date", "CDATA",
+	        atts.addAttribute("", "date", "", "CDATA",
 				dateFormat.format(date));
-	        // atts.addAttribute("", "time", "", "CDATA",
-	        atts.addAttribute("", "time", "time", "CDATA",
+	        atts.addAttribute("", "time", "", "CDATA",
 				timeFormat.format(date));
 											
             if (file.isFile())
             {
-	            // atts.addAttribute("", "size", "", "CDATA",
-	            atts.addAttribute("", "size", "size", "CDATA",
+	            atts.addAttribute("", "size", "", "CDATA",
 					String.valueOf(file.length()));
-                // sax.startElement("", "file", "", atts);
-                sax.startElement("", "file", "file", atts);
-                // sax.endElement("", "file", "");
-                sax.endElement("", "file", "file");
+                sax.startElement("", "file", "", atts);
+                sax.endElement("", "file", "");
             }
             else if (file.isDirectory())
             {
-                // sax.startElement("", "directory", "", atts);
-                sax.startElement("", "directory", "directory", atts);
-                // sax.endElement("", "directory", "");
-                sax.endElement("", "directory", "directory");
+                sax.startElement("", "directory", "", atts);
+                sax.endElement("", "directory", "");
             }
             else
                 ; // do nothing
         }
 
-        // sax.endElement("", "dirlist", "");
-        sax.endElement("", "dirlist", "dirlist");
+        sax.endElement("", "dirlist", "");
         sax.endDocument();
 	}
 
     public boolean hasBeenUpdated(long when) throws LagoonException, IOException
     {
-        if (getSourceMan().fileHasBeenUpdated(getSourceMan().getSourceURL(), when))
+        if (getSourceMan().fileHasBeenUpdated(getSourceMan().getSourceURL() ,when))
             return true;
 
         File dir = getSourceMan().getFile(getSourceMan().getSourceURL());
