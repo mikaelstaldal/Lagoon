@@ -258,5 +258,18 @@ public abstract class Node implements java.io.Serializable, Locator
 		else
 			return parent.getInheritedAttribute(namespaceURI, localName);
 	}
+    
+
+    /**
+     * Check if this node consist of whitespace only.
+     *
+     * @return <code>true</code> if and only if this is a Text node which
+     *                           contains no other characters than whitespace.
+     */
+    public boolean isWhitespaceNode()
+    {
+        return false;
+    }
+    
 }
 

@@ -74,6 +74,20 @@ public class TestXTree extends TestCase
     }
 
 
+    public void testWhitespace() throws Exception
+    {
+		Element el = TreeBuilder.parseXML(
+			new InputSource(getClass().getResourceAsStream("whitespace.xml")), false);
+                
+        Element el2 = el.getFirstChildElement();
+        Element el3 = el2.getFirstChildElement();
+
+        assertTrue(el.getChild(0).isWhitespaceNode());
+        assertTrue(!el2.getChild(0).isWhitespaceNode());
+        assertTrue(el3.getChild(0).isWhitespaceNode());
+    }
+
+
 	public void tearDown()
 	{
 		new File("xtree.ser").delete();	

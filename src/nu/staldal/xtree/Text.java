@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001, Mikael Ståldal
+ * Copyright (c) 2001-2003, Mikael Ståldal
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -44,13 +44,13 @@ import org.xml.sax.*;
 
 
 /**
- * Character content in an XML document.
+ * Character content in an XML document. This class is immutible.
  */
 public class Text extends Node
 {
 	static final long serialVersionUID = -128692223369356277L;
 
-	String value;
+	final String value;
     transient char[] charArrayCache;
 
 
@@ -114,5 +114,16 @@ public class Text extends Node
         obtainCharArray();
 		sax.characters(charArrayCache, 0, charArrayCache.length);
 	}
+    
+    
+    public boolean isWhitespaceNode()
+    {
+        for (int i = 0; i<value.length(); i++)
+        {
+            if (value.charAt(i) > ' ') 
+                return false;
+        }
+        return true;
+    }
 }
 
