@@ -30,6 +30,9 @@ in output like this</lsp:processing-instruction>
 <p>The parameter $bool was set to a non-empty string, namly "{$bool}"</p>
 </lsp:if>
 
+<hr />
+<h2>lsp:if</h2>
+
 <lsp:if test="5 &lt; 7">
 <p>5 is less than 7</p>
 </lsp:if>
@@ -37,6 +40,48 @@ in output like this</lsp:processing-instruction>
 <lsp:if test="not(5 &lt; 7)">
 <p>5 is not less than 7</p>
 </lsp:if>
+
+<hr />
+<h2>lsp:choose</h2>
+
+<lsp:choose>
+<lsp:when test="5 &lt; 7">
+	<p>5 is less than 7</p>
+</lsp:when>
+</lsp:choose>
+
+<lsp:choose>
+<lsp:when test="5 &lt; 7">
+	<p>5 is less than 7</p>
+</lsp:when>
+<lsp:when test="5 &lt; 6">
+	<p>5 is less than 6</p>
+</lsp:when>
+</lsp:choose>
+
+<lsp:choose>
+<lsp:when test="5 &lt; 7">
+	<p>5 is less than 7</p>
+</lsp:when>
+<lsp:when test="5 &lt; 6">
+	<p>5 is less than 6</p>
+</lsp:when>
+<lsp:otherwise>
+	<p>Otherwise</p>
+</lsp:otherwise>
+</lsp:choose>
+
+<lsp:choose>
+<lsp:when test="5 &gt; 7">
+	<p>5 is greater than 7</p>
+</lsp:when>
+<lsp:when test="5 &gt; 6">
+	<p>5 is greater than 6</p>
+</lsp:when>
+<lsp:otherwise>
+	<p>Otherwise</p>
+</lsp:otherwise>
+</lsp:choose>
 
 <hr/>
 <h2>Expressions</h2>
