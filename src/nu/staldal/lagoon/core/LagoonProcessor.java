@@ -43,7 +43,7 @@ package nu.staldal.lagoon.core;
 import java.io.*;
 import java.util.*;
 
-import org.xml.sax.SAXException;
+// import org.xml.sax.SAXException;
 
 import nu.staldal.xtree.*;
 import nu.staldal.lagoon.util.LagoonUtil;
@@ -67,7 +67,6 @@ public class LagoonProcessor
     private final String targetURL;
     private final FileStorage targetLocation;
     private File repositoryDir;
-    private long sitemapLastUpdated;
 
     private final Hashtable classDict;
     private final Hashtable paramDict;
@@ -109,39 +108,14 @@ public class LagoonProcessor
 	 * The InputStream for the sitemap is not used after
 	 * this method returns.
      *
-     * @param sitemapFile  the Sitemap file
+     * @param sitemapTree  the Sitemap as an XTree
      * @param sourceDir  where the source files are
      * @param password  password to access the target storage, or
      *                  <code>null</code> if not nessesary.
      */
-    public void init(File sitemapFile,
-                     File sourceDir,
-                     String password)
-        throws IOException, LagoonException, AuthenticationException,
-			javax.xml.parsers.ParserConfigurationException
+    public void init(Element sitemapTree, File sourceDir, String password)
+        throws IOException, LagoonException, AuthenticationException			
     {
-		Element sitemapTree;
-		try {
-			sitemapTree = TreeBuilder.parseXMLFile(sitemapFile, false);
-		}
-		catch (SAXException e)
-        {
-            Exception ee = e.getException();
-            if (ee == null)
-            {
-                e.printStackTrace();
-                throw new LagoonException(e.getMessage());
-            }
-            else if (ee instanceof java.io.IOException)
-			{
-                throw (java.io.IOException)ee;
-			}
-            else
-            {
-                ee.printStackTrace();
-                throw new LagoonException(ee.getMessage());
-            }
-        }
    		sitemap = new Sitemap(sitemapTree);
 
 		File workDir = new File(System.getProperty("user.home"), ".lagoon");
@@ -182,8 +156,6 @@ public class LagoonProcessor
         targetLocation.open(targetURL, this, password);
 
    		sitemap.init(this, sitemapTree, sourceDir, targetLocation);
-		sitemapTree = null;		
-        sitemapLastUpdated = sitemapFile.lastModified();
     }
 
     /**
@@ -213,15 +185,6 @@ public class LagoonProcessor
 	{
 		targetLocation.close();
 	}
-
-
-    /**
-     * Get the time when the sitemap was last updated.
-     */
-    public long getSitemapLastUpdated()
-    {
-        return sitemapLastUpdated;
-    }
 
 
     /**

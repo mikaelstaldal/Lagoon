@@ -43,7 +43,12 @@ package nu.staldal.lagoon;
 import java.io.*;
 import java.util.Properties;
 
+import org.xml.sax.SAXException;
+
+import nu.staldal.xtree.*;
+
 import nu.staldal.lagoon.core.*;
+
 
 /**
  * A command line interface to LagoonProcessor
@@ -128,14 +133,37 @@ public class LagoonCLI
 			
             processor = new LagoonProcessor(targetURL);
 
+			Element sitemapTree;
+			try {
+				sitemapTree = TreeBuilder.parseXMLFile(sitemapFile, false);
+			}
+			catch (SAXException e)
+			{
+				Exception ee = e.getException();
+				if (ee == null)
+				{
+					e.printStackTrace();
+					throw new LagoonException(e.getMessage());
+				}
+				else if (ee instanceof java.io.IOException)
+				{
+					throw (java.io.IOException)ee;
+				}
+				else
+				{
+					ee.printStackTrace();
+					throw new LagoonException(ee.getMessage());
+				}
+			}				
+			
             if (processor.needPassword())
             {
                 if (password == null)
                     throw new LagoonException(
                         "Password is required but not specified");
-            }
-
-            processor.init(sitemapFile, sourceDir, password);
+            }			
+			
+            processor.init(sitemapTree, sourceDir, password);
         }
         catch (AuthenticationException e)
         {

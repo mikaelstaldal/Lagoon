@@ -120,9 +120,10 @@ of Xerces.</li>
 version 0.19 (version 0.20 currently doesn't work). You can download it from 
 <a href="http://xml.apache.org/dist/">http://xml.apache.org/dist/</a>.</li>
 
-<li>To use SVG rendering, you need Apache Batik version 1.1. You can download it from 
-<a href="http://xml.apache.org/dist/">http://xml.apache.org/dist/</a>. Note that
-Apache Batik requires Java2.</li>
+<li>To use SVG rendering, you need Apache Batik version 1.1rc1 
+(later versions may not work). You can download it from 
+<a href="http://xml.apache.org/dist/">http://xml.apache.org/dist/</a>. 
+Note that Apache Batik requires Java2.</li>
 
 <li>To use SSH, you need a command-line based SSH client. Most (but
 not all) SSH clients for Windows are GUI based, and will not work. A
@@ -136,7 +137,8 @@ CVS.</li>
 <ol>
 <li>Make sure that your JRE is properly installed and working.</li>
 <li>Add the distribution JAR files from Xerces, Xalan and (if you use it) Batik and FOP 
-to your Java <code>CLASSPATH</code>. You should put Batik before FOP.</li> 
+to your Java <code>CLASSPATH</code>. You should put Batik before FOP. 
+If you use Batik, you need to put <code>lib/batik-patch.jar</code> before Batik.</li> 
 <li>Add the <code>bin</code> directory to your <code>PATH</code> and set an 
 environment variable <code>LAGOON_HOME</code> to the directory where you 
 installed Lagoon (there are scripts for Windows, OS/2 and UNIX based systems, 

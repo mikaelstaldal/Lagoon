@@ -50,16 +50,21 @@ public interface FileTarget extends Target
      * Used for splitting.
      *
      * @param filename  filename to use, must <em>not</em> start with '/'
+	 * @param prependFilename  prepend the name of the current main file
+	 *                         and an '_' to the new file name.
      */
-    public void newTarget(String filename);
+    public void newTarget(String filename, boolean prependFilename);
 	
 
     /**
      * Open a new target file, without closing the current one.
      *
      * @param filename  filename to use, may start with '/'
+	 * @param prependFilename  prepend the name of the current main file
+	 *                         and an '_' to the new file name (has no
+	 *                         effect if filename starts with '/').
      */
-    public OutputHandler newAsyncTarget(String filename)
+    public OutputHandler newAsyncTarget(String filename, boolean prependFilename)
 		throws java.io.IOException;
 
 	

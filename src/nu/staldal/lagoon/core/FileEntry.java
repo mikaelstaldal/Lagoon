@@ -336,16 +336,29 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
         return currentTargetURL;
     }
 
-    public void newTarget(String filename)
+    public void newTarget(String filename, boolean prependFilename)
     {
-        this.newTarget = filename;
+		if (prependFilename)
+		{
+			this.newTarget = currentTargetName + '_' + filename;	
+		}
+		else
+		{
+			this.newTarget = filename;
+		}
     }
 
-    public OutputHandler newAsyncTarget(String filename)
+    public OutputHandler newAsyncTarget(String filename, boolean prependFilename)
 		throws IOException
 	{
-		if (filename.charAt(0) != '/')
+		if (filename.charAt(0) != '/' && !prependFilename)
+		{
 			filename = currentTargetDir + filename;
+		}
+		else if (filename.charAt(0) != '/' && prependFilename)
+		{			
+			filename = currentTargetDir + currentTargetName + '_' + filename;
+		}
 			
 		if (DEBUG) System.out.println("New async target: " + filename);
 			

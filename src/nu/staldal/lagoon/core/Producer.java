@@ -111,14 +111,6 @@ public abstract class Producer implements ProducerInterface
 	}
 
     /**
-     * Get the time when the sitemap was last updated.
-     */
-    public long getSitemapLastUpdated()
-    {
-        return processor.getSitemapLastUpdated();
-    }
-
-    /**
      * Add a parameter to this producer.
      * Used during initialization.
      *

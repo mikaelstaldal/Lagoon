@@ -181,7 +181,8 @@ public class BasicSplit extends Transform implements ContentHandler, Runnable
             sax.startElement(namespaceURI, localName, qName, atts);
         else if (namespaceURI.equals(myNS) && localName.equals(myElement))
         {
-            ((FileTarget)target).newTarget(instantiateAtts(outputname, atts));
+            ((FileTarget)target).newTarget(
+				instantiateAtts(outputname, atts), false);
             mainThread.interrupt();
             sleepUntilInterrupted();
             sax.startDocument();
