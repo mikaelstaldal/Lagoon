@@ -1,39 +1,39 @@
 /*
  * Copyright (c) 2001, Mikael Ståldal
  * All rights reserved.
- * 
- * Redistribution and use in source and binary forms, with or without 
- * modification, are permitted provided that the following conditions 
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
  * are met:
- * 
- * 1. Redistributions of source code must retain the above copyright 
+ *
+ * 1. Redistributions of source code must retain the above copyright
  * notice, this list of conditions and the following disclaimer.
- * 
- * 2. Redistributions in binary form must reproduce the above copyright 
- * notice, this list of conditions and the following disclaimer in the 
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
  * documentation and/or other materials provided with the distribution.
- * 
- * 3. Neither the name of the author nor the names of its contributors 
- * may be used to endorse or promote products derived from this software 
- * without specific prior written permission. 
- * 
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR 
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
- * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+ *
+ * 3. Neither the name of the author nor the names of its contributors
+ * may be used to endorse or promote products derived from this software
+ * without specific prior written permission.
+ *
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
+ * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
- * 
- * Note: This is known as "the modified BSD license". It's an approved 
- * Open Source and Free Software license, see 
- * http://www.opensource.org/licenses/ 
+ *
+ *
+ * Note: This is known as "the modified BSD license". It's an approved
+ * Open Source and Free Software license, see
+ * http://www.opensource.org/licenses/
  * and
  * http://www.gnu.org/philosophy/license-list.html
  */
@@ -43,15 +43,15 @@ package nu.staldal.lagoon.core;
 import java.io.*;
 import java.util.*;
 
-/** 
+/**
  * The main worker class of the Lagoon core.
- * 
+ *
  * Initialized with InputStream for sitemap,
  * a source dir, a repository dir and a target storage URL.
- * Then building the website may be done several times, 
+ * Then building the website may be done several times,
  * until destroy() is invoked.
- * 
- * This class is not thread-safe. The build() and destroy() methods must not 
+ *
+ * This class is not thread-safe. The build() and destroy() methods must not
  * be invoked concurrently from different threads.
  */
 public class LagoonProcessor
@@ -67,7 +67,7 @@ public class LagoonProcessor
     protected Sitemap sitemap;
 
 
-    /** 
+    /**
      * Constructor. Reads the configuration file.
      *
      * @param targetURL  where to put the generated files,
@@ -106,7 +106,7 @@ public class LagoonProcessor
         return targetLocation.needPassword();
     }
 
-    /** 
+    /**
      * Initialize this processor.
 	 *
 	 * The InputStream for the sitemap is not used after
@@ -134,13 +134,13 @@ public class LagoonProcessor
         this.repositoryDir = repositoryDir;
 
         targetLocation.open(targetURL, this, password);
-        
+
         this.sitemap = new Sitemap(this, sitemap, config,
                                    sourceDir, targetLocation);
         this.sitemapLastUpdated = sitemapLastUpdated;
     }
-  
-    /** 
+
+    /**
      * Perform the building of the website.
      * May be invoked multiple times.
      * Synchronous, returns when the building is complete.
@@ -158,7 +158,7 @@ public class LagoonProcessor
         }
     }
 
-	/** 
+	/**
 	 * Dispose this object and release any resources it holds.
 	 * This causes the FileStorage to be closed.
 	 */
@@ -261,6 +261,11 @@ public class LagoonProcessor
             return null;
         }
         catch (ObjectStreamException e)
+        {
+            if (DEBUG) System.out.println(e);
+            return null;
+        }
+        catch (ClassCastException e)
         {
             if (DEBUG) System.out.println(e);
             return null;
