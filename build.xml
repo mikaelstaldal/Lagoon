@@ -15,6 +15,7 @@
   <property name="Batik" value="C:\javaInstall\batik\lib"/>
   <property name="Ant" value="C:\javaInstall\ant\lib\ant.jar"/>
   <property name="JAF" value="C:\javaInstall\jaf\activation.jar"/>
+  <property name="JARV" value="C:\javaInstall\isorelax.jar"/>
 
   <path id="lagoon.class.path">
     <pathelement location="${Ant}" />
@@ -101,6 +102,7 @@
            optimize="off" debug="on">
     	<classpath>
             <pathelement location="${JAF}" />
+            <pathelement location="${JARV}" />
         </classpath>
 	</javac>
 

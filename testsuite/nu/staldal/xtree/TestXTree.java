@@ -32,7 +32,7 @@ public class TestXTree extends TestCase
 		fis.close();
 
 		fos = new FileOutputStream("xtree.out");
-		TreeBuilder.toOutputStream(el, fos);
+		TreeBuilder.serialize(el, fos);
 		fos.close();
 	}
 

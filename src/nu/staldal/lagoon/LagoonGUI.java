@@ -335,14 +335,9 @@ public class LagoonGUI extends Frame implements WindowListener
             	e.getMessage());
 			ed.show();
         }
-        catch (javax.xml.parsers.ParserConfigurationException e)
-        {
-			MessageDialog ed = new MessageDialog(this, "Initializing error",
-            	e.getMessage());
-			ed.show();
-        }
 	}
 
+	
 	private void loadPropertyFile()
 	{
 		FileDialog propertyFileDialog = new FileDialog(this, "Load property file");

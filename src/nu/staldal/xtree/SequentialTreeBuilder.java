@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2002, Mikael Ståldal
+ * Copyright (c) 2002, Mikael Ståldal
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -44,13 +44,9 @@ import java.util.*;
 import java.io.*;
 import java.net.URL;
 
-import org.xml.sax.*;
 import javax.xml.parsers.*;
-import javax.xml.transform.*;
-import javax.xml.transform.sax.*;
-import javax.xml.transform.stream.StreamResult;
 
-import nu.staldal.xmlutil.ContentHandlerFixer;
+import org.xml.sax.*;
 
 
 /**
@@ -83,34 +79,38 @@ public class SequentialTreeBuilder implements ContentHandler, ErrorHandler
 	 * Uses JAXP to find a parser.
 	 * Will not support xml:base.
 	 *
-	 * @param xmlInput  the input to parse.
-	 * @param validate  should the file be validated?
-	 * @param handler   handler to invoke for each element
+	 * @param xmlInput    the input to parse
+	 * @param validateDTD validate using DTD
+	 * @param handler     handler to invoke for each element
 	 *
 	 * @return the root element (without any children)
 	 *
-	 * @throws SAXException  if the file doesn't contain a well-formed
-	 * (valid) XML document.
+	 * @throws SAXParseException if the XML data is not valid
+	 * @throws SAXException if any other error occurs while parsing the XML data
 	 * @throws IOException  if there was some I/O error while reading the input.
-	 * @throws ParserConfigurationExcpetion  if a JAXP parser is not properly setup
 	 */
-	public static Element parseXML(InputSource xmlInput, boolean validate, 
-			ElementHandler handler)
-		throws SAXException, IOException, ParserConfigurationException
+	public static Element parseXMLSequential(InputSource xmlInput, boolean validateDTD, 
+								   ElementHandler handler)
+		throws SAXParseException, SAXException, IOException
 	{
-		SAXParserFactory parserFactory = SAXParserFactory.newInstance();
-		parserFactory.setNamespaceAware(true);
-		parserFactory.setValidating(validate);
+		try {
+			SAXParserFactory parserFactory = SAXParserFactory.newInstance();
+			parserFactory.setNamespaceAware(true);
+			parserFactory.setValidating(validateDTD);
+	
+			XMLReader xmlReader = parserFactory.newSAXParser().getXMLReader();			
+			SequentialTreeBuilder tb = new SequentialTreeBuilder(handler);
 
-		XMLReader xmlReader = parserFactory.newSAXParser().getXMLReader();
-		SequentialTreeBuilder tb = new SequentialTreeBuilder(handler);
-
-		xmlReader.setContentHandler(tb);
-		xmlReader.setErrorHandler(tb);
-
-		xmlReader.parse(xmlInput);
-		
-		return tb.getRootElement();
+			xmlReader.setContentHandler(tb);
+			xmlReader.setErrorHandler(tb);
+			xmlReader.parse(xmlInput);
+					
+			return tb.getRootElement();
+		}
+		catch (javax.xml.parsers.ParserConfigurationException e)
+		{
+			throw new Error("XML parser configuration error: " + e.getMessage());	
+		}
 	}
 
 

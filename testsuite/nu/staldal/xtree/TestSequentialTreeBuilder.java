@@ -16,7 +16,7 @@ public class TestSequentialTreeBuilder // extends TestCase
     public void testSequentialTreeBuilder() throws Exception
 	{
 		System.out.println("----- BEGIN");
-		Element root = SequentialTreeBuilder.parseXML(
+		Element root = SequentialTreeBuilder.parseXMLSequential(
 			new InputSource(getClass().getResourceAsStream("xtree.xml")), false,
 			new ElementHandler() {
 				public void processElement(Element el) throws SAXException

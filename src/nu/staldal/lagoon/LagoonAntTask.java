@@ -140,7 +140,8 @@ public class LagoonAntTask extends Task
 			
 			Element sitemapTree;
 			try {
-				sitemapTree = TreeBuilder.parseXMLFile(sitemapFile, false);
+				sitemapTree = TreeBuilder.parseXML(
+					TreeBuilder.fileToInputSource(sitemapFile), false);
 			}
 			catch (SAXException e)
 			{
@@ -184,10 +185,6 @@ public class LagoonAntTask extends Task
             throw new BuildException(e);
         }
         catch (LagoonException e)
-        {
-            throw new BuildException(e.getMessage());
-        }
-        catch (javax.xml.parsers.ParserConfigurationException e)
         {
             throw new BuildException(e.getMessage());
         }

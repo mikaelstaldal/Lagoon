@@ -44,7 +44,6 @@ import java.io.*;
 import java.awt.datatransfer.DataFlavor;
 import javax.activation.*;
 
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.*;
 import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
@@ -89,10 +88,6 @@ public class XTreeXMLDataContentHandler implements DataContentHandler
 		catch (SAXException e)
 		{
 			throw new IOException(e.toString());
-		}
-		catch (ParserConfigurationException e)
-		{
-			throw new Error(e.toString());
 		}
 	}											
 
@@ -157,3 +152,4 @@ public class XTreeXMLDataContentHandler implements DataContentHandler
 		}
 	}
 }
+

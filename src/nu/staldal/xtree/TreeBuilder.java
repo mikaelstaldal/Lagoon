@@ -44,11 +44,12 @@ import java.util.*;
 import java.io.*;
 import java.net.URL;
 
-import org.xml.sax.*;
 import javax.xml.parsers.*;
 import javax.xml.transform.*;
 import javax.xml.transform.sax.*;
 import javax.xml.transform.stream.StreamResult;
+
+import org.xml.sax.*;
 
 import nu.staldal.xmlutil.ContentHandlerFixer;
 
@@ -77,116 +78,138 @@ public class TreeBuilder implements ContentHandler, ErrorHandler
     private Locator locator = null;
 	private URL baseURI;
 
-	
+
 	/**
-	 * Parse an XML document in a file into an XTree.
-	 * Uses JAXP to find a parser.
-	 * Will not support xml:base.
+	 * Create an SAX InputSource from a File object.
 	 *
-	 * @param xmlFile  the file to parse.
-	 * @param validate  should the file be validated?
+	 * @param file  the file
 	 *
-	 * @throws SAXException  if the file doesn't contain a well-formed
-	 * (valid) XML document.
+	 * @return an InputSource
 	 * @throws FileNotFoundException  if the file doesn't exist
-	 * @throws IOException  if there was some I/O error while reading the file.
-	 * @throws ParserConfigurationExcpetion  if a JAXP parser is not properly
-	 * setup
+	 * @throws FileNotFoundException  if some I/O error occurs
 	 */
-	public static Element parseXMLFile(File xmlFile, boolean validate)
-		throws SAXException, FileNotFoundException, IOException,
-		ParserConfigurationException
+	public static InputSource fileToInputSource(File file)
+		throws FileNotFoundException, IOException
 	{
         // we should use File.toURL() here, but it's Java2
+		
 		String absPath = 
-			xmlFile.getCanonicalPath().replace(File.separatorChar, '/');
+			file.getCanonicalPath().replace(File.separatorChar, '/');
         String systemId = "file:" 
 				+ ((absPath.charAt(0) == '/') ? "//" : "///") + absPath;
 
-		if (!xmlFile.isFile())
+		if (!file.isFile())
 			throw new FileNotFoundException(systemId);
 
-		return parseXML(new InputSource(systemId), validate);
+		return new InputSource(systemId);
 	}
-
+	
 
 	/**
 	 * Parse an XML document into an XTree.
 	 * Uses JAXP to find a parser.
 	 * Will not support xml:base.
 	 *
-	 * @param xmlInput  the input to parse.
-	 * @param validate  should the file be validated?
+	 * @param xmlInput    the input to parse
+	 * @param validateDTD validate using DTD
 	 *
-	 * @throws SAXException  if the file doesn't contain a well-formed
-	 * (valid) XML document.
+	 * @return an XTree representation of the XML data
+	 *
+	 * @throws SAXParseException if the XML data is not valid
+	 * @throws SAXException if any other error occurs while parsing the XML data
 	 * @throws IOException  if there was some I/O error while reading the input.
-	 * @throws ParserConfigurationExcpetion  if a JAXP parser is not properly
-	 * setup
 	 */
-	public static Element parseXML(InputSource xmlInput, boolean validate)
-		throws SAXException, IOException, ParserConfigurationException
+	public static Element parseXML(InputSource xmlInput, boolean validateDTD)
+		throws SAXParseException, SAXException, IOException
 	{
-		SAXParserFactory parserFactory = SAXParserFactory.newInstance();
-		parserFactory.setNamespaceAware(true);
-		parserFactory.setValidating(validate);
+		try {
+			SAXParserFactory parserFactory = SAXParserFactory.newInstance();
+			parserFactory.setNamespaceAware(true);
+			parserFactory.setValidating(validateDTD);
+	
+			XMLReader xmlReader = parserFactory.newSAXParser().getXMLReader();			
+			TreeBuilder tb = new TreeBuilder();
 
-		XMLReader xmlReader = parserFactory.newSAXParser().getXMLReader();
-		TreeBuilder tb = new TreeBuilder();
-
-		xmlReader.setContentHandler(tb);
-		xmlReader.setErrorHandler(tb);
-
-		xmlReader.parse(xmlInput);
-
-		return tb.getTree();
+			xmlReader.setContentHandler(tb);
+			xmlReader.setErrorHandler(tb);
+			xmlReader.parse(xmlInput);
+			return tb.getTree();
+		}
+		catch (javax.xml.parsers.ParserConfigurationException e)
+		{
+			throw new Error("XML parser configuration error: " + e.getMessage());	
+		}
 	}
 
+		
+	/**
+	 * Serialize an XTree into an OutputStream.
+	 *
+	 * @param tree      the XTree to serialize
+	 * @param os        the OutputStream to write to
+	 *
+	 * @throws IOException if any error occurs
+	 */
+	public static void serialize(Node tree, OutputStream os)
+        throws IOException
+	{
+		Properties prop = new Properties();
+
+		prop.setProperty(OutputKeys.METHOD, "xml");
+		prop.setProperty(OutputKeys.ENCODING, "utf-8");
+		prop.setProperty(OutputKeys.INDENT, "no");
+
+		serialize(tree, os, prop);
+	}
+	
 
 	/**
 	 * Serialize an XTree into an OutputStream.
 	 *
-	 * @param tree  the XTree to serialize
-	 * @param os  the OutputStream to write to
+	 * @param tree      the XTree to serialize
+	 * @param os        the OutputStream to write to
+	 * @param prop  	output properties
 	 *
 	 * @throws IOException if any error occurs
-	 * @throws TransformerConfigurationException 
-	 *		   if a JAXP serializer is not properly setup
 	 */
-	public static void toOutputStream(Node tree, OutputStream os)
-        throws IOException, TransformerConfigurationException
+	public static void serialize(Node tree, OutputStream os, Properties prop)
+        throws IOException
 	{
-		TransformerFactory tf = TransformerFactory.newInstance();
-        if (!(tf.getFeature(SAXTransformerFactory.FEATURE)
-              	&& tf.getFeature(StreamResult.FEATURE)))
-        {
-            throw new TransformerConfigurationException("The transformer factory "
-                + tf.getClass().getName() + " doesn't support SAX");
-        }
-            
-		SAXTransformerFactory tfactory = (SAXTransformerFactory)tf;
-		TransformerHandler th = tfactory.newTransformerHandler();
-		th.setResult(new StreamResult(os));
-		
-		Transformer trans = th.getTransformer();
-		trans.setOutputProperty(OutputKeys.METHOD, "xml");
-		trans.setOutputProperty(OutputKeys.ENCODING, "utf-8");
-		trans.setOutputProperty(OutputKeys.INDENT, "no");
-		
-		ContentHandler ch = new ContentHandlerFixer(th, true);
-		
 		try {
-			ch.startDocument();
-			tree.toSAX(ch);
-			ch.endDocument();
+			TransformerFactory tf = TransformerFactory.newInstance();
+			if (!(tf.getFeature(SAXTransformerFactory.FEATURE)
+					&& tf.getFeature(StreamResult.FEATURE)))
+			{
+				throw new Error("The transformer factory "
+					+ tf.getClass().getName() + " doesn't support SAX");
+			}
+				
+			SAXTransformerFactory tfactory = (SAXTransformerFactory)tf;
+			TransformerHandler th = tfactory.newTransformerHandler();
+			th.setResult(new StreamResult(os));
+			
+			Transformer trans = th.getTransformer();
+			trans.setOutputProperties(prop);
+			
+			ContentHandler ch = new ContentHandlerFixer(th, true);
+			
+			try {
+				ch.startDocument();
+				tree.toSAX(ch);
+				ch.endDocument();
+			}
+			catch (SAXException e)
+			{
+				throw new IOException(e.toString());	
+			}
 		}
-		catch (SAXException e)
+		catch (TransformerConfigurationException e)
 		{
-			throw new IOException(e.toString());	
+			throw new Error(e.toString());	
 		}
 	}
-	
-	
+
+
 	/**
 	 * Constructs a TreeBuilder, ready to receive SAX events.
 	 * Will not support xml:base.

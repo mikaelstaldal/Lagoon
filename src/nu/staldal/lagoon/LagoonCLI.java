@@ -135,7 +135,8 @@ public class LagoonCLI
 			
 			Element sitemapTree;
 			try {
-				sitemapTree = TreeBuilder.parseXMLFile(sitemapFile, false);
+				sitemapTree = TreeBuilder.parseXML(
+					TreeBuilder.fileToInputSource(sitemapFile), false);
 			}
 			catch (SAXException e)
 			{
@@ -190,12 +191,6 @@ public class LagoonCLI
         {
             System.err.println("Error while initializing Lagoon:");
             System.err.println(e.getMessage());
-            return;
-        }
-        catch (javax.xml.parsers.ParserConfigurationException e)
-        {
-            System.err.println("Error while initializing Lagoon:");
-            System.err.println(e.toString());
             return;
         }
 					
