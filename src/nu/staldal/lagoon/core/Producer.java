@@ -71,6 +71,16 @@ public abstract class Producer implements ProducerInterface
         this.entryName = entryName;
 	}
 
+	
+	/**
+	 * Get the name of the sitemap entry this producer is associated with.
+	 */
+	public String getEntryName()
+	{
+        return entryName;
+	}
+
+	
 	/**
 	 * Set the SourceManagerProvider this producer is associated with.
 	 * Used during initialization.
@@ -87,6 +97,15 @@ public abstract class Producer implements ProducerInterface
 	void setPosition(int pos)
 	{
         this.position = pos;
+	}
+
+
+	/**
+	 * Get the position of this producer in the pipeline.
+	 */
+	public int getPosition()
+	{
+        return position;
 	}
 
 
@@ -116,6 +135,7 @@ public abstract class Producer implements ProducerInterface
 		return sm;
 	}
 
+	
 	/**
 	 * Get the LagoonContext this producer is associated with.
 	 */
@@ -124,6 +144,7 @@ public abstract class Producer implements ProducerInterface
 		return processor;
 	}
 
+	
     /**
      * Add a parameter to this producer.
      * Used during initialization.
@@ -136,6 +157,7 @@ public abstract class Producer implements ProducerInterface
         params.put(name, value);
     }
 
+	
     /**
      * Get a parameter.
      *
@@ -148,6 +170,7 @@ public abstract class Producer implements ProducerInterface
         return (String)params.get(name);
     }
 
+	
     /**
      * Get an Enumeration of all parameter names.
      */
@@ -162,6 +185,7 @@ public abstract class Producer implements ProducerInterface
         return getClass().getName() + "." + position + "." + key;
     }
 
+	
     /**
      * Read from a file in the repository.
      * Read from the returned InputStream and close() it.

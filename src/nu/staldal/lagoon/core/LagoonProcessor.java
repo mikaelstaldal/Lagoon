@@ -66,7 +66,10 @@ public class LagoonProcessor implements LagoonContext
     private final FileStorage targetLocation;
     private File repositoryDir;
 	private File tempDir;
+	private File classDir;
 	private File sourceRootDir;
+	private java.net.URL[] classLoaderURLs;
+	private ClassLoader repositoryClassLoader;
 
     private final Hashtable classDict;
     private final Hashtable paramDict;
@@ -166,9 +169,14 @@ public class LagoonProcessor implements LagoonContext
 		}
 
 		if (repositoryDir != null)
+		{
 			tempDir = new File(repositoryDir, "temp");
+			classDir = new File(repositoryDir, "classes");
+		}
 		else
+		{
 			tempDir = new File(workDir, "temp");
+		}
 		if (!tempDir.exists())
 		{
 			if (!tempDir.mkdir())
@@ -185,6 +193,30 @@ public class LagoonProcessor implements LagoonContext
 			}
 		}
 		
+		if (classDir == null)
+		{
+			classDir = new File(tempDir, "classes");	
+		}
+		
+		if (!classDir.exists())
+		{
+			if (!classDir.mkdir())
+				throw new IOException("Unable to create directory: "
+					+ classDir);
+		}
+		else
+		{
+			if (!classDir.isDirectory())
+			{
+				throw new IOException(
+					"Unable to create directory (a file with that name exists): "
+					+ classDir);
+			}
+		}
+		
+		classLoaderURLs = new java.net.URL[] { classDir.toURL() };
+		reloadClasses();
+					
 		sitemap.init();
 				
         targetLocation.open(targetURL, this, password);
@@ -244,6 +276,17 @@ public class LagoonProcessor implements LagoonContext
         throws IOException
 	{
 		targetLocation.close();
+		
+		repositoryClassLoader = null;
+		
+		if (repositoryDir == null)
+		{
+			File[] classFiles = classDir.listFiles();
+			for (int i = 0; i<classFiles.length; i++)
+			{
+				classFiles[i].delete();	
+			}
+		}
 	}
 
 	public File getTempDir()
@@ -301,11 +344,72 @@ public class LagoonProcessor implements LagoonContext
         return new FileOutputStream(theFile);
     }
 
+
+    public Class loadClassFromRepository(String className)
+        throws ClassNotFoundException
+    {
+		if (DEBUG) System.out.println("loadClassFromRepository: "
+			+ className);
+		
+        try {
+			return Class.forName(className, true, repositoryClassLoader);
+		}
+		catch (ClassFormatError e)
+		{
+			File classFile = new File(classDir, className + ".class");
+			classFile.delete();
+			err.println(e.toString());
+			throw new ClassNotFoundException(className + " is malformed");
+		}
+		catch (VerifyError e)
+		{
+			File classFile = new File(classDir, className + ".class");
+			classFile.delete();
+			err.println(e.toString());
+			throw new ClassNotFoundException(className + " does not verify");
+		}
+    }
+	
+
+    public OutputStream storeClassInRepository(String className)
+        throws IOException
+    {
+		if (classDir == null) return null;
+		
+		File theFile = new File(classDir, className+".class");
+		
+		if (DEBUG) System.out.println("storeClassInRepository: " + theFile);			
+		
+        return new FileOutputStream(theFile);				
+    }
+	
+	
+    public void deleteClassInRepository(String className)
+        throws IOException
+    {
+		if (classDir == null) return;
+		
+		File theFile = new File(classDir, className+".class");
+		
+		if (DEBUG) System.out.println("deleteClassInRepository: " + theFile);			
+		
+        if (theFile.isFile() && !theFile.delete())
+			throw new IOException("Unable to delete file: " + theFile);				
+    }
+
+
+	public void reloadClasses()
+	{
+		repositoryClassLoader = new java.net.URLClassLoader(classLoaderURLs);
+	}
+
+	
     public Object getObjectFromRepository(String key)
         throws IOException
     {
         return getObjectFromRepository(null, key);
     }
+	
 
     Object getObjectFromRepository(String dir, String key)
         throws IOException

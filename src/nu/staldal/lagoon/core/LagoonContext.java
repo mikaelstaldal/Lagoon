@@ -83,6 +83,42 @@ public interface LagoonContext
 
 
 	/**
+     * Load a Java class file from the repository.
+     *
+     * @param className  the class name, no package
+     *
+     * @return  the Class, never <code>null</code>
+	 *
+	 * @throws ClassNotFoundException if the class cannot be loaded
+     */
+    public Class loadClassFromRepository(String className)
+        throws ClassNotFoundException;
+	
+
+    /**
+     * Store a Java class file in the repository.
+     * Write to the returned OutputStream and close() it.
+     *
+     * @param className  the class name, no package
+     *
+     * @return  an OutputStream to write to the class, or <code>null</code>
+	 *          if the repository is unavailable.
+     */
+    public OutputStream storeClassInRepository(String className)
+        throws IOException;
+
+
+    /**
+     * Delete a Java class file from the repository.
+     *
+     * @param className  the class name, no package
+     *
+     */
+    public void deleteClassInRepository(String className)
+        throws IOException;
+
+		
+	/**
      * Get an object from the repository.
      *
      * @param key  the key to locate the object
@@ -92,7 +128,13 @@ public interface LagoonContext
     public Object getObjectFromRepository(String key)
         throws IOException;
 
-
+		
+	/**
+	 * Reload classes.
+	 */
+	public void reloadClasses();
+	
+	
 	/**
      * Store an object into the repository.
      *

@@ -57,13 +57,16 @@ public class LSPTransformer extends Transform
     private LSPCompiler compiler;
     private LSPPage theCompiledPage;
     private HashMap params;
-		
+	private String pageName;
+	
     public void init()
         throws LagoonException, IOException
     {
         compiler = new LSPCompiler();
+		
+		pageName = Utils.encodePathAsIdentifier(getEntryName())+"_"+getPosition();
 
-        theCompiledPage = (LSPPage)getObjectFromRepository("page");
+		theCompiledPage = loadLSPPage();
         if (DEBUG)
             if (theCompiledPage == null)
                 System.out.println("No compiled page found");
@@ -76,6 +79,29 @@ public class LSPTransformer extends Transform
 		}
     }
 
+	private LSPPage loadLSPPage()
+		throws LagoonException
+	{
+        try {
+			Class theCompiledPageClass = 
+				getContext().loadClassFromRepository("_LSP_"+pageName);
+			LSPPage thePage = (LSPPage)theCompiledPageClass.newInstance();
+			return thePage;
+		}
+		catch (ClassNotFoundException e)
+		{
+			return null;	
+		}
+		catch (InstantiationException e)
+		{
+			throw new LagoonException(e.getMessage());
+		}
+		catch (IllegalAccessException e)
+		{
+			throw new LagoonException(e.getMessage());
+		}
+	}
+		
 	private boolean sourceUpdated(long when)
         throws LagoonException, IOException
 	{
@@ -88,11 +114,11 @@ public class LSPTransformer extends Transform
         	return true;
 		}
 
-		if (DEBUG) System.out.println("Checking imported files"); 
-		for (Iterator e = theCompiledPage.getCompileDependentFiles();
-             e.hasNext(); )
+		if (DEBUG) System.out.println("Checking imported files");
+		String[] importedFiles = theCompiledPage.getCompileDependentFiles(); 
+		for (int i = 0; i<importedFiles.length; i++)
 		{
-			String f = (String)e.next();
+			String f = importedFiles[i];
 			if (DEBUG) System.out.println("Checking imported file: " + f); 
 			if (getSourceMan().fileHasBeenUpdated(f, when))
 			{
@@ -109,17 +135,37 @@ public class LSPTransformer extends Transform
     {
 		if (DEBUG) System.out.println("LSP compile");
 
-        ContentHandler ch = compiler.startCompile(
-            new URLResolver() {
-                public void resolve(String url, ContentHandler ch) 
-					throws IOException, SAXException
-                {
-					getSourceMan().getFileAsSAX(url, ch, target);	
-                }
-            });
-        next.start(ch, target);
-        theCompiledPage = compiler.finishCompile();
-        putObjectIntoRepository("page", theCompiledPage);
+        OutputStream out = null;
+		try {
+			ContentHandler ch = compiler.startCompile(
+				pageName,
+				new URLResolver() {
+					public void resolve(String url, ContentHandler ch) 
+						throws IOException, SAXException
+					{
+						getSourceMan().getFileAsSAX(url, ch, target);	
+					}
+				});
+			next.start(ch, target);
+			out = getContext().storeClassInRepository("_LSP_"+pageName);
+			compiler.finishCompile(out);
+			out.close();
+		}
+		catch (SAXException e)
+		{
+			if (out != null)
+			{
+				out.close();
+				getContext().deleteClassInRepository("_LSP_"+pageName);
+			}
+			throw e;
+		}
+		getContext().reloadClasses();
+		theCompiledPage = loadLSPPage();
+		if (theCompiledPage == null)
+		{
+			throw new LagoonException("Unable to load compiled page");	
+		}
     }
 
 
@@ -161,11 +207,10 @@ public class LSPTransformer extends Transform
 
 		if (theCompiledPage.isExecuteDynamic()) return true;
 
-		for (Iterator e = theCompiledPage.getExecuteDependentFiles();
-             e.hasNext(); )
+		String[] includedFiles = theCompiledPage.getExecuteDependentFiles(); 
+		for (int i = 0; i<includedFiles.length; i++)
 		{
-			String f = (String)e.next();
-			if (DEBUG) System.out.println("Checking " + f);
+			String f = includedFiles[i];
 			if (getSourceMan().fileHasBeenUpdated(f, when))
 			{
 				return true;
