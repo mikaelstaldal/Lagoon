@@ -46,6 +46,10 @@ import java.net.URL;
 import org.xml.sax.*;
 import org.xml.sax.helpers.AttributesImpl;
 
+
+/**
+ * An XML Element.
+ */
 public class Element extends NodeWithChildren
 {
 	static final long serialVersionUID = -1804355746259349573L;
@@ -63,17 +67,44 @@ public class Element extends NodeWithChildren
     Vector namespaceURIs;
 
 
+	/**
+	 * Construct an element.
+	 *
+	 * @param namespaceURI  the namespace URI for this element,
+	 *                      may be the empty string
+	 * @param localName	the element name
+	 *                       
+	 */
     public Element(String namespaceURI, String localName)
     {
         this(namespaceURI, localName, -1, -1);
     }
 
+
+	/**
+	 * Construct an element.
+	 *
+	 * @param namespaceURI  the namespace URI for this element,
+	 *                      may be the empty string
+	 * @param localName	the element name
+	 * @param numberOfAttributes  the number of attributes this element should have
+	 */
     public Element(String namespaceURI, String localName,
                    int numberOfAttributes)
     {
         this(namespaceURI, localName, numberOfAttributes, -1);
     }
 
+
+	/**
+	 * Construct an element.
+	 *
+	 * @param namespaceURI  the namespace URI for this element,
+	 *                      may be the empty string
+	 * @param localName	the name of this element (no namespace)
+	 * @param numberOfAttributes  the number of attributes this element should have
+	 * @param numberOfChildren  the number of children this element should have
+	 */
     public Element(String namespaceURI, String localName,
                    int numberOfAttributes, int numberOfChildren)
     {
@@ -96,24 +127,56 @@ public class Element extends NodeWithChildren
         this.localName = localName;
     }
 
+
+	/**
+	 * Get the namespace URI for this element. May be the empty string.
+	 */
     public String getNamespaceURI()
     {
         return namespaceURI;
     }
 
+
+	/**
+	 * Get the name of this element. 
+	 * The name does not include namespace URI or prefix.
+	 */
     public String getLocalName()
     {
         return localName;
     }
 
+
     /**
-     * @return -1 if not found
+	 * Lookup the index of an attribute to this element. The returned index
+	 * may be used as argument to other methods in this class.
+	 *
+	 * @param namespaceURI  the namespace URI, may be the empty string
+	 * @param localName  the name
+     * @return the index of the attribute, or -1 if no such attribute exists
+	 *
+	 * @see #getAttributeValue
+	 * @see #getAttributeType
+	 * @see #removeAttribute
      */
     public int lookupAttribute(String namespaceURI, String localName)
     {
 		return attrName.indexOf(localName + '^' + namespaceURI);
 	}
 
+	
+	/**
+	 * Add an attribute to this element.
+	 *
+	 * The attribute type is one of the strings 
+	 * "CDATA", "ID", "IDREF", "IDREFS", "NMTOKEN", "NMTOKENS", 
+	 * "ENTITY", "ENTITIES", or "NOTATION" (always in upper case).
+	 *
+	 * @param namespaceURI  the namespace URI, may be the empty string
+	 * @param localName  the name
+	 * @param type  the type (use "CDATA" if the type is irrelevant)
+	 * @param value  the value
+	 */
     public void addAttribute(String namespaceURI, String localName,
     						 String type, String value)
     {
@@ -122,6 +185,14 @@ public class Element extends NodeWithChildren
 		attrValue.addElement(value);
 	}
 
+
+	/**
+	 * Remove an attribute at the specified index. 
+	 * This method is a bit inefficient.
+	 *
+	 * @param index  the index as returned from {@link #lookupAttribute}
+	 * @throws ArrayIndexOutOfBoundException  if no such attribute exist.
+	 */
     public void removeAttribute(int index)
         throws ArrayIndexOutOfBoundsException
     {
@@ -130,32 +201,73 @@ public class Element extends NodeWithChildren
         attrValue.removeElementAt(index);
     }
 
+	
+	/**
+	 * Return the number of attributes this element have.
+	 */
 	public int numberOfAttributes()
 	{
 		return attrName.size();
 	}
 
+	
+	/**
+	 * Get the namespace URI for the attribute at the specified index.
+	 *
+	 * @param index  the index as returned from {@link #lookupAttribute}
+	 * @return the namespace URI, may be (and is usually) the empty string
+	 * @throws ArrayIndexOutOfBoundException  if no such attribute exist.
+	 */
 	public String getAttributeNamespaceURI(int index)
+        throws ArrayIndexOutOfBoundsException
 	{
         if (index == -1) return null;
 		String s = (String)attrName.elementAt(index);
 		return s.substring(s.indexOf('^')+1);
 	}
 
+	
+	/**
+	 * Get the name of the attribute at the specified index.
+	 *
+	 * @param index  the index as returned from {@link #lookupAttribute}
+	 * @throws ArrayIndexOutOfBoundException  if no such attribute exist.
+	 */
 	public String getAttributeLocalName(int index)
+        throws ArrayIndexOutOfBoundsException
 	{
         if (index == -1) return null;
 		String s = (String)attrName.elementAt(index);
 		return s.substring(0, s.indexOf('^'));
 	}
 
+
+	/**
+	 * Get the type of the attribute at the specified index.
+	 *
+	 * The attribute type is one of the strings 
+	 * "CDATA", "ID", "IDREF", "IDREFS", "NMTOKEN", "NMTOKENS", 
+	 * "ENTITY", "ENTITIES", or "NOTATION" (always in upper case).
+	 *
+	 * @param index  the index as returned from {@link #lookupAttribute}
+	 * @throws ArrayIndexOutOfBoundException  if no such attribute exist.
+	 */
 	public String getAttributeType(int index)
+        throws ArrayIndexOutOfBoundsException
 	{
         if (index == -1) return null;
 		return (String)attrType.elementAt(index);
 	}
 
+
+	/**
+	 * Get the value of the attribute at the specified index.
+	 *
+	 * @param index  the index as returned from {@link #lookupAttribute}
+	 * @throws ArrayIndexOutOfBoundException  if no such attribute exist.
+	 */
 	public String getAttributeValue(int index)
+        throws ArrayIndexOutOfBoundsException
 	{
         if (index == -1) return null;
 		return (String)attrValue.elementAt(index);
@@ -168,17 +280,34 @@ public class Element extends NodeWithChildren
 		namespaceURIs = URIs;
 	}
 
+
+	/**
+	 * Add a namespace mapping to this element.
+	 *
+	 * @param prefix  the prefix
+	 * @param URI  the namespace URI
+	 */
 	public void addNamespaceMapping(String prefix, String URI)
 	{
 		namespacePrefixes.addElement(prefix);
 		namespaceURIs.addElement(URI);
 	}
 
+
+	/**
+	 * Return the number of namespace mapping for this element.
+	 */
 	public int numberOfNamespaceMappings()
 	{
 		return namespacePrefixes.size();
 	}
-
+	
+	/**
+	 * Return a namespace mapping at the specified index.
+	 *
+	 * @return a String[] with [0] = prefix, [1] = namespace URI
+	 * @throws ArrayIndexOutOfBoundException  if no such mapping exist.	 
+	 */
 	public String[] getNamespaceMapping(int index)
 		throws ArrayIndexOutOfBoundsException
 	{
@@ -187,12 +316,13 @@ public class Element extends NodeWithChildren
 			(String)namespaceURIs.elementAt(index) };
 	}
 
+
 	public String lookupNamespaceURI(String prefix)
 	{
 		int index = namespacePrefixes.indexOf(prefix);
 		if (index == -1)
 		{
-			if ((parent != null) && (parent instanceof Element))
+			if (parent != null)
 			{
 				return parent.lookupNamespaceURI(prefix);
 			}
@@ -214,14 +344,15 @@ public class Element extends NodeWithChildren
 		}
 	}
 
+
 	public String lookupNamespacePrefix(String URI)
 	{
 		int index = namespaceURI.indexOf(URI);
 		if (index == -1)
 		{
-			if ((parent != null) && (parent instanceof Element))
+			if (parent != null)
 			{
-				return ((Element)parent).lookupNamespacePrefix(URI);
+				return parent.lookupNamespacePrefix(URI);
 			}
 			else
 			{
@@ -252,12 +383,7 @@ public class Element extends NodeWithChildren
 		baseURI = URI;
 	}
 
-	/**
-	 * Returns the absolute base URI of this element.
-	 *
-	 * @returns  the absolute base URI of this element,
-	 * or <code>null</code> if unknown.
-	 */
+	
 	public URL getBaseURI()
 	{
 		if (baseURI != null)
@@ -266,9 +392,9 @@ public class Element extends NodeWithChildren
 		}
 		else
 		{
-			if ((parent != null) && (parent instanceof Element))
+			if (parent != null)
 			{
-				return ((Element)parent).getBaseURI();
+				return parent.getBaseURI();
 			}
 			else
 			{
@@ -278,6 +404,10 @@ public class Element extends NodeWithChildren
 	}
 
 
+	/**
+	 * Fire the startElement event to the given SAX2 ContentHandler.
+	 * Will also fire startPrefixMapping events.
+	 */
 	public void outputStartElement(ContentHandler sax)
 		throws SAXException
 	{
@@ -300,6 +430,11 @@ public class Element extends NodeWithChildren
 		sax.startElement(namespaceURI, localName, "", atts);
 	}
 
+	
+	/**
+	 * Fire the endElement event to the given SAX2 ContentHandler.
+	 * Will also fire endPrefixMapping events.
+	 */
 	public void outputEndElement(ContentHandler sax)
 		throws SAXException
 	{
@@ -311,6 +446,7 @@ public class Element extends NodeWithChildren
 		}
 	}
 
+	
 	public void toSAX(ContentHandler sax)
 		throws SAXException
 	{
@@ -378,7 +514,7 @@ public class Element extends NodeWithChildren
 
 
     /**
-     * Shortcut method for getting the first Element children with a
+     * Shortcut method for getting the first Element child with a
      * specified name.
      *
      * @return  the first child Element with the specified name,

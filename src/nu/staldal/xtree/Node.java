@@ -42,6 +42,10 @@ package nu.staldal.xtree;
 
 import org.xml.sax.*;
 
+
+/**
+ * Base class for a node in an XTree. 
+ */
 public abstract class Node implements java.io.Serializable
 {
     String systemId;
@@ -54,20 +58,34 @@ public abstract class Node implements java.io.Serializable
         parent = n;
     }
 
-    public NodeWithChildren getParent()
+    
+	/**
+	 * Get the parent of this node.
+	 *
+	 * @return  the parent of this node, 
+	 * or <code>null</code> if this node has no parent.
+	 */
+	public NodeWithChildren getParent()
     {
         return parent;
     }
 
+	
+	/**
+	 * Serialize this node, and recursively the (sub)tree beneath, 
+	 * into SAX2 events.
+	 *
+	 * @param sax  the SAX2 ContentHander to fire events on. 
+	 */
 	public abstract void toSAX(ContentHandler sax)
 		throws SAXException;
 
 
     /**
-     * Return the system identifier for this node.
+     * Return the system identifier for this node. Useful for error reporting.
      *
-     * <p>The return value is the system identifier of the document
-     * entity or of the external parsed entity.</p>
+     * The return value is the system identifier of the document
+     * entity or of the external parsed entity.
      *
      * @return A string containing the system identifier, or null
      *         if none is available.
@@ -79,15 +97,15 @@ public abstract class Node implements java.io.Serializable
 
 
     /**
-     * Return the line number where this node ends.
+     * Return the line number where this node ends. Useful for error reporting.
      *
-     * <p>The return value is an approximation of the line number
-     * in the document entity or external parsed entity.</p>
+     * The return value is an approximation of the line number
+     * in the document entity or external parsed entity.
      *
-	 * <p>The first line in the document is line 1.</p>
+	 * The first line in the document is line 1.
      *
      * @return The line number, or -1 if none is available.
-     * @see #getColumnNumber
+     * @see #getColumnNumber()
      */
     public int getLineNumber()
     {
@@ -96,21 +114,33 @@ public abstract class Node implements java.io.Serializable
 
 
     /**
-     * Return the column number where this node ends.
+     * Return the column number where this node ends. Useful for error reporting.
      *
-     * <p>The return value is an approximation of the column number
-     * in the document entity or external parsed entity.</p>
+     * The return value is an approximation of the column number
+     * in the document entity or external parsed entity.
      *
-	 * <p>The first column in each line is column 1.</p>
+	 * The first column in each line is column 1.
      *
      * @return The column number, or -1 if none is available.
-     * @see #getLineNumber
+     * @see #getLineNumber()
      */
     public int getColumnNumber()
     {
 		return column;
 	}
-
+	
+	
+	/**
+	 * Lookup the namespace URI which has been mapped to a prefix.
+	 *
+	 * @param prefix  the prefix, may be the empty string which denotes
+	 *  the default namespace.
+	 *
+	 * @return the namespace URI, or <code>null</code> 
+	 *  if the prefix is not mapped to any namespace URI, 
+	 *  or the empty string of prefix is the empty string and there is no
+	 *  default namespace mapping.
+	 */
 	public String lookupNamespaceURI(String prefix)
 	{
 		if (parent == null)
@@ -119,4 +149,37 @@ public abstract class Node implements java.io.Serializable
 			return parent.lookupNamespaceURI(prefix);
 	}
 	
+	
+	/**
+	 * Lookup a prefix which has been mapped to a namespace URI.
+	 *
+	 * @param URI  the namespace URI
+	 *
+	 * @return any of the prefixes which has been mapped to the namespace URI, 
+	 *  or <code>null</code> if no prefix is mapped to the namespace URI. 
+	 */
+	public String lookupNamespacePrefix(String URI)
+	{
+		if (parent == null)
+			return null;
+		else
+			return parent.lookupNamespacePrefix(URI);
+	}
+
+	
+	/**
+	 * Returns the absolute base URI of this node.
+	 *
+	 * @returns  the absolute base URI of this node,
+	 * or <code>null</code> if unknown.
+	 */
+	public URL getBaseURI()
+	{
+		if (parent == null)
+			return null;
+		else
+			return parent.getBaseURI();
+	}
+
 }
+

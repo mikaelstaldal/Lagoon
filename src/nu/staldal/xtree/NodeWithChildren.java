@@ -42,10 +42,20 @@ package nu.staldal.xtree;
 
 import java.util.Vector;
 
+
+/**
+ * Base class for a node with children. The children are ordered. 
+ */
 public abstract class NodeWithChildren extends Node
 {
     private Vector children;
 
+	/**
+	 * Construct a node which children.
+	 *
+	 * @param capacity  the number of children this node should have,
+	 *                  use -1 if unknown
+	 */
     public NodeWithChildren(int capacity)
     {
         if (capacity >= 0)
@@ -54,23 +64,49 @@ public abstract class NodeWithChildren extends Node
             children = new Vector();
     }
 
+
+	/**
+	 * Get the current number of children this node have.
+	 */
     public int numberOfChildren()
     {
         return children.size();
     }
 
+
+	/**
+	 * Get a specific child of this node.
+	 *
+	 * @param index  index of the node to get, the first child is 0.
+	 *
+	 * @throws ArrayIndexOutOfBoundException  if no such child exist.
+	 */
     public Node getChild(int index)
         throws ArrayIndexOutOfBoundsException
     {
         return (Node)children.elementAt(index);
     }
 
+	
+	/**
+     * Add a new child to this node, last in sequence.
+	 */
     public void addChild(Node newChild)
     {
         newChild.setParent(this);
         children.addElement(newChild);
     }
+	
 
+	/**
+	 * Replace a child with another.
+	 *
+	 * @param newChild  the new child
+	 * @param index  index of the child to replace
+	 *
+	 * @return  the replaced child
+	 * @throws ArrayIndexOutOfBoundsException  if no such child exist
+	 */
     public Node replaceChild(Node newChild, int index)
         throws ArrayIndexOutOfBoundsException
     {
@@ -81,8 +117,14 @@ public abstract class NodeWithChildren extends Node
         return oldChild;
     }
 
+	
     /**
-     * Inefficient
+	 * Remove a child from this node. This method is a bit inefficient.
+	 *
+	 * @param index  index of the child to replace
+	 *
+	 * @return  the removed child
+	 * @throws ArrayIndexOutOfBoundsException  if no such child exist
      */
     public Node removeChild(int index)
         throws ArrayIndexOutOfBoundsException
@@ -93,8 +135,20 @@ public abstract class NodeWithChildren extends Node
         return child;
     }
 
+
     /**
-     * Inefficient
+	 * Insert a new child at a specific point in sequence. 
+	 * This method is a bit inefficient.
+	 *
+	 * Inserts the new child at the specified index. 
+	 * Each child with an index greater or equal to the specified index 
+	 * is shifted upward to have an index one greater than the value it 
+	 * had previously. 
+	 *
+	 * @param newChild  the new child
+	 * @param index  index of the new child
+	 *
+	 * @throws ArrayIndexOutOfBoundsException  if the index is invalid.
      */
     public void insertChild(Node newChild, int index)
         throws ArrayIndexOutOfBoundsException
@@ -102,4 +156,6 @@ public abstract class NodeWithChildren extends Node
         newChild.setParent(this);
         children.insertElementAt(newChild, index);
     }
+	
 }
+

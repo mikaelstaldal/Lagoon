@@ -42,6 +42,9 @@ package nu.staldal.xtree;
 
 import org.xml.sax.*;
 
+/**
+ * An XML processing instruction.
+ */
 public class ProcessingInstruction extends Node
 {
 	static final long serialVersionUID = 813983310154546819L;
@@ -49,21 +52,37 @@ public class ProcessingInstruction extends Node
 	String target;
 	String value;
 
-	public ProcessingInstruction(String t, String v)
+
+	/**
+	 * Constructs a processing instruction.
+	 *
+	 * @param target  the target
+	 * @param value  the value
+	 */
+	public ProcessingInstruction(String target, String value)
 	{
-		target = t;
-		value = v;
+		this.target = target;
+		this.value = value;
 	}
 
+	
+	/**
+	 * Get the target.
+	 */
 	public String getTarget()
 	{
 		return target;
 	}
 
+
+	/**
+	 * Get the value.
+	 */
 	public String getValue()
 	{
 		return value;
 	}
+
 
 	public void toSAX(ContentHandler sax)
 		throws SAXException
