@@ -28,8 +28,8 @@
   <property name="version" value="1.0b20"/>
   <property name="ver" value="10b20"/>
 
-  <property name="version.lsp" value="1.0b6"/>
-  <property name="ver.lsp" value="10b6"/>
+  <property name="version.lsp" value="1.0"/>
+  <property name="ver.lsp" value="10"/>
 
   <property name="res.dir" value="resource"/>
   <property name="src.dir" value="src"/>
@@ -38,6 +38,12 @@
   <property name="build.classes" value="${build.dir}/classes"/>
   <property name="build.testsuite" value="${build.dir}/testsuite"/>
 
+  <taskdef classname="JFlex.anttask.JFlexTask" name="jflex">
+    <classpath>
+      <pathelement location="${JFlex}" />
+    </classpath>
+  </taskdef>
+  
   <target name="init">
     <tstamp>
       <format property="TODAY_DATE" pattern="yyyy-MM-dd" locale="en"/>
@@ -46,11 +52,6 @@
     <mkdir dir="${build.classes}"/>
     <mkdir dir="${build.testsuite}"/>
     <mkdir dir="dist"/>
-    <uptodate property="lexer.notRequired"
-    		  targetfile="${basedir}/${src.dir}/nu/staldal/lsp/expr/LSPExprLexer.java">
-		<srcfiles dir="${basedir}/${src.dir}"
-        		  includes="nu/staldal/lsp/expr/LSPExprLexer.lex"/>
-    </uptodate>
   </target>
 
 
@@ -78,7 +79,7 @@
     <javac srcdir="${src.dir}"
     	   includes="nu/staldal/lagoon/**/*"
            destdir="${build.classes}"
-           optimize="off" debug="on">
+           optimize="on" debug="on">
     	<classpath refid="lagoon.class.path"/>
 	</javac>           
 
@@ -113,7 +114,7 @@
     <javac srcdir="${src.dir}"
     	   includes="nu/staldal/xtree/**/*,nu/staldal/xmlutil/**/*,nu/staldal/ftp/**/*,nu/staldal/util/**/*"
            destdir="${build.classes}"
-           optimize="off" debug="on">
+           optimize="on" debug="on">
     	<classpath>
             <pathelement location="${JAF}" />
             <pathelement location="${JARV}" />
@@ -149,7 +150,7 @@
     <javac srcdir="${src.dir}"
     	   includes="nu/staldal/lsp/*,nu/staldal/lsp/wrapper/*,nu/staldal/lsp/servlet/**/*,nu/staldal/lsp/struts/**/*"
            destdir="${build.classes}"
-           optimize="off" debug="on">
+           optimize="on" debug="on">
        <classpath location="${Servlet}" />
        <classpath location="${Struts}" />
 	</javac>
@@ -181,12 +182,16 @@
   </target>
 
 
-  <target name="lspc" depends="init,xmlutil,lexer,lsprt"
+  <target name="lspc" depends="init,xmlutil,lsprt"
   	description="Compiles LSP compiler">
+
+    <jflex file="${src.dir}/nu/staldal/lsp/expr/LSPExprLexer.lex"
+        nobak="on"/>
+
     <javac srcdir="${src.dir}"
     	   includes="nu/staldal/lsp/compiler/*,nu/staldal/lsp/compile/*,nu/staldal/lsp/expr/*,nu/staldal/lsp/compiledexpr/*,nu/staldal/syntax/**/*"
            destdir="${build.classes}"
-           optimize="off" debug="on">
+           optimize="on" debug="on">
        <classpath location="${Ant}" />
        <classpath location="${BCEL}" />
 	</javac>
@@ -216,17 +221,6 @@
     </jar>
   </target>
 
-
-  <target name="lexer" unless="lexer.notRequired">
-    <java classname="JLex.Main">
-    	<classpath>
-            <pathelement location="${JLex}" />
-        </classpath>
-      <arg value="${basedir}/${src.dir}/nu/staldal/lsp/expr/LSPExprLexer.lex"/>
-    </java>
-    <move file="${basedir}/${src.dir}/nu/staldal/lsp/expr/LSPExprLexer.lex.java"
-    	  tofile="${basedir}/${src.dir}/nu/staldal/lsp/expr/LSPExprLexer.java"/>
-  </target>
 
   <target name="testsuite" depends="init,xmlutil,lspc,lagoon"
   	description="Compiles testsuite">

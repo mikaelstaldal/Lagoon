@@ -1,7 +1,7 @@
 # Build propertes for Lagoon
 # Customize for your system
 
-JLex=JLex
+JFlex=JFlex.jar
 FOP=fop.jar
 LogKit=logkit-1.0.jar
 Batik=lib
