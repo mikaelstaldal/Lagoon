@@ -43,6 +43,8 @@ package nu.staldal.lagoon.producer;
 import java.io.*;
 import java.util.Hashtable;
 import java.util.Enumeration;
+import java.util.Date;
+import java.text.SimpleDateFormat;
 
 import org.xml.sax.*;
 import org.xml.sax.helpers.AttributesImpl;
@@ -101,9 +103,33 @@ public class DirSource extends Source
 			//	getSourceMan().getFileURL(files[i]).toString());
             atts.addAttribute("", "absurl", "absurl", "CDATA",
 				getSourceMan().getFileURL(files[i]).toString());
-
+				
+			long timestamp = file.lastModified();
+			SimpleDateFormat dateFormat =
+     			new SimpleDateFormat("yyyy-MM-dd");
+			SimpleDateFormat timeFormat =
+     			new SimpleDateFormat("HH:mm:ss");
+			Date date = new Date(timestamp);
+			
+	        //atts.addAttribute("", "timestamp", "", "CDATA",
+			//	String.valueOf(timestamp));
+	        atts.addAttribute("", "timestamp", "timestamp", "CDATA",
+				String.valueOf(timestamp));
+	        //atts.addAttribute("", "date", "", "CDATA",
+			//	dateFormat.format(date));
+	        atts.addAttribute("", "date", "date", "CDATA",
+				dateFormat.format(date));
+	        //atts.addAttribute("", "time", "", "CDATA",
+			//	timeFormat.format(date));
+	        atts.addAttribute("", "time", "time", "CDATA",
+				timeFormat.format(date));
+											
             if (file.isFile())
             {
+	            //atts.addAttribute("", "size", "", "CDATA",
+				//	String.valueOf(file.length()));
+	            atts.addAttribute("", "size", "size", "CDATA",
+					String.valueOf(file.length()));
                 // sax.startElement("", "file", "", atts);
                 sax.startElement("", "file", "file", atts);
                 // sax.endElement("", "file", "");

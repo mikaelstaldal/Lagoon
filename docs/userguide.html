@@ -232,17 +232,25 @@ Parse the source file as XML.
 The files and subdirectories in this directory is listed and provided as
 XML in the following format:</p>
 
+  <directory filename="CVS" url="/style/CVS" absurl="file:/D:/mikes/lagoon/sample/src/style/CVS"  /> 
+  <file filename="first.xsl" url="/style/first.xsl" absurl="file:/D:/mikes/lagoon/sample/src/style/first.xsl" timestamp="987197358000" date="2001-04-13" time="23:29:18" size="445" /> 
+  
+
 <pre>
 &lt;dirlist&gt;
-    &lt;directory filename="somedir" url="/thisdir/somedir" absurl="file:/D:/MySites/ThisSite/thisdir/somedir"/&gt;
-    &lt;file filename="somefile.txt" url="/thisdir/somefile.txt" absurl="file:/D:/MySites/ThisSite/thisdir/somefile.txt"/&gt;
-    &lt;file filename="otherfile.xml" url="/thisdir/otherfile.xml" absurl="file:/D:/MySites/ThisSite/thisdir/otherfile.xml"/&gt;
-    &lt;file filename="thisfile.html" url="/thisdir/thisfile.html" absurl="file:/D:/MySites/ThisSite/thisdir/thisfile.html"/&gt;
+    &lt;directory filename="somedir" url="/thisdir/somedir" 
+        absurl="file:/D:/MySites/ThisSite/thisdir/somedir"
+        timestamp="987198810097" date="2001-04-13" time="23:53:30"/&gt;
+    &lt;file filename="somefile.txt" url="/thisdir/somefile.txt" 
+        absurl="file:/D:/MySites/ThisSite/thisdir/somefile.txt" 
+        timestamp="987197358000" date="2001-04-13" time="23:29:18" 
+        size="445"/&gt;
 &lt;/dirlist&gt;
 </pre>
 
 <p>The <code>url</code> attribute contains the same pseudo-absolute URL that
-would be used to refer to this file in the sitemap.</p>
+would be used to refer to this file in the sitemap. The <code>timestamp</code> 
+attribute contains the number of milliseconds since 1970, as a decimal number.</p>
 
 <p>There is one optional parameter, "pattern", which gives a wildcard
 pattern to select which files and subdirectories to include. If

@@ -113,14 +113,15 @@ in output like this</lsp:processing-instruction>
 <p>(5.2 &lt; 11) and (string-length('foo') = 3): "{(5.2 &lt; 11) and (string-length('foo') = 3)}"</p>
 <p>not(true()): "{not(true())}"</p>
 <p>$a: "{$a}"</p>
-<p>$a.b: "{$a.b}"</p>
+<!-- <p>$a.b: "{$a.b}"</p> -->
 
 <hr/>
 <h2>for-each</h2>
 
+<!-- <h4>A list of {count($foo)} elements</h4> -->
+
 <ul>
 
-<h4>A list of {count($foo)} elements</h4>
 <!-- <lsp:for-each select="$foo" var="i">
 <li>{$i}</li>
 </lsp:for-each> -->
