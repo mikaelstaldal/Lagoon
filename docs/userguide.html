@@ -132,7 +132,7 @@ Note that Apache Batik requires Java2.</li>
 <li>To use SSH, you need a command-line based SSH client. Most (but
 not all) SSH clients for Windows are GUI based, and will not work. A
 SSH client will probably work with Lagoon if and only if it works with
-CVS.</li>
+CVS. The OpenSSH port in Cygwin works.</li>
 </ul>
 
 
@@ -174,6 +174,12 @@ entries, which defines a partial document, to be included by another document.
 A <code>part</code> has a name, which is not an URL. The source URL must be 
 specified as an absolute or pseudo-absolute URL. The pipeline must end with an 
 XML producer. Wildcards may not be used.</p>
+
+<p>The sitemap may also contain <code>&lt;output&gt;</code> entries, which
+defines the end of the pipeline for use by several targets (and escially by 
+the island feature). An <code>&lt;output&gt;</code> entry has a name, which
+is not an URL. The pipeline must end with a byte producer, and start with an 
+XML consumer.</p>
 
 <p>The sitemap may also contain <code>&lt;delete&gt;</code> entries, which are
 used to delete the target.</p>
@@ -221,8 +227,8 @@ you can add your own resources by adding them to the Java <code>CLASSPATH</code>
 See the <a href="resource.html">Resource Guide</a> for information about 
 the included resources. E.g. <code>res:/style/imageindex.xsl</code></p>
 
-<p>The <code>part</code> scheme is used to point out &lt;part&gt; defined in the 
-sitemap. E.g. <code>part:thePart</code>.</p>
+<p>The <code>part</code> scheme is used to point out a <code>&lt;part&gt;</code> 
+defined in the sitemap. E.g. <code>part:thePart</code>.</p>
 
 <p>Dependency checking of sources works for relative, pesudo-absolute and 
 absolute URLs with <code>file</code> or <code>part</code> 
@@ -302,6 +308,15 @@ works as a transform, but can generate several output files from one
 single source. The pipeline after a split producer will be executed
 once for each part the split producer generates (it has to generate a
 filename for it as well).</p>
+
+
+<h3>Islands</h3>
+
+<p>Producer may have a special feature called <em>island</em> which
+works as a transform, but can generate several output files from one
+single source. Parts of the source document will be redirected to other 
+output pipelines, using <code>&lt;output&gt;</code> entries in the sitemap
+(it has to generate a filename for it as well).</p>
 
 
 <h2>The standard producers</h2>
@@ -409,16 +424,36 @@ literal brace in the filename, use a double brace.</p>
 
 <p>For example, a sitemap fragment like this:</p>
 <pre>
-&lt;transform type="split" namespace="" element="part" outputname="[name].xml"&gt;
+&lt;transform type="split" namespace="" element="thepart" outputname="[name].xml"&gt;
 </pre>
 <p>with an input fragment like this:</p>
 <pre>
-&lt;part name="first"&gt;
+&lt;thepart name="first"&gt;
 </pre>
 <p>will result in the file <code>first.xml</code> being created.</p>
 
 <p>The output name must be a relative URL, and is relative to the main
 target file. It must <em>not</em> be pseudo-absolute.</p>
+
+<h3>&lt;transform type="island"&gt;</h3>
+
+<p>Implements the island feature.</p>
+
+<p>The XML stream from the upstream producer is scanned for elements
+with specific XML namespaces, and each occurrence of such element generates 
+one output file. The XML data outside those elements is passed through 
+unchanged. This is typically used to processed embeeded SVG or MathML in 
+XHTML documents.</p>
+
+<p>For each XML namespace you want to extract, you need to specify
+the three parameters "namespace<em>n</em>", "output<em>n</em>" and 
+"outputExt<em>n</em>" where <em>n</em> is a number starting from 0.
+"output" specifies which <code>&lt;output&gt;</code> entry in sitemap to 
+use for this namespace. "outputExt" specifies the file extension to give
+to the generated file (including '.').</p>
+
+<p>Filenames for the extraced parts will be the name of the main file +
+ "_image" + a number + the extension given.</p>
 
 <h3>&lt;transform type="lsp"&gt;</h3>
 
@@ -618,6 +653,33 @@ to the LSP page):</p>
 &lt;/file&gt;
 </pre>
 
+<p>Build PNG images for SVG and MathML islands in XHTML.
+(Requires that you have an XSLT stylesheet to transform MatmML to SVG,
+no such stylesheet is included in Lagoon. The SVG part works fine though.):</p>
+<pre>
+&lt;output name="svgOutput"&gt;
+  &lt;format type="svg" format="png"/&gt;
+&lt;/output&gt;
+
+&lt;output name="mathmlOutput"&gt;
+  &lt;format type="svg" format="png"&gt;
+    &lt;transform type="xslt" stylesheet="/mathml2svg.xsl"/&gt;
+  &lt;/format&gt;
+&lt;/output&gt;
+
+&lt;file target="/island.html"&gt;
+  &lt;format type="html"&gt;
+    &lt;transform type="island" 
+        namespace1="http://www.w3.org/2000/svg" 
+        output1="svgOutput" outputext1=".png"
+        namespace2="http://www.w3.org/1998/Math/MathML" 
+        output2="mathmlOutput" outputext2=".png"&gt;
+      &lt;source/&gt;
+    &lt;/transform&gt;
+  &lt;/format&gt;
+&lt;/file&gt;
+</pre>
+
 <p>Delete an old file:</p>
 <pre>
 &lt;delete target="/oldstuff/outdated.html"/&gt;
@@ -704,10 +766,11 @@ This requires you to specify the password in the property file.</p>
 <p>To use SSH, specify an absolute URL in the form
 <code>ssh://<em>login</em>@<em>host</em>/<em>path</em>/</code>. The
 path is relative to your home directory on the remote machine
-(to start from root, do like <code>ftp://joe@foo.bar.com//abs/path/</code>). 
-You need to have an RSA key properly setup before using this (you should 
+(to start from root, do like <code>ssh://joe@foo.bar.com//abs/path/</code>). 
+You need to have an public key properly setup before using this (you should 
 be able to login without entering any password), do not specify the 
-password in the property file.</p>
+password in the property file. This requires a UNIX style shell with access
+to the commmands "mkdir -p", "rm -f" and "cat" on the remote server.</p>
 
 
 <h3>The working directory</h3>

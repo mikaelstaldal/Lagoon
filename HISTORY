@@ -48,4 +48,5 @@
 
 1.0 beta 15
 -----------
-* <output> in sitemap
+* <output> entry in sitemap
+* Better general support for XML islands, without using LSP.
