@@ -661,6 +661,11 @@ class TextAreaWriter extends Writer
 	
 	public void flush()
 	{
+		if (sb.charAt(sb.length()-2) == '\r')
+		{
+			sb.setCharAt(sb.length()-2, '\n');
+			sb.setLength(sb.length()-1);
+		}
 		ta.append(sb.toString());
 		sb.setLength(0); // clear buffer
 	}

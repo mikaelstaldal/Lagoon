@@ -42,3 +42,4 @@
 * Updated support for Apache Batik 1.1.1.
 * Updated LSP.
 * Checks for broken FTP connection (timeout) and reconnect.
+* Fixed display bug in GUI for Java2 1.4.
