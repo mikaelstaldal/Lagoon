@@ -62,3 +62,8 @@
 
 1.0 beta 17
 -----------
+* Now requires Java2 1.4 or later.
+* Support for Java2 container classes.
+* Made LSP independent from Lagoon.
+* Standalone LSP compiler.
+* Conditional if...then...else expression in LSP.
