@@ -49,7 +49,7 @@ import nu.staldal.lagoon.core.*;
 
 public class FileSource extends Source
 {
-	SAXParserFactory spf;	
+	private SAXParserFactory spf;	
 	
     public void init() throws LagoonException
     {

@@ -42,6 +42,7 @@ package nu.staldal.lagoon.producer;
 
 import java.io.*;
 
+import javax.xml.parsers.*;
 import org.xml.sax.*;
 
 import nu.staldal.lagoon.core.*;
@@ -53,9 +54,13 @@ public class XMLParse extends Parse implements Runnable
 	private MyInputStream mis;
 	private MyOutputStream mos;
 	private Target target;
-
-    public void init()
+	private SAXParserFactory spf;	
+	
+    public void init() throws LagoonException
     {
+		spf = SAXParserFactory.newInstance();
+		spf.setNamespaceAware(true);
+		spf.setValidating(false);
 		target = null;
     }
 
@@ -63,19 +68,15 @@ public class XMLParse extends Parse implements Runnable
         throws IOException, SAXException
     {
 		this.target = target;
-        XMLReader parser =
-			new org.apache.xerces.parsers.SAXParser();
-
-        parser.setFeature("http://xml.org/sax/features/validation",
-            false);
-        parser.setFeature("http://xml.org/sax/features/external-general-entities",
-            true);
-        // parser.setFeature("http://xml.org/sax/features/external-parameter-entities",
-        //   false); // not supported by Xerces
-        parser.setFeature("http://xml.org/sax/features/namespaces",
-            true);
-        parser.setFeature("http://xml.org/sax/features/namespace-prefixes",
-            false);
+        
+		XMLReader parser;	
+		try {
+			parser = spf.newSAXParser().getXMLReader();
+		}
+		catch (ParserConfigurationException e)
+		{
+			throw new LagoonException(e.getMessage());
+		}		
 
         parser.setContentHandler(sax);
 
