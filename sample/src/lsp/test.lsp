@@ -189,6 +189,7 @@ in output like this</lsp:processing-instruction>
 
 <h2>ExtFunc</h2>
 
+<!--
 <p><lsp:value-of select="test:func(1, 2, 3, 'one', 'two', 'three')"/></p>
 <p><lsp:value-of select="test:foo(1)"/></p>
 <p><lsp:value-of select="test:bar()"/></p> -->

@@ -20,6 +20,14 @@
 	</format>
 </file>
 
+<file target="/db.php">
+	<format type="xhtml">
+		<transform type="lsp">
+			<source/>
+		</transform>
+	</format>
+</file>
+
 <file target="/island.xml" source="/island.html">
 	<format type="xml">
 		<source/>
@@ -126,7 +134,7 @@
 </file>
 
 <file target="/lsptest.html" source="/lsp/test.lsp">
-	<format type="html" indent="yes">
+	<format type="xhtml" indent="yes">
 		<transform type="lsp" bool="BOOLEAN" hej="HEJSAN" pi="ACME"><source/></transform>
 	</format>
 </file>

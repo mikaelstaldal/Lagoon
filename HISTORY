@@ -56,4 +56,5 @@
 -----------
 * Better handling of DTDs.
 * Project properties in sitemap.
+* LSP will let processing instructions through. Useful for PHP.
 
