@@ -3,6 +3,6 @@
 * Documentation of resouces.
 * <delete> entry in sitemap.
 * JAXP interface to XML parser and XSLT processor, 
-  no dependency on Xerces or Xalan anymore.
+  no dependency on Xerces or Xalan anymore (hopefully...).
 * Prototyp integration with Apache Batik for SVG rendering.
-* <part> entry in sitemap, includable in LSP.
+* <part> entry in sitemap.
