@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2002, Mikael Ståldal
+ * Copyright (c) 2001-2003, Mikael Ståldal
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without 
@@ -56,6 +56,7 @@ public class XMLFormatter extends Format
 {
 	private SAXTransformerFactory tfactory;
 	private Properties outputProperties;
+	private boolean isHTML;
 	
     public void init() throws LagoonException
     {
@@ -88,13 +89,16 @@ public class XMLFormatter extends Format
         else
             throw new LagoonException("Unknown html variant");
 
+		isHTML = false;
+			
         if (method.equals("XML"))
         {
 			outputProperties.setProperty(OutputKeys.METHOD, "xml");
 			outputProperties.setProperty(OutputKeys.ENCODING, "UTF-8");
         }
-        else if (method.equals("HTML"))
+        else if (method.equals("HTML"))			
         {
+			isHTML = true;
 			outputProperties.setProperty(OutputKeys.METHOD, "html");
             switch (_html)
             {
@@ -182,7 +186,7 @@ public class XMLFormatter extends Format
 			Transformer trans = th.getTransformer();
 			trans.setOutputProperties(outputProperties);
 				
-        	getNext().start(new ContentHandlerFixer(th, true), target);
+        	getNext().start(new ContentHandlerFixer(th, !isHTML, isHTML), target);
 		}
 		catch (TransformerConfigurationException e)
 		{

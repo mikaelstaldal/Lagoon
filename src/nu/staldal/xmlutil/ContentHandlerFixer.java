@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2002, Mikael Ståldal
+ * Copyright (c) 2001-2003, Mikael Ståldal
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without 
@@ -55,6 +55,7 @@ public class ContentHandlerFixer implements ContentHandler
 	private static final boolean DEBUG = false;
 
     private final boolean nsDecl;
+    private final boolean stripNs;
 	private final ContentHandler ch;
     
 	private NamespaceSupport nsSup;
@@ -80,9 +81,23 @@ public class ContentHandlerFixer implements ContentHandler
 	 * @param nsDecl  add namespace declarations as explicit 'xmlns' attributes.
 	 */
     public ContentHandlerFixer(ContentHandler ch, boolean nsDecl)
+	{
+		this(ch, nsDecl, false);	
+	}
+	
+	
+	/**
+	 * Constructs a filter.
+	 *
+	 * @param ch  the SAX2 ContentHandler to fire events on.
+	 * @param nsDecl  add namespace declarations as explicit 'xmlns' attributes.
+	 * @param stripNs strip all namespaces, useful for HTML.
+	 */
+    public ContentHandlerFixer(ContentHandler ch, boolean nsDecl, boolean stripNs)
     {
 		this.ch = ch;
         this.nsDecl = nsDecl;
+		this.stripNs = stripNs;
 
         nsSup = new NamespaceSupport();
         contextPushed = false;
@@ -124,7 +139,7 @@ public class ContentHandlerFixer implements ContentHandler
     {
 		if (DEBUG) System.out.println("startElement("+namespaceURI+
             ','+localName+','+qname+')');
-
+			
         if (!contextPushed)
         {
             nsSup.pushContext();
@@ -133,7 +148,13 @@ public class ContentHandlerFixer implements ContentHandler
 
         String name;
         if (qname != null && qname.length() > 0)
+		{
             name = qname;
+		}
+		else if (stripNs)
+		{
+			name = localName;
+		}
         else
         {
             String prefix = nsSup.getPrefix(namespaceURI);
@@ -168,7 +189,7 @@ public class ContentHandlerFixer implements ContentHandler
             {
                 String uri = atts.getURI(i);
                 String alocalName = atts.getLocalName(i);
-                if (uri.length() == 0)
+                if ((uri.length() == 0) || stripNs)
                 {
                     aname = alocalName;
                 }
@@ -214,7 +235,7 @@ public class ContentHandlerFixer implements ContentHandler
 			ch.startPrefixMapping(prefix, uri);
         }
 						
-        ch.startElement(namespaceURI, localName, name, newAtts);
+        ch.startElement(stripNs ? "" : namespaceURI, localName, name, newAtts);
     }
 
     public void endElement(String namespaceURI, String localName,
@@ -226,7 +247,13 @@ public class ContentHandlerFixer implements ContentHandler
 
         String name;
         if (qname != null && qname.length() > 0)
+		{
             name = qname;
+		}
+		else if (stripNs)
+		{
+			name = localName;
+		}
         else
         {
             String prefix = nsSup.getPrefix(namespaceURI);
@@ -252,7 +279,7 @@ public class ContentHandlerFixer implements ContentHandler
             name = ((prefix.length() == 0) ? "" : (prefix + ':')) + localName;
         }
 
-        ch.endElement(namespaceURI, localName, name);
+        ch.endElement(stripNs ? "" : namespaceURI, localName, name);
 
         for (Enumeration e = nsSup.getDeclaredPrefixes(); e.hasMoreElements(); )
         {
