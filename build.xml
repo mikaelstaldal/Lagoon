@@ -72,6 +72,7 @@
     <javac srcdir="${src.dir}"
     	   includes="nu/staldal/lagoon/**/*"
            destdir="${build.classes}"
+           source="1.4" target="1.4"
            optimize="on" debug="on">
     	<classpath refid="lagoon.class.path"/>
 	</javac>           
@@ -107,6 +108,7 @@
     <javac srcdir="${src.dir}"
     	   includes="nu/staldal/xtree/**/*,nu/staldal/xmlutil/**/*,nu/staldal/ftp/**/*,nu/staldal/util/**/*"
            destdir="${build.classes}"
+           source="1.4" target="1.4"           
            optimize="on" debug="on">
     	<classpath>
             <pathelement location="${JAF}" />
@@ -144,7 +146,8 @@
     <javac srcdir="${src.testsuite}"
     	   includes="nu/staldal/**/*"
            destdir="${build.testsuite}"
-           optimize="off">
+           source="1.4" target="1.4"           
+           optimize="off" debug="on">
     	<classpath>
             <pathelement location="${build.classes}" />
             <pathelement location="${JUnit}" />
