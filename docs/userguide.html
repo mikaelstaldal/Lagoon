@@ -453,7 +453,7 @@ to the generated file (including '.').</p>
 
 <p>Performs <a href="lssi.html">LSSI</a> processing.</p>
 
-<p>Any relative URL included from the LSP page is searched 
+<p>Any relative URL included from the LSSI page is searched 
 for relative to the source file.</p>
 
 <p><code>part:</code> URL:s may be used when including. 
@@ -805,7 +805,6 @@ build file like this:</p>
   &lt;classpath&gt;
     &lt;pathelement location="<em>locationOfLagoonJars</em>/lagoon.jar" /&gt;
     &lt;pathelement location="<em>locationOfLagoonJars</em>/xmlutil.jar" /&gt;
-    &lt;pathelement location="<em>locationOfLagoonJars</em>/lsp.jar" /&gt;
   &lt;/classpath&gt;
 &lt;/taskdef&gt;  
 </pre>
@@ -873,7 +872,7 @@ all files will be added to the sitemap which is written to the file
 <em>sitemap_file</em>. BuildSitemap tries to be a bit clever by
 treating files differently based on its extension. However, don't
 expect the generated sitemap to work fine directly, you probably have
-to do manual adjustments. Making use of LSP, XSLT transformations and
+to do manual adjustments. Making use of LSSI, XSLT transformations and
 other features requires modifications of the sitemap.</p>
 
 </body>
