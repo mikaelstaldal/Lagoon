@@ -59,6 +59,7 @@ in output like this</lsp:processing-instruction>
 </lsp:when>
 </lsp:choose>
 
+<!-- error
 <lsp:choose>
 <lsp:when test="5 &lt; 7">
 	<p>5 is less than 7</p>
@@ -70,6 +71,7 @@ in output like this</lsp:processing-instruction>
 	<p>5 is less than 6</p>
 </lsp:when>
 </lsp:choose>
+-->
 
 <lsp:choose>
 <lsp:when test="5 &gt; 7">
@@ -81,6 +83,15 @@ in output like this</lsp:processing-instruction>
 <lsp:otherwise>
 	<p>Otherwise</p>
 </lsp:otherwise>
+</lsp:choose>
+
+<lsp:choose>
+<lsp:when test="5 &gt; 7">
+	<p>5 is greater than 7</p>
+</lsp:when>
+<lsp:when test="5 &gt; 6">
+	<p>5 is greater than 6</p>
+</lsp:when>
 </lsp:choose>
 
 <hr/>
