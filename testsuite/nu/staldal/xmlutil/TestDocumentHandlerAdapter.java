@@ -1,4 +1,4 @@
-package nu.staldal.lagoon.util;
+package nu.staldal.xmlutil;
 
 import java.io.*;
 

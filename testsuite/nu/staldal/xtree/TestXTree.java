@@ -4,9 +4,6 @@ import java.io.*;
 
 import org.xml.sax.*;
 
-import org.apache.xerces.parsers.SAXParser;
-import org.apache.xml.serialize.*;
-
 import nu.staldal.lagoon.util.*;
 
 import junit.framework.*;
@@ -20,21 +17,8 @@ public class TestXTree extends TestCase
 
     public void testXTree() throws Exception
 	{
-		XMLReader xreader = new SAXParser();
-
-		OutputFormat of = new OutputFormat();
-		of.setEncoding("iso-8859-1");
-		Serializer ser = new XMLSerializer(new FileOutputStream("xtree.out"),
-            of);
-
-		TreeBuilder tb = new TreeBuilder(
-			new java.net.URL("http://www.foo.com"));
-
-		xreader.setContentHandler(tb);
-		xreader.parse(new InputSource(getClass().getResourceAsStream(
-            "xtree.xml")));
-
-		Element el = tb.getTree();
+		Element el = TreeBuilder.parseXML(
+			new InputSource(getClass().getResourceAsStream("xtree.xml")), false);
 
 		OutputStream fos = new FileOutputStream("xtree.ser");
 		ObjectOutputStream oos = new ObjectOutputStream(fos);
@@ -47,7 +31,10 @@ public class TestXTree extends TestCase
 		el = (Element)ois.readObject();
 		fis.close();
 
-		el.toSAX(new DocumentHandlerAdapter(ser.asDocumentHandler()));
+		fos = new FileOutputStream("xtree.out");
+		TreeBuilder.toOutputStream(el, fos);
+		fos.close();
 	}
 
 }
+
