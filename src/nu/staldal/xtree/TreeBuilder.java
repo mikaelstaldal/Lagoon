@@ -60,6 +60,10 @@ public class TreeBuilder implements ContentHandler, ErrorHandler
 	private Vector nsPrefix = null;
 	private Vector nsURI = null;
     private StringBuffer textBuffer = null;
+    private Locator locator = null;
+    private String textSystemId = null;
+    private int textLine = -1;
+    private int textColumn = -1;
 
 
 	/**
@@ -123,7 +127,6 @@ public class TreeBuilder implements ContentHandler, ErrorHandler
 	}
 
 
-
 	/**
 	 * Constructs a TreeBuilder, ready to receive SAX events.
 	 * Will not support xml:base.
@@ -133,6 +136,7 @@ public class TreeBuilder implements ContentHandler, ErrorHandler
 		elementStack = new Stack();
 		baseURI = null;
 	}
+
 
 	/**
 	 * Constructs a TreeBuilder, ready to receive SAX events.
@@ -144,6 +148,7 @@ public class TreeBuilder implements ContentHandler, ErrorHandler
 		elementStack = new Stack();
 		baseURI = base;
 	}
+
 
 	/**
 	 * Obtain the XTree built from SAX events.
@@ -169,7 +174,11 @@ public class TreeBuilder implements ContentHandler, ErrorHandler
         if ((textBuffer != null) && (textBuffer.length() > 0))
         {
             Element parent = (Element)elementStack.peek();
-	    	parent.addChild(new Text(textBuffer.toString()));
+			Node node = new Text(textBuffer.toString());
+			node.systemId = textSystemId;
+			node.line = textLine;
+			node.column = textColumn;
+	    	parent.addChild(node);
         }
 
         textBuffer = null;
@@ -180,7 +189,7 @@ public class TreeBuilder implements ContentHandler, ErrorHandler
 
     public void setDocumentLocator(Locator locator)
     {
-		// nothing to do
+		this.locator = locator;
     }
 
     public void startDocument()
@@ -205,6 +214,12 @@ public class TreeBuilder implements ContentHandler, ErrorHandler
 			localName+','+qname+')');
 
 		Element el = new Element(namespaceURI, localName, atts.getLength());
+		if (locator != null)
+		{
+			el.systemId = locator.getSystemId();
+			el.line = locator.getLineNumber();
+			el.column = locator.getColumnNumber();
+		}
 		if (rootElement == null)
 		{
 			rootElement = el;
@@ -292,6 +307,12 @@ public class TreeBuilder implements ContentHandler, ErrorHandler
         }
 
         textBuffer.append(ch, start, length);
+		if (locator != null)
+		{
+			textSystemId = locator.getSystemId();
+			textLine = locator.getLineNumber();
+			textColumn = locator.getColumnNumber();
+		}
     }
 
     public void ignorableWhitespace(char ch[], int start, int length)
@@ -308,7 +329,14 @@ public class TreeBuilder implements ContentHandler, ErrorHandler
 		if (DEBUG) System.out.println("processingInstruction("+target+','+data+')');
 
 		Element parent = (Element)elementStack.peek();
-		parent.addChild(new ProcessingInstruction(target, data));
+		Node node = new ProcessingInstruction(target, data);
+		if (locator != null)
+		{
+			node.systemId = locator.getSystemId();
+			node.line = locator.getLineNumber();
+			node.column = locator.getColumnNumber();
+		}
+		parent.addChild(node);
     }
 
     public void skippedEntity(String name)

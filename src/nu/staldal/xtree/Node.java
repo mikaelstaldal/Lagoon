@@ -44,6 +44,9 @@ import org.xml.sax.*;
 
 public abstract class Node implements java.io.Serializable
 {
+    String systemId;
+    int line;
+    int column;
     NodeWithChildren parent = null;
 
     void setParent(NodeWithChildren n)
@@ -58,4 +61,54 @@ public abstract class Node implements java.io.Serializable
 
 	public abstract void toSAX(ContentHandler sax)
 		throws SAXException;
+
+
+    /**
+     * Return the system identifier for this node.
+     *
+     * <p>The return value is the system identifier of the document
+     * entity or of the external parsed entity.</p>
+     *
+     * @return A string containing the system identifier, or null
+     *         if none is available.
+     */
+    public String getSystemId()
+    {
+    	return systemId;
+	}
+
+
+    /**
+     * Return the line number where this node ends.
+     *
+     * <p>The return value is an approximation of the line number
+     * in the document entity or external parsed entity.</p>
+     *
+	 * <p>The first line in the document is line 1.</p>
+     *
+     * @return The line number, or -1 if none is available.
+     * @see #getColumnNumber
+     */
+    public int getLineNumber()
+    {
+		return line;
+	}
+
+
+    /**
+     * Return the column number where this node ends.
+     *
+     * <p>The return value is an approximation of the column number
+     * in the document entity or external parsed entity.</p>
+     *
+	 * <p>The first column in each line is column 1.</p>
+     *
+     * @return The column number, or -1 if none is available.
+     * @see #getLineNumber
+     */
+    public int getColumnNumber()
+    {
+		return column;
+	}
+
 }
