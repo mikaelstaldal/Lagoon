@@ -1,5 +1,0 @@
-# Lagoon properties
-
-sitemapFile: website.sitemap
-sourceDir: .
-targetURL: ssh://mikaelstaldal@lagoon.sourceforge.net//home/groups/l/la/lagoon/htdocs/
