@@ -259,7 +259,7 @@ class FileEntry implements SourceManager, FileTarget
     private void buildAlways()
         throws IOException
     {
-        System.out.println("Building: " + currentTargetURL);
+        if (DEBUG) System.out.println("Building: " + currentTargetURL);
 
 		int slash = currentTargetURL.lastIndexOf('/');
 		String currentTargetDir = currentTargetURL.substring(0, slash+1);
@@ -314,7 +314,8 @@ class FileEntry implements SourceManager, FileTarget
 
                 if (bailOut)
                 {
-					System.out.println("Too many exceptions, bailing out");
+					System.out.println("Error building " + currentTargetURL
+						+ ": Too many exceptions, bailing out");
 					break;
 				}
 				else
@@ -340,7 +341,7 @@ class FileEntry implements SourceManager, FileTarget
 		{
 			SAXParseException spe = (SAXParseException)e;
 			String sysId = (spe.getSystemId() == null)
-				? "source": spe.getSystemId();
+				? ("(" + currentTargetURL + ")"): spe.getSystemId();
 			System.out.println(sysId + ":" + spe.getLineNumber()
 				+ ":" + spe.getColumnNumber() + ": " + spe.getMessage());
 		}
@@ -350,22 +351,26 @@ class FileEntry implements SourceManager, FileTarget
 			Exception ee = se.getException();
 			if (ee != null)
 			{
-				System.out.println(ee.toString());
+				System.out.println("Error building " + currentTargetURL
+					+ ": " + ee.toString());
 			    if (DEBUG) ee.printStackTrace(System.out);
 			}
 			else
 			{
-				System.out.println(se.getMessage());
+				System.out.println("Error building " + currentTargetURL
+					+ ": " + se.getMessage());
     			if (DEBUG) se.printStackTrace(System.out);
 			}
 		}
 		else if (e instanceof IOException)
 		{
-			System.out.println(e.toString());
+			System.out.println("Error building " + currentTargetURL
+					+ ": " + e.toString());
 			if (DEBUG) e.printStackTrace(System.out);
 		}
 		else
 		{
+			System.out.println("Error building " + currentTargetURL + ":");
 			e.printStackTrace(System.out);
 		}
 	}
