@@ -43,7 +43,10 @@
   <property name="manifest" value="src/lagoon.mf"/>
 
   <target name="init">
-    <tstamp/>
+    <tstamp>
+      <format property="TODAY_DATE" pattern="yyyy-MM-dd" locale="en"/>
+    </tstamp>
+
     <mkdir dir="${build.classes}"/>
     <mkdir dir="${build.testsuite}"/>
     <mkdir dir="${dist.dir}"/>
@@ -55,9 +58,30 @@
     </uptodate>
   </target>
 
+
+  <target name="lagoon_version_check">
+    <uptodate property="lagoon_version.notRequired"
+    		  targetfile="${dist.jars}/${name}.jar">
+      <srcfiles dir="${build.classes}"> 
+    	 <include name="*"/>
+    	 <include name="nu/staldal/lagoon/**/*"/>
+    	 <include name="nu/staldal/syntax/**/*"/>
+    	 <include name="nu/staldal/lsp/**/*"/>
+      </srcfiles>
+      <srcfiles dir="${res.dir}"/>
+    </uptodate>
+  </target>
+
+  <target name="lagoon_version" depends="init,lagoon_version_check"
+          unless="lagoon_version.notRequired">
+    <filter token="NAME" value="${Name}" />
+    <filter token="VERSION" value="${version}" />
+    <filter token="DATE" value="${TODAY_DATE}" />
+    <copy file="version.txt" todir="${build.classes}" 
+          filtering="on" overwrite="on"/>
+  </target>
   
-  <target name="lagoon" depends="init,xmlutil,lexer"
-  	description="Compiles Lagoon">
+  <target name="lagoon_compile" depends="init">
     <javac srcdir="${src.dir}"
     	   includes="nu/staldal/lagoon/**/*,nu/staldal/lsp/**/*,nu/staldal/syntax/**/*"
            destdir="${build.classes}"
@@ -74,12 +98,12 @@
         <exclude name="**/*.lex" />
       </fileset>
     </copy>
+  </target>
 
-    <filter token="NAME" value="${Name}" />
-    <filter token="VERSION" value="${version}" />
-    <filter token="DATE" value="${DSTAMP}" />
-    <copy file="version.txt" todir="${build.classes}" 
-          filtering="on"/>
+  <target name="lagoon" 
+    depends="init,xmlutil,lexer,lagoon_compile,lagoon_version"
+  	description="Compiles Lagoon">
+ 
     <jar jarfile="${dist.jars}/${name}.jar"
          manifest="${manifest}">
       <fileset dir="${build.classes}"> 
