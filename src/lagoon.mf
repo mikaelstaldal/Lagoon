@@ -1,2 +1,2 @@
 Main-Class: nu.staldal.lagoon.LagoonGUI
-Class-Path: xmlutil.jar crimson.jar xerces.jar xalan.jar batik-rasterizer.jar fop.jar
+Class-Path: xmlutil.jar crimson.jar xerces.jar xalan.jar batik-patch.jar batik-rasterizer.jar fop.jar
