@@ -7,8 +7,7 @@
      the Ant optional tasks installed -->
 <!-- Get Junit from http://sourceforge.net/projects/junit/ -->
 
-<!-- Assumes that you have support for JAXP 1.1, 
-     e.g. Apache Xerces and Xalan, in your CLASSPATH -->
+<!-- Assumes Java2 SDK 1.4 or later -->
 
 <project name="Lagoon" default="lagoon">
 
