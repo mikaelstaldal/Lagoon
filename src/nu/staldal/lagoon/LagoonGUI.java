@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001, Mikael Ståldal
+ * Copyright (c) 2001-2002, Mikael Ståldal
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -76,7 +76,8 @@ public class LagoonGUI extends Frame implements WindowListener
 	private Label statusLabel;
 	private TextArea progressArea;
 
-	private LagoonProcessor processor = null;	  
+	private LagoonProcessor processor = null;
+	private long sitemapLastModified = 0;	  
 
 	
 	public static void main(String[] args) throws Exception
@@ -180,10 +181,17 @@ public class LagoonGUI extends Frame implements WindowListener
 		sourceDir.setEnabled(false);
 		targetURL.setEnabled(false);
 
+		File sm = new File(sitemapFile.getValue());
+		
 		if ((processor == null) || sitemapFile.hasChanged() 
 				|| sourceDir.hasChanged() || targetURL.hasChanged())
 		{
 			init();
+		}
+		else
+		{
+			if (sm.lastModified() > sitemapLastModified)
+				init();
 		}
 		
 		if (processor != null)
@@ -226,6 +234,8 @@ public class LagoonGUI extends Frame implements WindowListener
 		{
 			statusLabel.setText("Not initialized");
 		}
+
+		sitemapLastModified = sm.lastModified();
 					
 		loadButton.setEnabled(true);
 		saveButton.setEnabled(true);
