@@ -111,11 +111,12 @@ have a JDK. The GUI part of Lagoon requires Java2.</li>
 
 <li>An XML parser and an XSLT processor with JAXP 1.1 interface.
 Lagoon has been tested with Apache Xerces version 1.4.4 and Apache Xalan 
-(XSLT processor) version 2.2. You can download Xerces and Xalan
+version 2.2, and with Java2 1.4. You can download Xerces and Xalan
 from <a href="http://xml.apache.org/dist/">http://xml.apache.org/dist/</a>.
 The simplest way is to download Xalan only, it includes a suitable version
 of Xerces. Alternativly, you can download the Java XML Pack from 
-<code>http://java.sun.com/xml/</code>.</li>
+<code>http://java.sun.com/xml/</code>. Java2 1.4 includes XML parser and 
+XSLT processor, you don't need to install anything extra with Java2 1.4.</li>
 
 <li>To use XSL:FO to PDF formatting, you need Apache FOP 
 version 0.19 (version 0.20 currently doesn't work). You can download it from 
@@ -138,9 +139,9 @@ CVS.</li>
 <ol> 
 <li>Make sure that your JRE is properly installed and working.</li>
 <li>Add the distribution JAR files from Xerces, Xalan and (if you use it)
-Batik or FOP to your Java <code>CLASSPATH</code>. Due to a problem with
-Batik, it's currently not possible to use Batik and FOP 
-at the same time, Batik will not work if FOP is in the CLASSPATH.</li> 
+Batik or FOP to your Java <code>CLASSPATH</code>, or install them as 
+standard extensions in your JRE. Due to a problem with
+FOP, it's currently not possible to use Batik and FOP at the same time.</li> 
 <li>Add the <code>bin</code> directory (which contains scripts for Windows, 
 OS/2 and UNIX based systems) to your <code>PATH</code> and set an
 environment variable <code>LAGOON_HOME</code> to the directory where you
@@ -752,9 +753,8 @@ lagoongui [<em>property_file</em>]
 
 <p>Alternatively, you can simply execute <code>lagoon.jar</code>
 (<code>java -jar lagoon.jar</code>),
-but that requires you to put the required libraries (XML Parser etc) 
-in the same directory as <code>lagoon.jar</code> 
-(instead of in the Java <code>CLASSPATH</code>).
+but that requires you to install the required libraries (XML Parser etc) 
+as standard extensions in your JRE.</p>
 
 
 <h2>Adapting your web site for Lagoon</h2>
