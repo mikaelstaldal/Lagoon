@@ -14,7 +14,7 @@
 
 <!-- Comments are ignored -->
 
-<?pi param="processing instructions are ignored"?>
+<?pi param="processing instructions are included"?>
 
 <lsp:processing-instruction name="{$pi}">Create a processing instrunction 
 in output like this</lsp:processing-instruction>
@@ -209,13 +209,19 @@ in output like this</lsp:processing-instruction>
 <p xmlns="http://default.com"><lsp:attribute name="style" value="color: green;"/>green</p>
 
 
+<!--
 <h2>ExtFunc</h2>
 
-<!--
 <p><lsp:value-of select="test:func(1, 2, 3, 'one', 'two', 'three')"/></p>
 <p><lsp:value-of select="test:foo(1)"/></p>
 <p><lsp:value-of select="test:bar()"/></p> -->
 <!-- <p><lsp:value-of select="stringtest:func(1, 2, 3, 'one', 'two', 'three')"/></p> -->
+
+<h2>Partial Unicode support</h2>
+
+<lsp:let båt="'segelbåt'">
+<p><lsp:value-of select="$båt"/></p>
+</lsp:let>
 
 <p>---End of LSP Test---</p>
 
