@@ -1,7 +1,0 @@
-@echo off
-
-rem Windows batch script for running Lagoon
-
-rem SET LAGOON_HOME=D:\lagoon
-
-java -classpath %CLASSPATH%;%LAGOON_HOME%\lagoon.jar nu.staldal.lagoon.XMLCheck %1 %2 %3 %4 %5 %6 %7 %8 %9

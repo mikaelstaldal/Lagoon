@@ -1,6 +1,6 @@
 @echo off
 
-rem OS/2 batch script for running Lagoon GUI
+rem Windows and OS/2 batch script for running Lagoon GUI
 
 rem SET LAGOON_HOME=D:\lagoon
 
