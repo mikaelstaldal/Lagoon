@@ -63,7 +63,7 @@ import nu.staldal.util.Utils;
  */
 class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
 {
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
 
     private Producer myProducer;
 	private OutputEntry outputEntry;
@@ -378,6 +378,12 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
 			if (ee instanceof RuntimeException)
 			{
 				return ee;
+			}
+			else if (ee != null)
+			{
+				processor.err.println("Error building " + currentTargetURL
+					+ ": " + ee.toString());
+    			if (DEBUG) ee.printStackTrace(System.out);
 			}
 			else
 			{
