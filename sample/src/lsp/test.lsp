@@ -129,6 +129,24 @@ in output like this</lsp:processing-instruction>
 </lsp:for-each>
 </ul>
 
+
+<hr/>
+<h2>lsp:let</h2>
+
+<lsp:let foo="'FOO'" bar="5+6.8*7.1-2" baz="concat('hej','san')">
+<ul>
+<li>foo: <lsp:value-of select="$foo"/></li>
+<li>bar: <lsp:value-of select="$bar"/></li>
+<li>baz: <lsp:value-of select="$baz"/></li>
+</ul>
+</lsp:let>
+
+<ul>
+<li>foo: <lsp:value-of select="$foo"/></li>
+<li>bar: <lsp:value-of select="$bar"/></li>
+<li>baz: <lsp:value-of select="$baz"/></li>
+</ul>
+
 <hr/>
 <h2>include</h2>
 
