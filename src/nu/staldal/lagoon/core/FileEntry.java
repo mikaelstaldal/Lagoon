@@ -56,7 +56,7 @@ import nu.staldal.lagoon.util.Wildcard;
  */
 class FileEntry implements SourceManager, FileTarget
 {
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
 
     private ByteStreamProducer myProducer;
 

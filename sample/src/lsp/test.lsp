@@ -112,6 +112,8 @@ in output like this</lsp:processing-instruction>
 <p>5.2 > 11: "{5.2 > 11}"</p>
 <p>(5.2 &lt; 11) and (string-length('foo') = 3): "{(5.2 &lt; 11) and (string-length('foo') = 3)}"</p>
 <p>not(true()): "{not(true())}"</p>
+<p>$a: "{$a}"</p>
+<p>$a.b: "{$a.b}"</p>
 
 <hr/>
 <h2>include</h2>
