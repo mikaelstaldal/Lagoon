@@ -61,6 +61,7 @@ abstract class EntryWithSource implements SourceManager
 {
     private static final boolean DEBUG = true;
 
+	protected final LagoonProcessor processor;
 	protected final Sitemap sitemap;
     protected final File sourceRootDir;
 
@@ -72,14 +73,17 @@ abstract class EntryWithSource implements SourceManager
     /**
      * Constructor.
      *
+     * @param processor the LagoonProcessor.
      * @param sitemap  the Sitemap.
      * @param sourceURL  the file to use, may contain wildcard in filename,
 	 *                   must absolute or pseudo-absolute, may be <code>null</code>.
      * @param sourceRootDir  absolute path to the source directory
      */
-    public EntryWithSource(Sitemap sitemap, String sourceURL, File sourceRootDir)
+    public EntryWithSource(LagoonProcessor processor, Sitemap sitemap, 
+		String sourceURL, File sourceRootDir)
         throws LagoonException
     {
+		this.processor = processor;
 		this.sitemap = sitemap;
 
         String absPath = sourceRootDir.getAbsolutePath();
@@ -150,7 +154,7 @@ abstract class EntryWithSource implements SourceManager
 			}
 			else if (url.startsWith("res:"))
 			{
-				String resDir = System.getProperty("resourceDir");
+				String resDir = processor.getProperty("resourceDir");
 				if (resDir == null)
 					throw new FileNotFoundException(
 						"Resource Dir is not specified");

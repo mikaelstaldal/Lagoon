@@ -82,6 +82,7 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
     /**
      * Constructor.
      *
+     * @param processor the LagoonProcessor.
      * @param sitemap  the Sitemap.
      * @param targetURL  the file to create, may contain wildcard anywhere,
      *                   must be pseudo-absolute.
@@ -91,11 +92,12 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
      * @param targetStorage  where to store generated files
 	 * @param tempDir	where to store temporary files
      */
-    public FileEntry(Sitemap sitemap, String targetURL, String sourceURL,
+    public FileEntry(LagoonProcessor processor, Sitemap sitemap, 
+					 String targetURL, String sourceURL,
                      File sourceRootDir, FileStorage targetStorage, File tempDir)
         throws LagoonException
     {
-		super(sitemap, sourceURL, sourceRootDir);	
+		super(processor, sitemap, sourceURL, sourceRootDir);	
 		
         this.targetStorage = targetStorage;
 		this.tempDir = tempDir;

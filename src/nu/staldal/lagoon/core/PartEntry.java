@@ -58,10 +58,11 @@ class PartEntry extends EntryWithSource
     private XMLStreamProducer myProducer;
 
 	
-    public PartEntry(Sitemap sitemap, String sourceURL, File sourceRootDir)
+    public PartEntry(LagoonProcessor processor, Sitemap sitemap, 
+					 String sourceURL, File sourceRootDir)
         throws LagoonException
 	{
-		super(sitemap, sourceURL, sourceRootDir);
+		super(processor, sitemap, sourceURL, sourceRootDir);
 		myProducer = null;
 	}
 

@@ -136,8 +136,8 @@ class Sitemap
 				if (theSource == null || theSource.length() < 1)
 					theSource = currentTargetName;
 					
-				currentFile = new FileEntry(this, currentTargetName,
-											theSource,
+				currentFile = new FileEntry(processor, this, 
+											currentTargetName, theSource,
 											sourceDir, targetLocation,
 											processor.getTempDir());
 				
@@ -169,8 +169,8 @@ class Sitemap
 						"invalid part name: " + currentTargetName);
 				}
 				
-				currentFile = new PartEntry(this, entry.getAttrValue("source"), 
-					sourceDir);
+				currentFile = new PartEntry(processor, this, 
+					entry.getAttrValue("source"), sourceDir);
 				
 				depth = 0;
 				Object o = handleProducer(entry);
