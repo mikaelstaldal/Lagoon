@@ -57,6 +57,8 @@ import nu.staldal.lagoon.core.*;
  */
 public class LagoonCLI
 {
+	private static boolean DEBUG = false;	
+	
     private static final String syntaxMsg =
         "Syntax:\n"
 	  + "nu.staldal.lagoon.LagoonCLI <property_file> [<interval>|build|force]\n"
@@ -266,6 +268,7 @@ public class LagoonCLI
         }
         catch (IOException e)
         {
+			if (DEBUG) e.printStackTrace();
             System.err.println("I/O error: " + e.getMessage());
         }
 	}

@@ -57,7 +57,7 @@ import nu.staldal.lagoon.util.LagoonUtil;
  * Then building the website may be done several times,
  * until destroy() is invoked.
  *
- * This class is not thread-safe. The build() and destroy() methods must not
+ * This class is not thread-safe. The methods must not
  * be invoked concurrently from different threads.
  */
 public class LagoonProcessor

@@ -198,7 +198,7 @@ public class FTPFileStorage extends RemoteFileStorage
     }	
 
 
-    public synchronized void open(String url, LagoonProcessor processor, String password)
+    public void open(String url, LagoonProcessor processor, String password)
         throws MalformedURLException, UnknownHostException,
         FTPException, IOException, AuthenticationException
     {
@@ -319,7 +319,7 @@ public class FTPFileStorage extends RemoteFileStorage
      *
      * After this method has been invoked, no other method may be invoked.
      */
-    public synchronized void close()
+    public void close()
     	throws IOException
     {
         closeDateFile();
@@ -336,7 +336,7 @@ public class FTPFileStorage extends RemoteFileStorage
      *
      * @param pathname  path to the file
      */
-    public synchronized OutputHandler createFile(String pathname)
+    public OutputHandler createFile(String pathname)
         throws IOException
     {
 		int resp;
@@ -448,8 +448,21 @@ public class FTPFileStorage extends RemoteFileStorage
 		}
 
 		sendLine("STOR " + filename);
-
 		Socket data = new Socket(addr, port);
+		resp = recvResponse();
+		switch (resp)
+		{
+			case 125:
+			case 150:
+				break;
+
+			case 421:
+				throw new FTPException("FTP server not avaliable (421)");
+
+			default:
+				throw new FTPException("Unexpected response from FTP server: " + respString);
+		}
+
 		return new FTPOutputHandler(
 			pathname, filename,	data, data.getOutputStream());
     }
@@ -461,7 +474,7 @@ public class FTPFileStorage extends RemoteFileStorage
 	 *
      * @param pathname  path to the file
      */
-    public synchronized void deleteFile(String pathname)
+    public void deleteFile(String pathname)
         throws java.io.IOException
     {
 		String path;
@@ -547,12 +560,6 @@ public class FTPFileStorage extends RemoteFileStorage
 				int resp = recvResponse();
 				switch (resp)
 				{
-					case 125:
-					case 150:
-						//commitFile();
-						//break;
-						continue theLoop;
-	
 					case 226:
 					case 250:
 						break;
