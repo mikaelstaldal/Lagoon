@@ -51,6 +51,7 @@ import javax.xml.transform.stream.StreamSource;
 import org.xml.sax.*;
 
 import nu.staldal.lagoon.util.*;
+import nu.staldal.util.Utils;
 
 
 /**
@@ -143,7 +144,7 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
             currentTargetURL = targetURL;
             return buildFile(always);
         }
-        else if (LagoonUtil.absoluteURL(sourceURL))
+        else if (Utils.absoluteURL(sourceURL))
         {   // absolute URL
 	        currentSourceURL = sourceURL;
             currentTargetURL = targetURL;

@@ -47,7 +47,7 @@ import org.xml.sax.*;
 
 import nu.staldal.lsp.*;
 import nu.staldal.lagoon.core.*;
-import nu.staldal.lagoon.util.*;
+import nu.staldal.util.Utils;
 
 
 public class LSPTransformer extends Transform
@@ -144,7 +144,7 @@ public class LSPTransformer extends Transform
             {
 				getSourceMan().getFileAsSAX(url, ch, target);	
             }
-        }, params);
+        }, params, getContext(), target.getCurrentTargetURL());
 
         ch.endDocument();
     }

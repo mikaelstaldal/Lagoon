@@ -50,6 +50,7 @@ import org.apache.batik.dom.svg.*;
 
 import nu.staldal.lagoon.core.*;
 import nu.staldal.lagoon.util.*;
+import nu.staldal.util.Utils;
 
 /**
  * Uses Apache Batik version 1.1.1.
@@ -97,9 +98,9 @@ public class BatikFormatter extends Format
     {
 		URL sourceURL;
 		String _sourceURL = getSourceMan().getSourceURL();
-		if (LagoonUtil.absoluteURL(_sourceURL))
+		if (Utils.absoluteURL(_sourceURL))
 			sourceURL = new URL(_sourceURL);
-		else if (LagoonUtil.pseudoAbsoluteURL(_sourceURL))
+		else if (Utils.pseudoAbsoluteURL(_sourceURL))
 			sourceURL = new java.net.URL(getContext().getSourceRootDir().toURL(),
 				_sourceURL.substring(1));
 		else

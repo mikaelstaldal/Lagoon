@@ -44,7 +44,7 @@ import java.io.*;
 import java.util.*;
 
 import nu.staldal.xtree.*;
-import nu.staldal.lagoon.util.LagoonUtil;
+import nu.staldal.util.Utils;
 
 
 /**
@@ -572,7 +572,7 @@ public class LagoonProcessor implements LagoonContext
 
 	public boolean canCheckFileHasBeenUpdated(String url)
 	{
-		return !LagoonUtil.absoluteURL(url) 
+		return !Utils.absoluteURL(url) 
 			|| url.startsWith("part:")
 			|| url.startsWith("file:")
 			|| url.startsWith("res:");
@@ -587,13 +587,13 @@ public class LagoonProcessor implements LagoonContext
 	
 	public String getFileURLRelativeTo(String url, String base)
     {
-        if (LagoonUtil.absoluteURL(url) || LagoonUtil.pseudoAbsoluteURL(url))
+        if (Utils.absoluteURL(url) || Utils.pseudoAbsoluteURL(url))
 		{
             return url;
 		}
         else
         {
-            if (!LagoonUtil.pseudoAbsoluteURL(base))
+            if (!Utils.pseudoAbsoluteURL(base))
                 throw new IllegalArgumentException(
 					"base must be a pseudo-absolute URL");
 

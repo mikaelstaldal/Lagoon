@@ -53,6 +53,7 @@ import org.xml.sax.*;
 
 import nu.staldal.xmlutil.*;
 import nu.staldal.lagoon.util.*;
+import nu.staldal.util.Utils;
 
 
 /**
@@ -90,8 +91,8 @@ abstract class EntryWithSource implements SourceManager, SourceManagerProvider
 
         this.sourceRootDir = sourceRootDir;
 		
-		if (!LagoonUtil.absoluteURL(sourceURL) 
-				&& !LagoonUtil.pseudoAbsoluteURL(sourceURL))
+		if (!Utils.absoluteURL(sourceURL) 
+				&& !Utils.pseudoAbsoluteURL(sourceURL))
 		{
         	throw new LagoonException(
 				"source must be absolute or pseudo-absolute");
@@ -145,7 +146,7 @@ abstract class EntryWithSource implements SourceManager, SourceManagerProvider
     public File getFile(String url)
         throws FileNotFoundException
     {
-		if (LagoonUtil.absoluteURL(url))
+		if (Utils.absoluteURL(url))
 		{
 			if (url.startsWith("file:"))
 			{
@@ -171,7 +172,7 @@ abstract class EntryWithSource implements SourceManager, SourceManagerProvider
 		
 		if (file == null)
 		{
-			if (LagoonUtil.absoluteURL(url) && url.startsWith("part:"))
+			if (Utils.absoluteURL(url) && url.startsWith("part:"))
 			{
 				final PartEntry pe = sitemap.lookupPart(url.substring(5));
 				if (pe == null)
@@ -186,7 +187,7 @@ abstract class EntryWithSource implements SourceManager, SourceManagerProvider
 					}					
 				}, new InputSource());
 			}
-			else if (LagoonUtil.absoluteURL(url) && url.startsWith("res:"))
+			else if (Utils.absoluteURL(url) && url.startsWith("res:"))
 			{
 				return new StreamSource(
 					getClass().getResourceAsStream(url.substring(4)));
@@ -204,7 +205,7 @@ abstract class EntryWithSource implements SourceManager, SourceManagerProvider
 	public void getFileAsSAX(String url, ContentHandler ch, Target target)
 		throws IOException, SAXException
 	{
-		if (LagoonUtil.absoluteURL(url) && url.startsWith("part:"))
+		if (Utils.absoluteURL(url) && url.startsWith("part:"))
 		{
 			PartEntry pe = sitemap.lookupPart(url.substring(5));
 			if (pe == null)
@@ -217,7 +218,7 @@ abstract class EntryWithSource implements SourceManager, SourceManagerProvider
 		InputSource is;
 		InputStream istream = null;
 		
-		if (LagoonUtil.absoluteURL(url) && url.startsWith("res:"))
+		if (Utils.absoluteURL(url) && url.startsWith("res:"))
 		{
 			is = new InputSource(
 				getClass().getResourceAsStream(url.substring(4)));
@@ -285,7 +286,7 @@ abstract class EntryWithSource implements SourceManager, SourceManagerProvider
         File file = getFile(url);
 		if (file == null)
 		{
-			if (LagoonUtil.absoluteURL(url) && url.startsWith("part:"))
+			if (Utils.absoluteURL(url) && url.startsWith("part:"))
 			{
 				PartEntry pe = sitemap.lookupPart(url.substring(5));
 				if (pe == null)
@@ -294,7 +295,7 @@ abstract class EntryWithSource implements SourceManager, SourceManagerProvider
 
 				return pe.getXMLProducer().hasBeenUpdated(when);
 			}
-			else if (LagoonUtil.absoluteURL(url) && url.startsWith("res:"))
+			else if (Utils.absoluteURL(url) && url.startsWith("res:"))
 			{
 				return false;  // cannot check
 			}
