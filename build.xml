@@ -25,10 +25,8 @@
   <property name="dist.jars" value="${dist.dir}/lib"/>
   <property name="build.classes" value="${build.dir}/classes"/>
   <property name="build.testsuite" value="${build.dir}/testsuite"/>
-  <property name="build.javadocs" value="${build.dir}/javadocs"/>
+  <property name="build.javadoc" value="${build.dir}/javadoc"/>
 
-  <property name="packages" 
-  	value="nu.staldal.lagoon.*,nu.staldal.xtree.*,nu.staldal.lsp.*,nu.staldal.syntax.*"/>
   <!-- <property name="manifest" value="src/manifest"/> -->
  
 
@@ -81,6 +79,7 @@
 
   </target>
 
+
   <target name="xtree" depends="init"
   	description="Compiles XTree">
     <javac srcdir="${src.dir}"
@@ -103,6 +102,7 @@
     </jar>
   </target>
 
+
   <target name="syntax" depends="init">
     <javac srcdir="${src.dir}"
     	   includes="nu/staldal/syntax/**/*"
@@ -117,6 +117,7 @@
     </copy>
   </target>
 
+
   <target name="lexer" unless="lexer.notRequired">
     <java classname="JLex.Main">
     	<classpath>
@@ -127,6 +128,7 @@
     <move file="${basedir}/${src.dir}/nu/staldal/lsp/expr/LSPExprLexer.lex.java"
     	  tofile="${basedir}/${src.dir}/nu/staldal/lsp/expr/LSPExprLexer.java"/>
   </target>
+
 
   <target name="lsp" depends="init,xtree,lexer,syntax"
   	description="Compiles LSP">
@@ -178,25 +180,20 @@
   </target>
 
 
-  <target name="docs">
-  	<copy todir="${dist.dir}/docs">
-      <fileset dir="docs"/>
-    </copy>
+  <target name="javadoc" depends="init" 
+  	description="Creates the API documentation">
+    <mkdir dir="${build.javadoc}"/>
+    <javadoc packagenames="nu.staldal.lagoon.core,nu.staldal.lagoon.util,nu.staldal.xtree,nu.staldal.lsp,nu.staldal.syntax"
+    	     sourcepath="${src.dir}"
+             destdir="${build.javadoc}"
+             author="true"
+             version="true"
+             windowtitle="${Name} API"
+             doctitle="${Name}" />
   </target>
 
-  <target name="resource">
-  	<copy todir="${dist.dir}/resource">
-      <fileset dir="resource"/>
-    </copy>
-  </target>
 
-  <target name="bin">
-  	<copy todir="${dist.dir}/bin">
-      <fileset dir="bin"/>
-    </copy>
-  </target>
-
-  <target name="dist" depends="lagoon,docs,resource,bin"
+  <target name="dist" depends="lagoon,javadoc"
   		  description="Builds the distribution">
     <filter token="NAME" value="${Name}" />
     <filter token="VERSION" value="${version}" />
@@ -205,21 +202,22 @@
           overwrite="true"
           filtering="on"/>
     <copy file="LICENSE" todir="${dist.dir}" />
+    <copy file="HISTORY" todir="${dist.dir}" />
+  	<copy todir="${dist.dir}/docs">
+      <fileset dir="docs"/>
+    </copy>
+  	<copy todir="${dist.dir}/docs/javadoc">
+      <fileset dir="${build.javadoc}"/>
+    </copy>
+  	<copy todir="${dist.dir}/bin">
+      <fileset dir="bin"/>
+    </copy>
+  	<copy todir="${dist.dir}/resource">
+      <fileset dir="resource"/>
+    </copy>
+
     <zip zipfile="${name}${ver}.zip"
     	 basedir="${dist.dir}" />
-  </target>
-
-
-  <target name="javadocs" depends="init" 
-  	description="Creates the API documentation">
-    <mkdir dir="${build.javadocs}"/>
-    <javadoc packagenames="${packages}"
-    	     sourcepath="${src.dir}"
-             destdir="${build.javadocs}"
-             author="true"
-             version="true"
-             windowtitle="${Name} API"
-             doctitle="${Name}" />
   </target>
 
 
@@ -229,3 +227,4 @@
   </target>
 
 </project>
+
