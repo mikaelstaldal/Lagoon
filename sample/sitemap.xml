@@ -68,7 +68,6 @@
 	</format>
 </file>
 
-<!--
 <file target="/report.pdf" source="/work/report.xml">
 	<format type="fo">
 	   	<transform type="xslt" stylesheet="/style/report_print.xsl">
@@ -76,7 +75,6 @@
 		</transform>
     </format>
 </file>
--->
 
 <file target="/picture.jpeg" source="/test.svg">
 	<format type="svg" format="jpeg" quality="0.5">
