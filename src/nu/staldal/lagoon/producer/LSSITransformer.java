@@ -42,6 +42,7 @@ package nu.staldal.lagoon.producer;
 
 import java.io.*;
 import java.util.*;
+import java.text.*;
 
 import org.xml.sax.*;
 
@@ -168,6 +169,18 @@ class LSSIHandler implements ContentHandler
                 {
                     throw new SAXException(e);    
                 }
+            }
+            else if (localName.equals("date"))
+            {
+                String format = atts.getValue("format");                
+                if (format == null) format = "yyyy-MM-dd";
+                
+                DateFormat df = new SimpleDateFormat(format);
+                String tz = atts.getValue("tz");
+                if (tz != null) df.setTimeZone(TimeZone.getTimeZone(tz));
+                
+                String theDate = df.format(new Date());
+                sax.characters(theDate.toCharArray(), 0, theDate.length());
             }
             else if (localName.equals("root"))
             {
