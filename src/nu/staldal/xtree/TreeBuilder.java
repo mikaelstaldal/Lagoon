@@ -191,7 +191,7 @@ public class TreeBuilder implements ContentHandler, ErrorHandler
 			Transformer trans = th.getTransformer();
 			trans.setOutputProperties(prop);
 			
-			ContentHandler ch = new ContentHandlerFixer(th, true);
+			ContentHandler ch = new ContentHandlerFixer(th);
 			
 			try {
 				ch.startDocument();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001, Mikael Ståldal
+ * Copyright (c) 2001-2002, Mikael Ståldal
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without 
@@ -77,7 +77,7 @@ public class ContentHandlerFixer implements ContentHandler
 	 * Constructs a filter.
 	 *
 	 * @param ch  the SAX2 ContentHandler to fire events on.
-	 * @param nsDecl  add namespace declarationa as explicit 'xmlns' attributes.
+	 * @param nsDecl  add namespace declarations as explicit 'xmlns' attributes.
 	 */
     public ContentHandlerFixer(ContentHandler ch, boolean nsDecl)
     {
