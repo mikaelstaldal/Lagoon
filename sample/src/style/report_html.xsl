@@ -24,7 +24,7 @@
         <title><xsl:value-of select="$myparam"/></title>
         <meta name="Author" content="{$theparam}"/>
 
-		<!-- <xsl:copy-of select="document('part:thePart')"/> -->
+		<xsl:copy-of select="document('part:largePart')"/>
 
 		<xsl:copy-of select="document('includehere.xml')"/>
 

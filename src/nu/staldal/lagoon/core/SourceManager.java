@@ -100,10 +100,11 @@ public interface SourceManager
 	 * @param url  URL to the file, if relative it's searched for relative to
 	 * the main source file (or a FileNotFoundException is thrown if
 	 * there is no main source file).
+	 * @param target  The current target.
      *
      * @throws FileNotFoundException if the main source file is not specified
      */
-    public javax.xml.transform.Source getFileAsJAXPSource(String url)
+    public javax.xml.transform.Source getFileAsJAXPSource(String url, Target target)
         throws FileNotFoundException;
 		
 

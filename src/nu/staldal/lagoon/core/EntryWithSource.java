@@ -48,6 +48,7 @@ import java.net.URLConnection;
 import javax.xml.parsers.*;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
+import javax.xml.transform.sax.SAXSource;
 import org.xml.sax.*;
 
 import nu.staldal.lagoon.util.*;
@@ -168,13 +169,31 @@ abstract class EntryWithSource implements SourceManager
     }
 
 	
-    public Source getFileAsJAXPSource(String url)
+    public Source getFileAsJAXPSource(final String url, final Target target)
         throws FileNotFoundException
 	{
 		File file = getFile(url);	
 		
 		if (file == null)
-			return new StreamSource(getFileURL(url));
+		{
+			if (LagoonUtil.absoluteURL(url) && url.startsWith("part:"))
+			{
+				final PartEntry pe = sitemap.lookupPart(url.substring(5));
+				if (pe == null)
+					throw 
+						new	FileNotFoundException("Part " + url + " not found");
+					
+				return new SAXSource(new XMLReaderImpl() {
+					public void parse(InputSource is) 
+						throws SAXException, IOException
+					{
+						pe.getXMLProducer().start(contentHandler, target);							
+					}					
+				}, new InputSource());
+			}
+			else
+				return new StreamSource(getFileURL(url));
+		}
 		else
 			return new StreamSource(file);
 	}

@@ -118,6 +118,15 @@
 	<transform type="lsp" foo="BAZ"><source/></transform>
 </part>
 
+<part name="largePart" source="/style/">
+    <transform type="xslt" stylesheet="/dir.xsl">
+        <source type="dir" pattern="*.xsl"/>
+    </transform>
+</part>
+
+<file target="/dirpart.html" source="part:largePart">
+	<format type="html"><source/></format>
+</file>
 
 <file target="/htmltest.html" source="/htmltest.html">
 	<format type="html">

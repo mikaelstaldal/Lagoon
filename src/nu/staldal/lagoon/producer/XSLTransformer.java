@@ -77,6 +77,7 @@ public class XSLTransformer extends Transform
         {
 			TransformerFactory tf = TransformerFactory.newInstance();
             if (!(tf.getFeature(SAXTransformerFactory.FEATURE)
+                    && tf.getFeature(SAXSource.FEATURE)
                     && tf.getFeature(SAXResult.FEATURE)
                     && tf.getFeature(StreamSource.FEATURE)))
             {
@@ -98,7 +99,7 @@ public class XSLTransformer extends Transform
         }
     }
 
-    private void readStylesheet()
+    private void readStylesheet(final Target target)
     	throws IOException, SAXException
     {
         container = new StylesheetContainer(always);
@@ -126,7 +127,7 @@ public class XSLTransformer extends Transform
 	                    container.importedFiles.put(thisFile, "");
 					}
 				
-					return getSourceMan().getFileAsJAXPSource(thisFile);
+					return getSourceMan().getFileAsJAXPSource(thisFile, target);
 				}
 				catch (FileNotFoundException e)
 				{
@@ -135,7 +136,7 @@ public class XSLTransformer extends Transform
             }
         });
 
-		Source ss = getSourceMan().getFileAsJAXPSource(xslPath);
+		Source ss = getSourceMan().getFileAsJAXPSource(xslPath, target);
 		
         try {
             container.stylesheet = tfactory.newTemplates(ss);
@@ -185,12 +186,12 @@ public class XSLTransformer extends Transform
 		return false;
 	}
 
-    public void start(org.xml.sax.ContentHandler sax, Target target)
+    public void start(org.xml.sax.ContentHandler sax, final Target target)
     	throws IOException, SAXException
     {
         if (stylesheetUpdated())
         {
-            readStylesheet();
+            readStylesheet(target);
         }
 
         if (DEBUG) System.out.println("Transforming");
@@ -230,8 +231,7 @@ public class XSLTransformer extends Transform
 							getSourceMan().getFileURL(href), "");
 					}
 					
-					// *** <part> ???
-					return getSourceMan().getFileAsJAXPSource(href);
+					return getSourceMan().getFileAsJAXPSource(href, target);
 					}
 				catch (FileNotFoundException e)
 				{
