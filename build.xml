@@ -25,8 +25,8 @@
 
   <property name="Name" value="Lagoon"/>
   <property name="name" value="lagoon"/>
-  <property name="version" value="1.0b18"/>
-  <property name="ver" value="10b18"/>
+  <property name="version" value="1.0b19"/>
+  <property name="ver" value="10b19"/>
 
   <property name="version.lsp" value="1.0b3"/>
   <property name="ver.lsp" value="10b3"/>

@@ -77,4 +77,5 @@
 
 1.0 beta 19
 -----------
-* Strip whitespace in LSP.
+* LSP available as separate package.
+* LSSI.

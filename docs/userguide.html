@@ -448,10 +448,21 @@ to the generated file (including '.').</p>
 <p>Filenames for the extraced parts will be the name of the main file +
  "_image" + a number + the extension given.</p>
 
+
+<h3>&lt;transform type="lssi"&gt;</h3>
+
+<p>Performs <a href="lssi.html">LSSI</a> processing.</p>
+
+<p>Any relative URL included from the LSP page is searched 
+for relative to the source file.</p>
+
+<p><code>part:</code> URL:s may be used when including. 
+Included parts need not to be well-formed.</p> 
+
+
 <h3>&lt;transform type="lsp"&gt;</h3>
 
-<p>Executes an LSP page. See the <a href="lspuser.html">LSP User
-Guide</a>.</p>
+<p>Executes an <a href="lspuser.html">LSP</a> page.</p>
 
 <p>Any parameters to this producers are used as parameters to the LSP
 page.</p>

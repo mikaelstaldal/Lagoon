@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<html>
+<head><title>LSSI Guide</title></head>
+<link rel="stylesheet" type="text/css" href="manual.css" />
+<body>
+<h1>LSSI Guide</h1>
+
+<h2>Overview</h2>
+
+<p>LSSI is a simple XML based web template language.</p>
+
+<p>LSSI is fully based on XML and namespaces. This means that it's easy
+to efficiently use LSSI together with other XML technologies, such as
+XSLT (for example, you can process the output of LSSI with XSLT).</p>
+
+<p>LSSI is used for simple pseudo-dynamic web content generation. 
+For a more advanced web template language, see <a href="lspuser.html">LSP</a>.
+</p>
+
+
+<h2>LSSI basics</h2>
+
+<p>An LSSI page is a well-formed XML document, composed of elements from
+the LSSI namespace and from other namespaces (including the null
+namespace). The document root element may, but doesn't have to, be in
+the LSSI namespace.</p>
+
+<p>The namespace URI for LSSI is
+<code>http://staldal.nu/Lagoon/LSSI</code>. In this document, it's assumed
+that this namespace is mapped to the prefix <code>lssi</code>, however
+any prefix may be used.</p>
+
+<p>An LSSI page is processed by interpreting all LSSI elements, and
+sending all non-LSSI elements, all character data and all processing 
+instructions to the output. 
+Comments in the LSSI page are ignored. Any DTD in the LSSI page is not sent 
+to the output.</p>
+
+<p>It's simple to start using LSSI in a static HTML (or some XML
+based markup language) page. Just add a declaration for the LSSI
+namespace (<code>xmlns:lssi="http://staldal.nu/Lagoon/LSSI"</code>) in the
+root element and add LSSI elements. However, you must
+ensure that the HTML page is in well-formed XML format.</p>
+
+
+<h2>LSSI elements</h2>
+
+<p>This section describes all elements in the LSSI namespace. An
+attribute name in <b>bold</b> means this attribute is required. </p>
+
+<h4>lssi:include</h4>
+
+<p class="element-syntax">
+<a name="element-include"></a>&lt;lssi:include<br />
+&#160;&#160;<b>file</b> = <var>URL</var> /&gt;
+</p>
+
+<p>The <code>lssi:include</code> includes a file when the page is
+executed. Any elements in the LSP namespace in the included file
+are processed, and an included file may include other files in arbitrary 
+nesting.</p>
+
+
+<h4>lssi:root</h4>
+
+<p class="element-syntax">
+<a name="element-root"></a>&lt;lssi:root&gt;<br />
+&#160;&#160;&lt;!-- Content: <var>any</var> --&gt;<br />
+&lt;/lssi:root&gt;
+</p>
+
+<p>The <code>lssi:root</code> element simply outputs all of its content.
+Useful as document root element in files to be 
+<code>include</code>d. The <code>lssi:root</code> element can be
+nested.</p>
+
+
+</body>
+</html>
+
