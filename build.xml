@@ -151,6 +151,7 @@
            destdir="${build.classes}"
            optimize="off" debug="on">
        <classpath location="${Ant}" />
+       <classpath location="${BCEL}" />
 	</javac>
 
     <copy todir="${build.classes}">

@@ -71,3 +71,4 @@
 
 1.0 beta 18
 -----------
+* Compile LSP into Java bytecode for better performance.

@@ -8,3 +8,4 @@ Batik=lib
 JAF=activation.jar
 JARV=iso-relax.jar
 Ant=ant.jar
+BCEL=bcel.jar
