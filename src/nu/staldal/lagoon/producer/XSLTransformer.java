@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001, Mikael Ståldal
+ * Copyright (c) 2001-2002, Mikael Ståldal
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without 
@@ -107,7 +107,7 @@ public class XSLTransformer extends Transform
 
         final String xslPath = getSourceMan().getFileURL(xslFile);
 			
-		if (!getSourceMan().canCheckFileHasBeenUpdated(xslPath))
+		if (!getContext().canCheckFileHasBeenUpdated(xslPath))
 			container.compileDynamic = true;
 
         if (DEBUG) System.out.println("Read stylesheet: " + xslPath);
@@ -116,10 +116,10 @@ public class XSLTransformer extends Transform
             public Source resolve(String href, String base)
             {
 				String thisFile = 
-					getSourceMan().getFileURLRelativeTo(href, xslPath);
+					getContext().getFileURLRelativeTo(href, xslPath);
 
 				try {
-	                if (!getSourceMan().canCheckFileHasBeenUpdated(thisFile))
+	                if (!getContext().canCheckFileHasBeenUpdated(thisFile))
 	                {
 	                    container.compileDynamic = true;
 	                }
@@ -222,7 +222,7 @@ public class XSLTransformer extends Transform
             public Source resolve(String href, String base)
             {
 				try {
-					if (!getSourceMan().canCheckFileHasBeenUpdated(href))
+					if (!getContext().canCheckFileHasBeenUpdated(href))
 					{
 						container.executeDynamic = true;
 					}

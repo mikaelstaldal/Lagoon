@@ -56,7 +56,7 @@ import nu.staldal.lagoon.util.*;
  */
 public class BatikFormatter extends Format
 {
-	private static boolean DEBUG = true;
+	private static boolean DEBUG = false;
 
 	private ImageTranscoder transcoder;
 	
@@ -100,10 +100,10 @@ public class BatikFormatter extends Format
 		if (LagoonUtil.absoluteURL(_sourceURL))
 			sourceURL = new URL(_sourceURL);
 		else if (LagoonUtil.pseudoAbsoluteURL(_sourceURL))
-			sourceURL = new java.net.URL(getSourceMan().getRootDir().toURL(),
+			sourceURL = new java.net.URL(getContext().getSourceRootDir().toURL(),
 				_sourceURL.substring(1));
 		else
-			sourceURL = new java.net.URL(getSourceMan().getRootDir().toURL(),
+			sourceURL = new java.net.URL(getContext().getSourceRootDir().toURL(),
 				_sourceURL);
 		if (DEBUG) System.out.println("The source URL: " + sourceURL);
 

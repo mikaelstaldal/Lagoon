@@ -260,7 +260,18 @@ public class LagoonCLI
                 }
             }
 
-            System.out.println("Exiting Lagoon...");
+			if (DEBUG)
+			{
+				Thread[] threads = new Thread[Thread.activeCount()];
+				Thread.enumerate(threads);
+				for (int i = 0; i<threads.length; i++)
+				{
+					if (threads[i] != null && threads[i] != Thread.currentThread())
+						System.out.println("Thread still running: " + threads[i]);
+				}
+			}
+			
+			System.out.println("Exiting Lagoon...");
             processor.destroy();
 			System.exit(0);
         }

@@ -47,12 +47,11 @@ package nu.staldal.lagoon.core;
 public interface ProducerInterface
 {
     /** 
-     * Initialize the producer. This method is invoked once after
-     * all parameters has been added and the SourceManager has been set,
-     * but before start() is invoked the first time.
+     * Initialize the producer. This method is invoked once 
+     * before the start() method is invoked the first time.
      *
-     * This method may use the getParam(), getParamNames(), and the
-     * getSourceMan() methods.
+     * This method may use the getParam(), getParamNames(), and
+     * getContext() methods.
      */
     public void init()
         throws LagoonException, java.io.IOException;

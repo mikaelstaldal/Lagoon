@@ -10,13 +10,21 @@
     <attribute name="name"/>
     <zeroOrMore>
       <choice>
-      <ref name="deleteEntry"/>
-      <ref name="fileEntry"/>
-      <ref name="partEntry"/>
+        <ref name="outputEntry"/>
+        <ref name="deleteEntry"/>
+        <ref name="fileEntry"/>
+        <ref name="partEntry"/>
       </choice>
     </zeroOrMore>
   </element>
 </start>
+
+<define name="outputEntry">
+  <element name="output">
+    <attribute name="name"/>
+    <ref name="byteProducerOutput"/>  
+  </element>
+</define>
 
 <define name="deleteEntry">
   <element name="delete">
@@ -31,7 +39,18 @@
     <optional>
       <attribute name="source"/> <!-- Source may contain wildcard -->
     </optional>
-    <optional><ref name="byteProducer"/></optional>  
+
+    <choice>
+      <group>    
+        <attribute name="output"/>
+        <optional>
+          <ref name="xmlProducer"/>
+        </optional>
+      </group>
+      <optional>
+        <ref name="byteProducer"/>
+      </optional>
+    </choice>
   </element>
 </define>
 
@@ -107,4 +126,53 @@
   </choice>
 </define>
 
+<define name="byteProducerOutput">
+  <choice>
+    <element name="process">
+<!--  <optional>
+        <attribute name="type"/>  Ommitting uses default
+      </optional> -->
+      <zeroOrMore>
+        <attribute><anyName/></attribute>
+      </zeroOrMore>
+      <ref name="byteProducerOutput"/>  
+    </element>      
+    <element name="format">
+<!--  <optional>
+        <attribute name="type"/>  Ommitting uses default
+      </optional> -->
+      <zeroOrMore>
+        <attribute><anyName/></attribute>
+      </zeroOrMore>
+      <ref name="xmlProducerOutput"/>  
+    </element>
+  </choice>
+</define>
+
+<define name="xmlProducerOutput">
+  <optional>
+      <choice>
+        <element name="parse">
+    <!--  <optional>
+            <attribute name="type"/>
+          </optional> -->
+          <zeroOrMore>
+            <attribute><anyName/></attribute>
+          </zeroOrMore>
+          <ref name="byteProducerOutput"/>  
+        </element>
+        <element name="transform">
+    <!--  <optional>
+            <attribute name="type"/>
+          </optional> -->
+          <zeroOrMore>
+            <attribute><anyName/></attribute>
+          </zeroOrMore>
+          <ref name="xmlProducerOutput"/>  
+        </element>      
+      </choice>
+  </optional>
+</define>
+
 </grammar>
+

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001, Mikael Ståldal
+ * Copyright (c) 2001-2002, Mikael Ståldal
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,9 +40,10 @@
 
 package nu.staldal.lagoon.filestorage;
 
+import java.io.*;
+
 import nu.staldal.lagoon.core.*;
 
-import java.io.*;
 
 /**
  * A FileStorage using the local file system.
@@ -69,7 +70,7 @@ public class LocalFileStorage implements FileStorage
         return true;
     }	
 
-    public void open(String loc, LagoonProcessor processor, String password)
+    public void open(String loc, LagoonContext context, String password)
         throws java.io.IOException
     {
         root = new File(loc);

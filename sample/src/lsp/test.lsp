@@ -4,7 +4,8 @@
 
 <html xmlns:lsp="http://staldal.nu/LSP/core" 
 	  xmlns:test="http://staldal.nu/LSP/test"
-	  xmlns:stringtest="http://staldal.nu/LSP/string">
+	  xmlns:stringtest="http://staldal.nu/LSP/string"
+	  xmlns:foo="http://foo.com">
 <head>
 <title>LSP test</title>
 </head>
@@ -174,11 +175,18 @@ in output like this</lsp:processing-instruction>
 </test:foo>
 </p>
 
+<!--
 <p>
 <stringtest:hej>apa</stringtest:hej>
 </p>
+-->
 
-<!--
+<p>
+<test:foo>
+	<lsp:if test="2 &gt; 3"><bar>apa</bar></lsp:if>
+</test:foo>
+</p>
+
 <h2>ExtFunc</h2>
 
 <p><lsp:value-of select="test:func(1, 2, 3, 'one', 'two', 'three')"/></p>

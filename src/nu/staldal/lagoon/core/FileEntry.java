@@ -64,7 +64,8 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
 {
     private static final boolean DEBUG = false;
 
-    private ByteStreamProducer myProducer;
+    private Producer myProducer;
+	private OutputEntry outputEntry;
 
     private final FileStorage targetStorage;
 	private final File tempDir;
@@ -77,6 +78,8 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
     private long targetLastMod;
     private String newTarget;
 	private Vector tempFiles;
+	
+	private Vector targetThreads;
 
 	
     /**
@@ -103,11 +106,14 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
 		this.targetURL = targetURL;
 		
         this.myProducer = null;
+		this.outputEntry = null;
 
         this.currentSourceURL = null;
         this.currentTargetURL = null;
         this.targetLastMod = -1;
         this.newTarget = null;
+		
+		this.targetThreads = new Vector();
     }
 
 
@@ -116,12 +122,18 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
      * FileEntry.
      * Used during initialization.
      */
-    void setMyProducer(ByteStreamProducer prod)
+    void setMyProducer(Producer prod)
     {
         myProducer = prod;
     }
 
 
+    void setMyOutput(OutputEntry outputEntry)
+    {
+        this.outputEntry = outputEntry;
+    }
+
+	
     public boolean build(boolean always)
         throws IOException
     {
@@ -220,7 +232,7 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
         throws IOException
     {
         processor.log.println("Building: " + currentTargetURL);
-
+		
 		int slash = currentTargetURL.lastIndexOf('/');
 		currentTargetDir = currentTargetURL.substring(0, slash+1);
 		currentTargetName = currentTargetURL.substring(slash+1);
@@ -230,6 +242,18 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
         String exceptionType = null;
         boolean bailOut = false;
 		boolean success = true;
+		
+		ByteStreamProducer theProducer;
+		if (outputEntry == null)
+		{
+			theProducer = (ByteStreamProducer)myProducer;	
+		}
+		else
+		{
+			outputEntry.setNext((XMLStreamProducer)myProducer);
+			outputEntry.setSourceManager(this);
+			theProducer = outputEntry.getByteProducer();
+		}
 
 		tempFiles = new Vector();
 		
@@ -241,7 +265,7 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
 	        out = targetStorage.createFile(thisTargetURL);
 			
 			try {
-                myProducer.start(out.getOutputStream(), this);
+                theProducer.start(out.getOutputStream(), this);
                 exceptionType = null; // no exception thrown
             }
             catch (Exception e)
@@ -258,7 +282,7 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
 				}
 				exceptionType = thisExceptionType;
 
-                reportException(e);
+                e = reportException(e);
 
 				if (out != null) out.discard();				
 
@@ -311,15 +335,36 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
 			}
 			oh.commit();			
 		}
+		
+		for (Enumeration enum = targetThreads.elements(); 
+			 enum.hasMoreElements(); )
+		{
+			Thread t = (Thread)enum.nextElement();
+			try {
+				if (t != null) t.join();
+			}
+			catch (InterruptedException e) {}
+		}
+		targetThreads.clear();
+		
 		return success;
     }
 
 
-	private void reportException(Exception e)
+	private Exception reportException(Exception e)
 	{
+		if (e instanceof RuntimeException)
+		{
+			return e;	
+		}
 		if (e instanceof SAXParseException)
 		{
 			SAXParseException spe = (SAXParseException)e;
+			Exception ee = spe.getException();
+			if (ee instanceof RuntimeException)
+			{
+				return ee;
+			}
 			String sysId = (spe.getSystemId() == null)
 				? ("(" + currentTargetURL + ")"): spe.getSystemId();
 			processor.err.println(sysId + ":" + spe.getLineNumber()
@@ -329,11 +374,9 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
 		{
 			SAXException se = (SAXException)e;
 			Exception ee = se.getException();
-			if (ee != null)
+			if (ee instanceof RuntimeException)
 			{
-				processor.err.println("Error building " + currentTargetURL
-					+ ": " + ee.toString());
-			    if (DEBUG) ee.printStackTrace(System.out);
+				return ee;
 			}
 			else
 			{
@@ -353,6 +396,7 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
 			processor.err.println("Error building " + currentTargetURL + ":");
 			e.printStackTrace(processor.err);
 		}
+		return e;
 	}
 
 
@@ -387,7 +431,8 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
 		}
     }
 
-    public OutputHandler newAsyncTarget(String filename, boolean prependFilename)
+    public OutputHandler newAsyncTarget(String filename, 
+			boolean prependFilename)
 		throws IOException
 	{
 		if (filename.charAt(0) != '/' && !prependFilename)
@@ -413,7 +458,105 @@ class FileEntry extends EntryWithSource implements SitemapEntry, FileTarget
 				new FileOutputStream(currentFile));
 		}
 	}	
+
+
+    private static void sleepUntilInterrupted()
+    {
+        try {
+            while (true)
+                Thread.sleep(1000*60); // Sleep one minute
+        }
+        catch (InterruptedException e) {}
+    }
+
 	
+	private Thread mainThread;
+	private ContentHandler asyncSAX;
+	private Exception asyncException;
+	
+    public ContentHandler newAsyncTargetWithOutput(
+			String filename, boolean prependFilename, String outputName)
+		throws java.io.IOException, SAXException
+	{
+		mainThread = Thread.currentThread();
+		asyncSAX = null;
+		asyncException = null;
+		
+		final OutputHandler oh = newAsyncTarget(filename, prependFilename);
+		
+		final OutputEntry outputEntry = sitemap.lookupOutput(outputName);
+		if (outputEntry == null) throw new LagoonException(
+			"Output entry " + outputName + " not found in Sitemap");
+
+		outputEntry.setSourceManager(this);
+				
+		outputEntry.setNext(new XMLStreamProducer() {
+		    public void start(ContentHandler sax, Target target)
+        		throws SAXException, IOException
+			{
+				asyncSAX = sax;
+				mainThread.interrupt();
+			}
+			
+			public void init()
+			{
+				throw new RuntimeException("Invalid context");	
+			}
+
+			public boolean hasBeenUpdated(long lastBuild) 
+			{
+				throw new RuntimeException("Invalid context");	
+			}
+		});
+
+		Thread targetThread = new Thread(new Runnable() {
+			public void run()
+			{
+				if (DEBUG) System.out.println("TargetThread just started");
+				try {
+					try {
+						outputEntry.getByteProducer().start(
+							oh.getOutputStream(), 
+							FileEntry.this);
+					}
+					catch (Exception e)
+					{
+						oh.discard();
+						throw e;
+					}
+					oh.commit();
+				}
+				catch (Exception e)
+				{
+					asyncException = e;
+					mainThread.interrupt();
+				}
+				if (DEBUG) System.out.println("TargetThread about to end");
+			}
+		}, "TargetThread");
+		targetThreads.addElement(targetThread);
+		targetThread.start();
+
+		if (DEBUG) System.out.println("Waiting for TargetThread...");
+	 	sleepUntilInterrupted();
+		if (DEBUG) System.out.println("...finished waiting for TargetThread");
+		
+		if (asyncException != null)
+		{
+			if (asyncException instanceof IOException)
+				throw (IOException)asyncException;
+			else if (asyncException instanceof SAXException)
+				throw (SAXException)asyncException;
+			else if (asyncException instanceof RuntimeException)
+				throw (RuntimeException)asyncException;
+			else
+				throw new SAXException(asyncException);
+		}
+		
+		return asyncSAX;
+	}	
+
+
 	public boolean isWildcard()
     {
         return Wildcard.isWildcard(sourceURL);

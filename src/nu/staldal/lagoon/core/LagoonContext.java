@@ -111,6 +111,19 @@ public interface LagoonContext
      * Get an absolute File object representing the source root directory.
      */
     public File getSourceRootDir();
-	
+
+
+    /**
+     * Get an URL representing the given file or directory.
+	 *
+	 * @param url  URL to the file, if relative it's searched for relative to
+	 * the base parameter.
+	 *
+	 * @param base  base URL, must be pseudo-absolute
+	 *
+	 * @return an absolute or pseudo-absolute URL
+	 * 		   (the url parameter unchanged unless it's relative)
+     */
+    public String getFileURLRelativeTo(String url, String base);
 }
 

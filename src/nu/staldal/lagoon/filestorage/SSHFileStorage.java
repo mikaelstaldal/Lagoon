@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001, Mikael Ståldal
+ * Copyright (c) 2001-2002, Mikael Ståldal
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,13 +40,14 @@
 
 package nu.staldal.lagoon.filestorage;
 
+import java.io.*;
+import java.net.MalformedURLException;
+
 import nu.staldal.lagoon.core.FileStorage;
 import nu.staldal.lagoon.core.OutputHandler;
 import nu.staldal.lagoon.core.RemoteFileStorage;
-import nu.staldal.lagoon.core.LagoonProcessor;
+import nu.staldal.lagoon.core.LagoonContext;
 
-import java.io.*;
-import java.net.MalformedURLException;
 
 /**
  * A FileStorage which transfers files to a remote site using SSH.
@@ -114,7 +115,7 @@ public class SSHFileStorage extends RemoteFileStorage
     }	
 
 
-    public void open(String url, LagoonProcessor processor, String passoword)
+    public void open(String url, LagoonContext context, String passoword)
         throws MalformedURLException, IOException
     {
 		if (!url.startsWith("ssh://"))
@@ -160,7 +161,7 @@ public class SSHFileStorage extends RemoteFileStorage
 
 		this.rt = Runtime.getRuntime();
 
-        openDateFile(processor);
+        openDateFile(context);
     }
 
 

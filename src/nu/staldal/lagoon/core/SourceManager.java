@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001, Mikael Ståldal
+ * Copyright (c) 2001-2002, Mikael Ståldal
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without 
@@ -47,12 +47,6 @@ import java.io.*;
  */
 public interface SourceManager
 {
-
-    /**
-     * Get an absolute File object representing the source root directory.
-     */
-    public File getRootDir();
-
 		
 	/**
      * Get the URL representing the main source.
@@ -151,29 +145,5 @@ public interface SourceManager
     public boolean fileHasBeenUpdated(String url, long when)
         throws FileNotFoundException, IOException, LagoonException;
 
-		
-    /**
-     * Tell whether the given source can be checked for dependency.
-	 *
-	 * @param url  URL to the file, if relative it's searched for relative to
-	 * the main source file (or a FileNotFoundException is thrown if
-	 * there is no main source file).
-     */
-    public boolean canCheckFileHasBeenUpdated(String url)
-        throws FileNotFoundException;
-	
-
-    /**
-     * Get an URL representing the given file or directory.
-	 *
-	 * @param url  URL to the file, if relative it's searched for relative to
-	 * the base parameter.
-	 *
-	 * @param base  base URL, must be pseudo-absolute
-	 *
-	 * @return an absolute or pseudo-absolute URL
-	 * 		   (the url parameter unchanged unless it's relative)
-     */
-    public String getFileURLRelativeTo(String url, String base);
 }
 

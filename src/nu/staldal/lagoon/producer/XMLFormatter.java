@@ -182,7 +182,7 @@ public class XMLFormatter extends Format
 			Transformer trans = th.getTransformer();
 			trans.setOutputProperties(outputProperties);
 				
-        	getNext().start(new ContentHandlerFixer(th), target);
+        	getNext().start(new ContentHandlerFixer(th, true), target);
 		}
 		catch (TransformerConfigurationException e)
 		{

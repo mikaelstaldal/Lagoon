@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001, Mikael Ståldal
+ * Copyright (c) 2001-2002, Mikael Ståldal
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -58,7 +58,7 @@ import nu.staldal.lagoon.util.*;
 /**
  *
  */
-abstract class EntryWithSource implements SourceManager
+abstract class EntryWithSource implements SourceManager, SourceManagerProvider
 {
     private static final boolean DEBUG = false;
 
@@ -88,12 +88,8 @@ abstract class EntryWithSource implements SourceManager
 		this.processor = processor;
 		this.sitemap = sitemap;
 
-        String absPath = sourceRootDir.getAbsolutePath();
-        this.sourceRootDir = new File(absPath);
-        if (!this.sourceRootDir.isDirectory())
-            throw new LagoonException(
-                "sourceRootDir must be an existing directory: " + sourceRootDir);
-
+        this.sourceRootDir = sourceRootDir;
+		
 		if (!LagoonUtil.absoluteURL(sourceURL) 
 				&& !LagoonUtil.pseudoAbsoluteURL(sourceURL))
 		{
@@ -110,12 +106,6 @@ abstract class EntryWithSource implements SourceManager
 
 
 	// SourceManager implemenation
-
-    public File getRootDir()
-    {
-        return sourceRootDir;
-    }
-
     
     public String getSourceURL()
         throws FileNotFoundException
@@ -266,7 +256,7 @@ abstract class EntryWithSource implements SourceManager
     public String getFileURL(String url)
         throws FileNotFoundException
     {
-		return getFileURLRelativeTo(url, getSourceURL());
+		return processor.getFileURLRelativeTo(url, getSourceURL());
 	}
 
 
@@ -301,33 +291,11 @@ abstract class EntryWithSource implements SourceManager
     }
 
 	
-    public boolean canCheckFileHasBeenUpdated(String url)
+	// SourceManagerProvider implementation
+    
+	public SourceManager getSourceManager()
 	{
-		return !LagoonUtil.absoluteURL(url) 
-			|| url.startsWith("part:")
-			|| url.startsWith("file:")
-			|| url.startsWith("res:");
-	}
-
-
-    public String getFileURLRelativeTo(String url, String base)
-    {
-        if (LagoonUtil.absoluteURL(url) || LagoonUtil.pseudoAbsoluteURL(url))
-		{
-            return url;
-		}
-        else
-        {
-            if (!LagoonUtil.pseudoAbsoluteURL(base))
-                throw new IllegalArgumentException(
-					"base must be a pseudo-absolute URL");
-
-            int slash = base.lastIndexOf('/');
-            String baseDir = base.substring(0, slash+1);
-
-            return baseDir + url;
-        }
-    }
-	
+		return this;	
+	}		
 }
 

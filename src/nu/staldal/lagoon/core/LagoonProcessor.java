@@ -567,4 +567,24 @@ public class LagoonProcessor implements LagoonContext
 		return sourceRootDir;		
 	}
 
+	
+	public String getFileURLRelativeTo(String url, String base)
+    {
+        if (LagoonUtil.absoluteURL(url) || LagoonUtil.pseudoAbsoluteURL(url))
+		{
+            return url;
+		}
+        else
+        {
+            if (!LagoonUtil.pseudoAbsoluteURL(base))
+                throw new IllegalArgumentException(
+					"base must be a pseudo-absolute URL");
+
+            int slash = base.lastIndexOf('/');
+            String baseDir = base.substring(0, slash+1);
+
+            return baseDir + url;
+        }
+    }
+
 }

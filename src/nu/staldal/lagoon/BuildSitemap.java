@@ -85,7 +85,7 @@ public class BuildSitemap
 		trans.setOutputProperty(OutputKeys.ENCODING, "iso-8859-1");
 		trans.setOutputProperty(OutputKeys.INDENT, "yes");
 		
-		ContentHandler ch = new ContentHandlerFixer(th);
+		ContentHandler ch = new ContentHandlerFixer(th, true);
 		
 		baseDir = new File(args[0]);		
 		

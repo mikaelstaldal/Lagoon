@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001, Mikael Ståldal
+ * Copyright (c) 2002, Mikael Ståldal
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,47 +40,13 @@
 
 package nu.staldal.lagoon.core;
 
-import java.io.*;
-import java.util.*;
-import java.net.URL;
-import java.net.URLConnection;
-
-import nu.staldal.lagoon.util.*;
-
 
 /**
- * A part entry in the sitemap.
  *
- * @see nu.staldal.lagoon.core.Sitemap
  */
-class PartEntry extends EntryWithSource
+interface SourceManagerProvider
 {
-    private XMLStreamProducer myProducer;
-
-	
-    public PartEntry(LagoonProcessor processor, Sitemap sitemap, 
-					 String sourceURL, File sourceRootDir)
-        throws LagoonException
-	{
-		super(processor, sitemap, sourceURL, sourceRootDir);
-		myProducer = null;
-	}
-
-	
-    /**
-     * Set the XMLStreamProducer that produces the output for this
-     * PartEntry.
-     * Used during initialization.
-     */
-    void setMyProducer(XMLStreamProducer prod)
-    {
-        myProducer = prod;
-    }
-
-	
-	public XMLStreamProducer getXMLProducer()
-	{
-		return myProducer;
-	}
+    
+    public SourceManager getSourceManager();
 }
 

@@ -40,11 +40,12 @@
 
 package nu.staldal.lagoon.filestorage;
 
+import java.io.*;
+import java.net.*;
+
 import nu.staldal.lagoon.core.*;
 import nu.staldal.ftp.*;
 
-import java.io.*;
-import java.net.*;
 
 /**
  * A FileStorage which transfers files to a remote site using FTP.
@@ -80,7 +81,7 @@ public class FTPFileStorage extends RemoteFileStorage
     }	
 
 
-    public void open(String url, LagoonProcessor processor, String password)
+    public void open(String url, LagoonContext context, String password)
         throws MalformedURLException, UnknownHostException,
         FTPException, IOException, AuthenticationException
     {
@@ -89,7 +90,7 @@ public class FTPFileStorage extends RemoteFileStorage
 		
 		ftp = new FTPClient(url, password);
 		
-        openDateFile(processor);
+        openDateFile(context);
     }
 
 

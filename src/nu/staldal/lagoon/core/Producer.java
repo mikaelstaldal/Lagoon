@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001, Mikael Ståldal
+ * Copyright (c) 2001-2002, Mikael Ståldal
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without 
@@ -58,7 +58,7 @@ public abstract class Producer implements ProducerInterface
     private Hashtable params = new Hashtable();
 
     private String entryName;
-	private SourceManager sourceMan = null;
+	private SourceManagerProvider sourceMan = null;
     private LagoonProcessor processor = null;
     private int position = 0;
 
@@ -72,10 +72,10 @@ public abstract class Producer implements ProducerInterface
 	}
 
 	/**
-	 * Set the SourceManager this producer is associated with.
+	 * Set the SourceManagerProvider this producer is associated with.
 	 * Used during initialization.
 	 */
-	void setSourceManager(SourceManager sourceMan)
+	void setSourceManager(SourceManagerProvider sourceMan)
 	{
         this.sourceMan = sourceMan;
 	}
@@ -107,7 +107,21 @@ public abstract class Producer implements ProducerInterface
 	{
         if (sourceMan == null)
             throw new RuntimeException("No SourceManager avaliable");
-        return sourceMan;
+		
+		SourceManager sm = sourceMan.getSourceManager(); 
+        
+		if (sm == null)
+            throw new RuntimeException("No SourceManager avaliable");
+        
+		return sm;
+	}
+
+	/**
+	 * Get the LagoonContext this producer is associated with.
+	 */
+	public LagoonContext getContext()
+	{
+		return processor;
 	}
 
     /**

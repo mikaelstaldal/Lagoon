@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001, Mikael Ståldal
+ * Copyright (c) 2002, Mikael Ståldal
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -49,38 +49,61 @@ import nu.staldal.lagoon.util.*;
 
 
 /**
- * A part entry in the sitemap.
+ * An output entry in the sitemap.
  *
  * @see nu.staldal.lagoon.core.Sitemap
  */
-class PartEntry extends EntryWithSource
+class OutputEntry implements SourceManagerProvider
 {
-    private XMLStreamProducer myProducer;
-
+    private ByteStreamProducer myProducer;
+	private XMLStreamConsumer bottomProducer;
+	private SourceManager sourceMan;
 	
-    public PartEntry(LagoonProcessor processor, Sitemap sitemap, 
-					 String sourceURL, File sourceRootDir)
+    public OutputEntry()
         throws LagoonException
 	{
-		super(processor, sitemap, sourceURL, sourceRootDir);
 		myProducer = null;
+		bottomProducer = null;
 	}
 
 	
     /**
-     * Set the XMLStreamProducer that produces the output for this
-     * PartEntry.
+     * Set the ByteStreamProducer that produces the final output for this
+     * OutputEntry.
      * Used during initialization.
      */
-    void setMyProducer(XMLStreamProducer prod)
+    void setMyProducer(ByteStreamProducer prod)
     {
         myProducer = prod;
     }
 
 	
-	public XMLStreamProducer getXMLProducer()
+	ByteStreamProducer getByteProducer()
 	{
 		return myProducer;
 	}
+	
+    void setBottomProducer(XMLStreamConsumer prod)
+    {
+        bottomProducer = prod;
+    }
+
+	
+	void setNext(XMLStreamProducer next)
+	{
+		bottomProducer.setNext(next);	
+	}
+	
+	void setSourceManager(SourceManager sm)
+	{
+		this.sourceMan = sm;	
+	}
+	
+	
+	public SourceManager getSourceManager()
+	{
+		return sourceMan;	
+	}
+
 }
 

@@ -64,8 +64,6 @@ public class DirSource extends Source
     public void start(ContentHandler sax, Target target)
         throws IOException, SAXException
     {
-        File root = getSourceMan().getRootDir();
-
         File dir = getSourceMan().getFile(getSourceMan().getSourceURL());
         if (!dir.isDirectory())
             throw new IOException("The source is not a directory");

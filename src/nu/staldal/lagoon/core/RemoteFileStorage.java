@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001, Mikael Ståldal
+ * Copyright (c) 2001-2002, Mikael Ståldal
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without 
@@ -52,23 +52,23 @@ public abstract class RemoteFileStorage implements FileStorage
 {
     private static final boolean DEBUG = false;
     
-    private LagoonProcessor processor;
+    private LagoonContext context;
     private Hashtable lastModTable;
 
     /**
 	 * Open the file to store last update dates locally.
 	 * Invoke this from the {@link nu.staldal.lagoon.core.FileStorage#open} method.
 	 */
-	protected void openDateFile(LagoonProcessor processor)
+	protected void openDateFile(LagoonContext context)
         throws IOException
     {
         if (DEBUG) System.out.println("RemoteFileStorage.init()");
         
-        this.processor = processor;
+        this.context = context;
 		try
 		{
 			lastModTable =
-                (Hashtable)processor.getObjectFromRepository(
+                (Hashtable)context.getObjectFromRepository(
                     "nu.staldal.lagoon.filestorage.RemoteFileStorage");
             if (lastModTable == null) lastModTable = new Hashtable();
 		}
@@ -85,7 +85,7 @@ public abstract class RemoteFileStorage implements FileStorage
     protected void closeDateFile()
         throws IOException
     {
-		processor.putObjectIntoRepository(
+		context.putObjectIntoRepository(
             "nu.staldal.lagoon.filestorage.RemoteFileStorage", lastModTable);
     }
 

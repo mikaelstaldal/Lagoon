@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001, Mikael Ståldal
+ * Copyright (c) 2002, Mikael Ståldal
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without 
@@ -40,6 +40,9 @@
 
 package nu.staldal.lagoon.core;
 
+import org.xml.sax.*;
+
+
 /**
  * Defines operations a Producer can do on a File target.
  */
@@ -63,12 +66,31 @@ public interface FileTarget extends Target
 	 * @param prependFilename  prepend the name of the current main file
 	 *                         and an '_' to the new file name (has no
 	 *                         effect if filename starts with '/').
+	 *
+	 * @return an OutputHandler to send a byte stream to
      */
     public OutputHandler newAsyncTarget(String filename, boolean prependFilename)
 		throws java.io.IOException;
 
 	
     /**
+     * Open a new target file, without closing the current one.
+	 * Uses an <output> specification from the Sitemap.
+     *
+     * @param filename  filename to use, may start with '/'
+	 * @param prependFilename  prepend the name of the current main file
+	 *                         and an '_' to the new file name (has no
+	 *                         effect if filename starts with '/').
+	 * @param output  an <output> specification from the Sitemap.
+	 *
+	 * @return an SAX ContentHandler to send an XML stream to 
+     */
+    public ContentHandler newAsyncTargetWithOutput(
+			String filename, boolean prependFilename, String output)
+		throws java.io.IOException, SAXException;
+
+		
+	/**
      * Determine if this file target is a wildcard.
      */
 	public boolean isWildcard();

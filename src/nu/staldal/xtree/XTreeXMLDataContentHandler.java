@@ -139,7 +139,7 @@ public class XTreeXMLDataContentHandler implements DataContentHandler
 			th.getTransformer().setOutputProperty(OutputKeys.MEDIA_TYPE, mimeTypeString);
 			
 			th.startDocument();
-			((Node)obj).toSAX(new ContentHandlerFixer(th));
+			((Node)obj).toSAX(new ContentHandlerFixer(th, true));
 			th.endDocument();
 		}
 		catch (TransformerConfigurationException e)

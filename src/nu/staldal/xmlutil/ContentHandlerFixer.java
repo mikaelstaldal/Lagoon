@@ -206,6 +206,9 @@ public class ContentHandlerFixer implements ContentHandler
         {
             String prefix = (String)e.nextElement();
             String uri = nsSup.getURI(prefix);
+			
+			if (DEBUG) System.out.println("prefix=" + prefix + "  uri=" + uri);
+			
 			ch.startPrefixMapping(prefix, uri);
         }
 						

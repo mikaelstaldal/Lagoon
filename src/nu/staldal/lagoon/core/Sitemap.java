@@ -59,7 +59,6 @@ class Sitemap
     private Hashtable entries;
 	private Vector entryVector;
     private Hashtable parts;
-	private Hashtable inputs;
 	private Hashtable outputs;
 
     // Attributes
@@ -69,9 +68,11 @@ class Sitemap
 
     // Work attributes
     private String currentTargetName;
-    private EntryWithSource currentFile;
+    private SourceManagerProvider currentFile;
 	private int depth;
-
+	private Producer bottomProducer;
+	private Element sitemapTree;
+	
 	
     /**
      * The constructor
@@ -83,7 +84,7 @@ class Sitemap
 	public Sitemap(LagoonProcessor processor,
                    Element sitemapTree,
                    java.io.File sourceDir)
-        throws java.io.IOException, LagoonException
+        throws LagoonException
 	{
         if (!sitemapTree.getLocalName().equals("sitemap"))
 		{
@@ -97,12 +98,18 @@ class Sitemap
 		}
 
         this.processor = processor;
-
         this.sourceDir = sourceDir;
+		this.sitemapTree = sitemapTree;
+		
         entries = new Hashtable();
 		entryVector = new Vector();
 		parts = new Hashtable();
-
+		outputs = new Hashtable();
+	}
+	
+	public void init()
+        throws LagoonException, java.io.IOException
+	{
         currentFile = null;
 	
 		for (int i = 0; i<sitemapTree.numberOfChildren(); i++)
@@ -131,27 +138,43 @@ class Sitemap
 											sourceDir,
 											processor.getTempDir());
 
+				String useOutput = entry.getAttrValueOrNull("output");	
+				
 				if (entry.numberOfChildren() == 0)
-					entry.addChild(new Element("", "read", 0, 0));
+				{
+					if (useOutput == null)
+						entry.addChild(new Element("", "read", 0, 0));
+					else
+						entry.addChild(new Element("", "source", 0, 0));
+				}
 											
 				depth = 0;
 				Object o = handleProducer(entry);
-				
-				if (o instanceof ByteStreamProducer)
+							
+				if (o instanceof ByteStreamProducer && (useOutput == null))
 				{
-					((FileEntry)currentFile).setMyProducer((ByteStreamProducer)o);
+					((FileEntry)currentFile).setMyProducer((Producer)o);
+				}
+				else if (o instanceof XMLStreamProducer && (useOutput != null))
+				{
+					((FileEntry)currentFile).setMyProducer((Producer)o);
+
+					OutputEntry theOutput = 
+						(OutputEntry)outputs.get(useOutput);
+					if (theOutput == null)
+						throw new LagoonException(
+							"Output not found: " + useOutput);
+											
+					((FileEntry)currentFile).setMyOutput(theOutput);
 				}
 				else
 				{
 					throw new LagoonException(
-						"Target must contain a byte stream producer: " 
-						+ currentTargetName);
+						"Inconsistent producer chain: " + currentTargetName);
 				}
 
 	            entries.put(currentTargetName, currentFile);
 				entryVector.addElement(currentFile);
-	            currentTargetName = null;
-	            currentFile = null;
 			}
 			else if (entry.getLocalName().equals("part"))
 			{
@@ -159,8 +182,7 @@ class Sitemap
 				if (currentTargetName == null
 						|| currentTargetName.length() < 1)
 				{
-					throw new LagoonException(
-						"invalid part name: " + currentTargetName);
+					throw new LagoonException("part name missing");
 				}
 				
 				currentFile = new PartEntry(processor, this, 
@@ -181,8 +203,6 @@ class Sitemap
 				}
 														 				
 	            parts.put(currentTargetName, currentFile);
-	            currentTargetName = null;
-				currentFile = null;
 			}
 			else if (entry.getLocalName().equals("delete"))
 			{
@@ -200,9 +220,56 @@ class Sitemap
 				
 	            entries.put(currentTargetName, currentEnt);
 				entryVector.addElement(currentEnt);
-	            currentTargetName = null;
 			}
+			else if (entry.getLocalName().equals("output"))
+			{
+				currentTargetName = entry.getAttrValueOrNull("name");
+				if (currentTargetName == null
+						|| currentTargetName.length() < 1)
+				{
+					throw new LagoonException("output name missing");
+				}
+				
+				currentFile = new OutputEntry();
+											
+				depth = 0;
+				Object o = handleProducer(entry);
+				
+				if (bottomProducer instanceof XMLStreamConsumer)
+				{
+					((OutputEntry)currentFile).setBottomProducer(
+						(XMLStreamConsumer)bottomProducer);
+				}
+				else
+				{
+					throw new LagoonException(
+						"Output must contain a byte stream producer: " 
+						+ currentTargetName);
+				}
+				
+				if (o instanceof ByteStreamProducer)
+				{
+					((OutputEntry)currentFile).setMyProducer(
+						(ByteStreamProducer)o);
+				}
+				else
+				{
+					throw new LagoonException(
+						"Inconsistent producer chain: " + currentTargetName);
+				}
+
+	            outputs.put(currentTargetName, currentFile);
+			}
+			else
+			{
+				throw new LagoonException(
+					"Unknown entry in sitemap: " + entry.getLocalName());	
+			}
+	        currentTargetName = null;
+	        currentFile = null;
 		}
+		
+		sitemapTree = null;
     }
 
 
@@ -260,6 +327,20 @@ class Sitemap
         return (PartEntry)parts.get(name);
     }
 
+
+    /**
+     * Lookup a specific output entry in the sitemap.
+     *
+     * @param name  the name of the output to obtain.
+     *
+     * @returns the output entry with the specified name,
+     *  or <code>null</code> if not found.
+     */
+    OutputEntry lookupOutput(String name)
+    {
+        return (OutputEntry)outputs.get(name);
+    }
+
 	
 	private Object handleProducer(Element parentEl)
 		throws LagoonException, java.io.IOException
@@ -305,8 +386,14 @@ class Sitemap
 
 			depth++;
 			Object o = handleProducer(el);
-			if (o instanceof String)
+			if (o == null)
 			{
+				bottomProducer = prod;
+			}
+			else if (o instanceof String)
+			{
+				bottomProducer = prod;
+
 				String nameParam = ((String)o).trim();
 				if (nameParam.length() > 0)
 					prod.addParam("name", nameParam);
