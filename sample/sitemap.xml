@@ -4,6 +4,32 @@
 
 <property name="foo">bar</property>
 
+<file target="/lsptest.html" source="/lsp/test.lsp">
+	<format type="xhtml">
+		<transform type="lsp" bool="BOOLEAN" hej="HEJSAN" pi="ACME"><source/></transform>
+	</format>
+</file>
+
+<part name="thePart" source="/lsp/part.lsp">
+	<transform type="lsp" foo="BAR"><source/></transform>
+</part>
+
+<part name="theSecondPart" source="/lsp/part2.lsp">
+	<transform type="lsp" foo="BAZ"><source/></transform>
+</part>
+
+<part name="largePart" source="/style/">
+    <transform type="xslt" stylesheet="/dir.xsl">
+        <source type="dir" pattern="*.xsl"/>
+    </transform>
+</part>
+
+<file target="/dirpart.html" source="part:largePart">
+	<format type="html"><source/></format>
+</file>
+
+<!--
+
 <delete target="/remove/me.txt"/>
 
 <file target="/dtd/xmlwithdtd.xml">
@@ -90,7 +116,6 @@
     </format>
 </file>
 
-<!--
 <file target="/report.pdf" source="/work/report.xml">
 	<format type="fo">
 	   	<transform type="xslt" stylesheet="/style/report_print.xsl">
@@ -98,23 +123,19 @@
 		</transform>
     </format>
 </file>
--->
 
-<!--
 <file target="/picture.png" source="/batikLogo.svg">
 	<format type="svg" format="png">
     	<source/>
     </format>
 </file>
--->
 
-<!--
 <file target="/picture.tiff" source="/batikLogo.svg">
 	<format type="svg" format="tiff">
     	<source/>
     </format>
 </file>
--->
+
 <file target="/pic.png" source="/img/pic.png">
 	<read/>
 </file>
@@ -131,30 +152,6 @@
 			<read/>
 		</parse>
 	</format>
-</file>
-
-<file target="/lsptest.html" source="/lsp/test.lsp">
-	<format type="xhtml" indent="yes">
-		<transform type="lsp" bool="BOOLEAN" hej="HEJSAN" pi="ACME"><source/></transform>
-	</format>
-</file>
-
-<part name="thePart" source="/lsp/part.lsp">
-	<transform type="lsp" foo="BAR"><source/></transform>
-</part>
-
-<part name="theSecondPart" source="/lsp/part2.lsp">
-	<transform type="lsp" foo="BAZ"><source/></transform>
-</part>
-
-<part name="largePart" source="/style/">
-    <transform type="xslt" stylesheet="/dir.xsl">
-        <source type="dir" pattern="*.xsl"/>
-    </transform>
-</part>
-
-<file target="/dirpart.html" source="part:largePart">
-	<format type="html"><source/></format>
 </file>
 
 <file target="/htmltest.html" source="/htmltest.html">
@@ -190,6 +187,8 @@
 </file>
 
 <file target="/file/pic.png" source="file:C:\home\mikes\lagoon\sample\src\img\pic.png"/>
+
+-->
 
 <!--
 <file target="/res/pic.png" source="res:/img/pic.png">
