@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2002, Mikael Ståldal
+ * Copyright (c) 2001-2005, Mikael Ståldal
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without 
@@ -62,7 +62,8 @@ public class XSLTransformer extends Transform
     private boolean always;
     private long stylesheetRead = 0;
 
-    private StylesheetContainer container;
+    private StylesheetContainer stylesheetInfo;
+    private Templates stylesheet;
 
     public void init() throws LagoonException, IOException
     {
@@ -88,8 +89,8 @@ public class XSLTransformer extends Transform
             }
             tfactory = (SAXTransformerFactory)tf;
 
-            container = (StylesheetContainer)getObjectFromRepository(
-                "stylesheet");
+            stylesheetInfo = (StylesheetContainer)getObjectFromRepository(
+                "stylesheetInfo");
 		}
         catch (LagoonException e)
 		{
@@ -99,6 +100,8 @@ public class XSLTransformer extends Transform
         {
             throw new LagoonException(e.getMessage());
         }
+
+        stylesheet = null;        
     }
     
     public void afterBuild()
@@ -106,20 +109,20 @@ public class XSLTransformer extends Transform
     {
         if (stylesheetRead > 0)
         {
-            container.stylesheetRead = System.currentTimeMillis();
-            putObjectIntoRepository("stylesheet", container);
+            stylesheetInfo.stylesheetRead = System.currentTimeMillis();
+            putObjectIntoRepository("stylesheetInfo", stylesheetInfo);
         }
     }
 
     private void readStylesheet(final Target target)
     	throws IOException, SAXException
     {
-        container = new StylesheetContainer(always);
+        stylesheetInfo = new StylesheetContainer(always);
 
         final String xslPath = getSourceMan().getFileURL(xslFile);
 			
 		if (!getContext().canCheckFileHasBeenUpdated(xslPath))
-			container.compileDynamic = true;
+			stylesheetInfo.compileDynamic = true;
 
         if (DEBUG) System.out.println("Read stylesheet: " + xslPath);
 
@@ -132,11 +135,11 @@ public class XSLTransformer extends Transform
 				try {
 	                if (!getContext().canCheckFileHasBeenUpdated(thisFile))
 	                {
-	                    container.compileDynamic = true;
+	                    stylesheetInfo.compileDynamic = true;
 	                }
 					else
 					{
-	                    container.importedFiles.put(thisFile, "");
+	                    stylesheetInfo.importedFiles.put(thisFile, "");
 					}
 				
 					return getSourceMan().getFileAsJAXPSource(thisFile, target);
@@ -151,9 +154,9 @@ public class XSLTransformer extends Transform
 		Source ss = getSourceMan().getFileAsJAXPSource(xslPath, target);
 		
         try {
-            container.stylesheet = tfactory.newTemplates(ss);
+            stylesheet = tfactory.newTemplates(ss);
             stylesheetRead = System.currentTimeMillis();
-            putObjectIntoRepository("stylesheet", container);
+            putObjectIntoRepository("stylesheetInfo", stylesheetInfo);
         }
         catch (TransformerConfigurationException e)
         {
@@ -163,7 +166,7 @@ public class XSLTransformer extends Transform
         if (DEBUG)
         {
             System.out.println("---depends on files:");
-            for (Enumeration e = container.importedFiles.keys();
+            for (Enumeration e = stylesheetInfo.importedFiles.keys();
                 e.hasMoreElements(); )
             {
                 System.out.println("\t" + e.nextElement());
@@ -175,21 +178,21 @@ public class XSLTransformer extends Transform
 	private boolean stylesheetUpdated()
         throws LagoonException, IOException
 	{
-        if (container == null) return true;
+        if (stylesheetInfo == null) return true;
     
-        if (container.compileDynamic) return true;
+        if (stylesheetInfo.compileDynamic) return true;
 
         if (getSourceMan().fileHasBeenUpdated(xslFile,
-                                              container.stylesheetRead))
+                                              stylesheetInfo.stylesheetRead))
         {
         	return true;
 		}
 
-		for (Enumeration e = container.importedFiles.keys();
+		for (Enumeration e = stylesheetInfo.importedFiles.keys();
              e.hasMoreElements(); )
 		{
 			if (getSourceMan().fileHasBeenUpdated((String)e.nextElement(),
-                                                  container.stylesheetRead))
+                                                  stylesheetInfo.stylesheetRead))
 			{
 				return true;
 			}
@@ -201,7 +204,7 @@ public class XSLTransformer extends Transform
     public void start(org.xml.sax.ContentHandler sax, final Target target)
     	throws IOException, SAXException
     {
-        if (stylesheetUpdated())
+        if (stylesheet == null || stylesheetUpdated())
         {
             readStylesheet(target);
         }
@@ -210,7 +213,7 @@ public class XSLTransformer extends Transform
 
         TransformerHandler th;
         try {
-            th = tfactory.newTransformerHandler(container.stylesheet);
+            th = tfactory.newTransformerHandler(stylesheet);
         }
         catch (TransformerConfigurationException e)
         {
@@ -235,11 +238,11 @@ public class XSLTransformer extends Transform
 				try {
 					if (!getContext().canCheckFileHasBeenUpdated(href))
 					{
-						container.executeDynamic = true;
+						stylesheetInfo.executeDynamic = true;
 					}
 					else
 					{
-						container.readFiles.put(
+						stylesheetInfo.readFiles.put(
 							getSourceMan().getFileURL(href), "");
 					}
 					
@@ -254,12 +257,12 @@ public class XSLTransformer extends Transform
 
         getNext().start(new ContentHandlerFixer(th), target);
 
-        putObjectIntoRepository("stylesheet", container);
+        putObjectIntoRepository("stylesheetInfo", stylesheetInfo);
 
         if (DEBUG)
         {
             System.out.println("---execute depends on files:");
-            for (Enumeration e = container.readFiles.keys();
+            for (Enumeration e = stylesheetInfo.readFiles.keys();
                  e.hasMoreElements(); )
             {
                 System.out.println("\t" + e.nextElement());
@@ -276,9 +279,9 @@ public class XSLTransformer extends Transform
             return true;
         }
 
-		if (container.executeDynamic) return true;
+		if (stylesheetInfo.executeDynamic) return true;
 
-		for (Enumeration e = container.readFiles.keys();
+		for (Enumeration e = stylesheetInfo.readFiles.keys();
              e.hasMoreElements(); )
 		{
 			String f = (String)e.nextElement();
@@ -295,7 +298,6 @@ public class XSLTransformer extends Transform
 
 class StylesheetContainer implements Serializable
 {
-    Templates stylesheet;
     long stylesheetRead;
     boolean executeDynamic;
     boolean compileDynamic;
