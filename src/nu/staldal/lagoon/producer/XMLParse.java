@@ -79,6 +79,28 @@ public class XMLParse extends Parse implements Runnable
 		}		
 
         parser.setContentHandler(sax);
+		parser.setEntityResolver(new EntityResolver() {
+			public InputSource resolveEntity(String publicId,
+											 String systemId)
+								throws SAXException,
+										IOException
+			{
+				InputSource is = new InputSource(
+					getSourceMan().getFileURL(systemId));
+				
+				File fil = getSourceMan().getFile(systemId);
+				
+				if (fil != null)
+				{
+					InputStream istr = new FileInputStream(fil);				
+					is.setByteStream(istr);	
+				}
+				
+				return is;
+			}
+		});
+		
+		
 
 		exception = null;
 

@@ -4,6 +4,12 @@
 
 <delete target="/remove/me.txt"/>
 
+<file target="/xmlwithdtd.xml">
+	<format type="xml">
+		<source/>
+	</format>
+</file>
+
 <file target="/island.html">
 	<format type="xml">
 		<transform type="lsp">
@@ -74,6 +80,7 @@
     </format>
 </file>
 
+<!--
 <file target="/report.pdf" source="/work/report.xml">
 	<format type="fo">
 	   	<transform type="xslt" stylesheet="/style/report_print.xsl">
@@ -81,6 +88,7 @@
 		</transform>
     </format>
 </file>
+-->
 
 <!--
 <file target="/picture.png" source="/batikLogo.svg">

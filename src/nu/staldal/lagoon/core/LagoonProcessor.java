@@ -119,8 +119,8 @@ public class LagoonProcessor implements LagoonContext
         this.sourceRootDir = new File(absPath);
         if (!this.sourceRootDir.isDirectory())
             throw new LagoonException(
-                "sourceDir must be an existing directory: " + sourceDir);   		
-		
+                "sourceDir must be an existing directory: " + sourceDir);
+				
 		sitemap = new Sitemap(this, sitemapTree, sourceRootDir);
 
 		File workDir = new File(System.getProperty("user.home"), ".lagoon");

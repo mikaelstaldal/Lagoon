@@ -200,7 +200,7 @@ abstract class EntryWithSource implements SourceManager, SourceManagerProvider
 			return new StreamSource(file);
 	}
 	
-	
+
 	public void getFileAsSAX(String url, ContentHandler ch, Target target)
 		throws IOException, SAXException
 	{
@@ -226,11 +226,11 @@ abstract class EntryWithSource implements SourceManager, SourceManagerProvider
 		{
 			is = new InputSource(getFileURL(url));
 		
-			File file = getFile(url);	
+			File file = getFile(url);
 		
 			if (file != null)
 			{
-				istream = new FileInputStream(file);
+				istream = new FileInputStream(file);				
 				is.setByteStream(istream);	
 			}
 		}
@@ -239,6 +239,25 @@ abstract class EntryWithSource implements SourceManager, SourceManagerProvider
 			XMLReader parser = spf.newSAXParser().getXMLReader(); 
 
 			parser.setContentHandler(ch);
+			parser.setEntityResolver(new EntityResolver() {
+				public InputSource resolveEntity(String publicId,
+                				                 String systemId)
+                          			throws SAXException,
+                                 			IOException
+				{
+					InputSource is = new InputSource(getFileURL(systemId));
+					
+					File fil = getFile(systemId);
+					
+					if (fil != null)
+					{
+						InputStream istr = new FileInputStream(fil);				
+						is.setByteStream(istr);	
+					}
+					
+					return is;
+				}
+			});
 
 			parser.parse(is);
 		}
