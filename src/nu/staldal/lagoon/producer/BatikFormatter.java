@@ -47,6 +47,8 @@ import org.xml.sax.*;
 import org.apache.batik.transcoder.*;
 import org.apache.batik.transcoder.image.*;
 import org.apache.batik.dom.svg.*;
+import org.apache.batik.util.XMLResourceDescriptor;
+import org.apache.batik.util.SVGConstants;
 
 import nu.staldal.lagoon.core.*;
 import nu.staldal.lagoon.util.*;
@@ -58,7 +60,7 @@ import nu.staldal.xmlutil.*;
  */
 public class BatikFormatter extends Format
 {
-	private static boolean DEBUG = true;
+	private static boolean DEBUG = false;
 
 	private ImageTranscoder transcoder;
 	
@@ -109,6 +111,31 @@ public class BatikFormatter extends Format
 				_sourceURL);
 		if (DEBUG) System.out.println("The source URL: " + sourceURL.toString());
 
+        // Hack to work-around error in Batik 1.5.1
+        SVGOMDocument doc;
+        {
+            String parserClassname = XMLResourceDescriptor.getXMLParserClassName();
+            String namespaceURI = SVGConstants.SVG_NAMESPACE_URI;
+            String documentElement = SVGConstants.SVG_SVG_TAG;
+	    
+            SAXSVGDocumentFactory f = new SAXSVGDocumentFactory(parserClassname);
+            f.setValidating(false);
+            doc = (SVGOMDocument)f.createDocument(namespaceURI,
+                                   documentElement,
+                                   sourceURL.toString(),
+                                   new XMLReaderImpl() {
+                                        public void parse(InputSource is) 
+                                        throws SAXException, IOException
+                                        {
+                                            getNext().start(contentHandler, target);							
+                                        }					
+                                   });
+            doc.setURLObject(sourceURL);
+        }        
+		TranscoderInput input = new TranscoderInput(doc);
+        
+/*
+        // This should have been enough         
 		TranscoderInput input = new TranscoderInput(sourceURL.toString());
         input.setXMLReader(
 			new XMLReaderImpl() {
@@ -117,7 +144,8 @@ public class BatikFormatter extends Format
 					{
 						getNext().start(contentHandler, target);							
 					}					
-				});			
+				}); 
+*/
 
         TranscoderOutput output = new TranscoderOutput(out);
         try {
