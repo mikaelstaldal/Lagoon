@@ -293,13 +293,14 @@ no way to know whether a general URL has been updated.</p>
 <p>Applies an XSLT stylesheet to the XML stream.</p>
 
 <p>The mandatory parameter "stylesheet" specifies the location of the
-stylesheet, as a relative URL. If this URL starts with '/', it relative
-to the local source root directory, otherwise it is relative to the
-source file. Any relative URL imported or included from the
+stylesheet, as an URL. If this URL starts with '/', it is searched for 
+relative to the local source root directory, if it is not absolute and 
+not starts with '/', it's searched for relative to the
+source file. Any non-absolute URL imported or included from the
 stylesheet is searched for relative to the stylesheet (or to the
 local source root directory if it starts with '/').</p>
 
-<p>Any relative URL refeered to by the <code>document()</code> function
+<p>Any non-absolute URL refeered to by the <code>document()</code> function
 is searched for relative to the source file (or to the local source
 root directory if it starts with '/').</p>
 
@@ -374,8 +375,7 @@ page depends on, and signal the need for rebuilding if any of them are
 updated (or always signal the need for rebuilding if any resource
 cannot be checked, e.g. an absolute URL).</p>
 
-<p>This producer can <strong>not</strong> be used together with
-wildcards.</p>
+<p>This producer can <strong>not</strong> be used together with wildcards.</p>
 
 
 <h3>&lt;format type="xml"&gt;</h3>
@@ -519,18 +519,21 @@ to the LSP page):</p>
 <h2>Running Lagoon</h2>
 
 <p>Lagoon is invoked by the application class
-<code>nu.staldal.lagoon.LagoonCLI</code>. The syntax is:</p>
+<code>nu.staldal.lagoon.LagoonCLI</code>. The syntax is one of:</p>
 <pre>
 <em>java</em> nu.staldal.lagoon.LagoonCLI <em>property_file</em> <em>how_to_run</em>
+<em>java</em> nu.staldal.lagoon.LagoonCLI <em>sitemap_file</em> <em>how_to_run</em>
 </pre>
 
 <p><em>java</em> is your Java interpreter, usually just "java". It's
 not recommended to use "javaw" in Sun JDK for Windows, since Lagoon
 will write error messages and other information to standard out.</p>
 
-<p>The <em>property_file</em> is specified using a platform-dependent
-path (e.g. use '\' as path separator in Windows). It may be absolute or
-relative (to the current working directory).</p>
+<p>The <em>property_file</em> and <em>sitemap_file</em> is specified using 
+a platform-dependent path (e.g. use '\' as path separator in Windows). It may 
+be absolute or relative (to the current working directory). If the filename 
+ends with "<code>.xml</code>" or "<code>.sitemap</code>", it will be taken as 
+a sitemap file, otherwise it will be taken as a property file.</p>
 
 <p>The <em>how_to_run</em> argument specifies what Lagoon should do
 after initialization. "build" causes it to perform a normal build
@@ -556,6 +559,12 @@ lines beginning with '#' are ignored.</p>
 <p>The sitemap file and source directory are specified using platform-dependent 
 paths (e.g. use '\' as path separator in Windows). They may be absolute or 
 relative (to the current working directory).</p>
+
+<p>If no property file is used (the sitemap file is specified directly on the 
+command line), sourceDir and targetURL will both be set to the current 
+directory. <strong>Note:</strong> this requires a careful setup of the sitemap,
+since the default behaviour is to use the same path as source and target (which
+obviously won't work if sourceDir and targetURL are the same).</p>
 
 <p>Sample property file:</p>
 <pre>

@@ -5,7 +5,7 @@
 <file target="/very_transformed.xml" source="/twoxsl.xml">
 	<format type="xml" indent="4">
 		<transform type="xslt" stylesheet="/style/second.xsl">
-			<transform type="xslt" stylesheet="/style/first.xsl">
+			<transform type="xslt" stylesheet="file:///D:/mikes/lagoon/sample/src/style/first.xsl">
 				<source/>
 			</transform>
 		</transform>

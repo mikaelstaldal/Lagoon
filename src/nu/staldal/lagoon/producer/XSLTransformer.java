@@ -101,16 +101,20 @@ public class XSLTransformer extends Transform
     private void readStylesheet()
     	throws IOException, SAXException
     {
-        final String xslPath = getSourceMan().getFilePath(xslFile);
+        container = new StylesheetContainer(always);
+
+        final String xslPath = LagoonUtil.absoluteURL(xslFile) 
+			? null
+			: getSourceMan().getFilePath(xslFile);
+			
+		if (xslPath == null) container.compileDynamic = true;
 
         if (DEBUG) System.out.println("Read stylesheet: " + xslPath);
-
-        container = new StylesheetContainer(always);
 
         tfactory.setURIResolver(new URIResolver() {
             public Source resolve(String href, String base)
             {
-                if (LagoonUtil.absoluteURL(href))
+                if (xslPath == null	|| LagoonUtil.absoluteURL(href))
                 {
                     container.compileDynamic = true;
                     return null; // let XSLT processor resolve 
@@ -132,9 +136,12 @@ public class XSLTransformer extends Transform
             }
         });
 
+		StreamSource ss = (xslPath == null) 
+			? new StreamSource(xslFile)
+			: new StreamSource(getSourceMan().openFile(xslPath));
+		
         try {
-            container.stylesheet = tfactory.newTemplates(
-                new StreamSource(getSourceMan().openFile(xslPath)));
+            container.stylesheet = tfactory.newTemplates(ss);
             container.stylesheetRead = System.currentTimeMillis();
             putObjectIntoRepository("stylesheet", container);
         }

@@ -53,11 +53,11 @@ import nu.staldal.lagoon.core.*;
 public class LagoonCLI
 {
     private static final String syntaxMsg =
-        "Syntax: nu.staldal.lagoon.LagoonCLI <property_file> "
-      + "[<interval>|build|force]";
-
+        "Syntax:\n"
+	  + "nu.staldal.lagoon.LagoonCLI <property_file> [<interval>|build|force]\n"
+	  + "nu.staldal.lagoon.LagoonCLI <sitemap_file> [<interval>|build|force]";
+  
     private static Properties properties;
-
 
 
     /**
@@ -97,28 +97,45 @@ public class LagoonCLI
 
         LagoonProcessor processor;
         try {
-            File propertyFile = new File(args[0]);
-            properties = new Properties();
-            properties.load(new FileInputStream(propertyFile));
-
             System.out.println("Initializing Lagoon...");
+			
+			String targetURL;
+			File sitemapFile;
+			File sourceDir;
+			String password;
+			
+			if (args[0].endsWith(".xml") || args[0].endsWith(".sitemap"))
+			{
+				targetURL = System.getProperty("user.dir");
+				sourceDir = new File(targetURL);
+				sitemapFile = new File(args[0]);
+				password = null;
+			}
+			else
+			{
+				File propertyFile = new File(args[0]);
+			
+				properties = new Properties();
+				FileInputStream fis = new FileInputStream(propertyFile);
+				properties.load(fis);
+				fis.close();
+	
+				targetURL = getProperty("targetURL");
+				sitemapFile = new File(getProperty("sitemapFile"));
+				sourceDir = new File(getProperty("sourceDir"));			
+                password = properties.getProperty("password");
+			}
+			
+            processor = new LagoonProcessor(targetURL);
 
-            File sitemapFile = new File(getProperty("sitemapFile"));
-
-            processor = new LagoonProcessor(getProperty("targetURL"));
-
-            String password = null;
             if (processor.needPassword())
             {
-                password = properties.getProperty("password");
                 if (password == null)
                     throw new LagoonException(
                         "Password is required but not specified");
             }
 
-            processor.init(sitemapFile,
-                           new File(getProperty("sourceDir")),
-                           password);
+            processor.init(sitemapFile, sourceDir, password);
         }
         catch (AuthenticationException e)
         {
@@ -150,9 +167,7 @@ public class LagoonCLI
             System.err.println(e.toString());
             return;
         }
-			
-		
-		
+					
         System.out.println("Lagoon initialized successfully");
 
         try {
@@ -252,3 +267,4 @@ public class LagoonCLI
 			System.out.println("in " + ms/1000 + " s");
 	}
 }
+
