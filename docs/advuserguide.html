@@ -27,7 +27,13 @@ use of this.</p>
 
 <h2>Embeeding Lagoon in other applications</h2>
 
-<p><em>To be done...</em></p>
+<p>Construct an instance of the 
+<code>nu.staldal.lagoon.core.LagoonProcessor</code> class, the parameters to 
+the constructor are much the same as what you put in the property file
+to the Lagoon CLI. Then invoke the <code>build()</code> method, possible 
+multiple times. When finished, invoke the <code>destroy()</code> method.</p>
+
+<p>See the source code of <code>nu.staldal.lagoon.LagoonCLI</code>.</p>
 
 
 <h2>LSP Extension Libraries</h2>
@@ -37,3 +43,4 @@ use of this.</p>
 
 </body>
 </html>
+
