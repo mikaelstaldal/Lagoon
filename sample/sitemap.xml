@@ -62,7 +62,7 @@
 
 
 <file target="/very_transformed.xml" source="/twoxsl.xml">
-	<format type="xml" indent="4">
+	<format type="xml" indent="yes">
 		<transform type="xslt" stylesheet="/style/second.xsl">
 			<transform type="xslt" stylesheet="/style/first.xsl">
 				<source/>
@@ -72,7 +72,7 @@
 </file>
 
 <file target="/split/split.sem" source="/split.xml">
-	<format type="xml" indent="4">
+	<format type="xml" indent="yes">
 		<transform type="split" namespace="" element="split" 
 				   outputname="[name].xml">
 			<source/>
@@ -81,19 +81,19 @@
 </file>
 
 <file target="/dirlistall.xml" source="/style/">
-	<format type="xml" indent="4">
+	<format type="xml" indent="yes">
 		<source type="dir"/>
 	</format>
 </file>
 
 <file target="/dirlistraw.xml" source="/style/">
-	<format type="xml" indent="4">
+	<format type="xml" indent="yes">
 		<source type="dir" pattern="*.xsl"/>
 	</format>
 </file>
 
 <file target="/dirlist.xml" source="/style/">
-	<format type="xml" indent="4">
+	<format type="xml" indent="yes">
 		<transform type="xslt" stylesheet="/dir.xsl">
 			<source type="dir" pattern="*.xsl"/>
 		</transform>
@@ -116,6 +116,7 @@
     </format>
 </file>
 
+<!--
 <file target="/report.pdf" source="/work/report.xml">
 	<format type="fo">
 	   	<transform type="xslt" stylesheet="/style/report_print.xsl">
@@ -123,7 +124,9 @@
 		</transform>
     </format>
 </file>
+-->
 
+<!--
 <file target="/picture.png" source="/batikLogo.svg">
 	<format type="svg" format="png">
     	<source/>
@@ -135,6 +138,7 @@
     	<source/>
     </format>
 </file>
+-->
 
 <file target="/pic.png" source="/img/pic.png">
 	<read/>
@@ -208,5 +212,14 @@
     </format>
 </file>
 -->
+
+<file target="/index.php" source="/index-php.xml">
+    <format omit-xml-declaration="yes" html="strict" indent="yes" 
+	encoding="UTF-8" type="xhtml">
+      		<transform stylesheet="/site-xhtml.xsl" type="xslt">
+        <source/>
+      </transform>
+    </format>
+</file>
 
 </sitemap>
