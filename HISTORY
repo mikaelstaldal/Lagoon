@@ -79,3 +79,8 @@
 -----------
 * LSP available as separate package.
 * LSSI.
+
+
+1.0 beta 20
+-----------
+* Better Batik integration for SVG rendering: xlinks now works.
