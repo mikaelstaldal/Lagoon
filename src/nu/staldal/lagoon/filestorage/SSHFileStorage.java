@@ -122,7 +122,7 @@ public class SSHFileStorage extends RemoteFileStorage
 			throw new MalformedURLException(url);
 
 		int userPos = 5;
-		int hostPos = url.indexOf('@', userPos+1);
+		int hostPos = url.lastIndexOf('@');
 		if (hostPos < 0)
 			throw new MalformedURLException(url);
 		int portPos = url.indexOf(':', hostPos+1);
