@@ -28,8 +28,8 @@
   <property name="version" value="1.0b20"/>
   <property name="ver" value="10b20"/>
 
-  <property name="version.lsp" value="1.0b4"/>
-  <property name="ver.lsp" value="10b4"/>
+  <property name="version.lsp" value="1.0b5"/>
+  <property name="ver.lsp" value="10b5"/>
 
   <property name="res.dir" value="resource"/>
   <property name="src.dir" value="src"/>
@@ -82,7 +82,7 @@
     	<classpath refid="lagoon.class.path"/>
 	</javac>           
 
-    <copy todir="${build.classes}">
+    <copy todir="${build.classes}" includeEmptyDirs="no">
       <fileset dir="${src.dir}">
         <include name="nu/staldal/lagoon/**/*" />
         <exclude name="**/*.java" />
@@ -92,8 +92,9 @@
     </copy>
   </target>
 
+  
   <target name="lagoon" 
-    depends="init,xmlutil,lexer,lsp,lagoon_compile,lagoon_version"
+    depends="init,xmlutil,lagoon_compile,lagoon_version"
   	description="Compiles Lagoon">
  
     <jar jarfile="dist/${name}.jar"
@@ -104,7 +105,6 @@
       </fileset>
       <fileset dir="${res.dir}"/>
     </jar>
-
   </target>
 
 
@@ -120,7 +120,7 @@
         </classpath>
 	</javac>
 
-    <copy todir="${build.classes}">
+    <copy todir="${build.classes}" includeEmptyDirs="no">
       <fileset dir="${src.dir}">
         <include name="nu/staldal/xtree/**/*" />
         <include name="nu/staldal/xmlutil/**/*" />
@@ -144,21 +144,59 @@
   </target>
 
 
-  <target name="lsp" depends="init,xmlutil,lexer"
-  	description="Compiles LSP">
+  <target name="lsprt" depends="init"
+  	description="Compiles LSP runtime">
     <javac srcdir="${src.dir}"
-    	   includes="nu/staldal/lsp/**/*,nu/staldal/syntax/**/*"
+    	   includes="nu/staldal/lsp/*,nu/staldal/lsp/wrapper/*,nu/staldal/lsp/servlet/**/*,nu/staldal/lsp/struts/**/*"
            destdir="${build.classes}"
            optimize="off" debug="on">
-       <classpath location="${Ant}" />
-       <classpath location="${BCEL}" />
        <classpath location="${Servlet}" />
        <classpath location="${Struts}" />
 	</javac>
 
-    <copy todir="${build.classes}">
+    <copy todir="${build.classes}" includeEmptyDirs="no">
       <fileset dir="${src.dir}">
-        <include name="nu/staldal/lsp/**/*" />
+        <include name="nu/staldal/lsp/*" />
+        <include name="nu/staldal/lsp/wrapper/*" />
+        <include name="nu/staldal/lsp/servlet/**/*" />
+        <include name="nu/staldal/lsp/struts/**/*" />
+        <exclude name="**/*.java" />
+        <exclude name="**/*.lex" />
+        <exclude name="**/package.html" />
+      </fileset>
+    </copy>
+
+    <jar jarfile="dist/lsprt.jar"
+         manifest="src/lsprt.mf">
+      <fileset dir="${build.classes}"> 
+         <include name="nu/staldal/lsp/*" />
+         <include name="nu/staldal/lsp/wrapper/*" />
+         <include name="nu/staldal/lsp/servlet/**/*" />
+         <include name="nu/staldal/lsp/struts/**/*" />
+         <include name="nu/staldal/util/Environment*.class" />
+         <include name="nu/staldal/util/Utils.class" />
+         <include name="nu/staldal/xmlutil/ContentHandlerFixer.class" />
+      </fileset>	 
+    </jar>
+  </target>
+
+
+  <target name="lspc" depends="init,xmlutil,lexer,lsprt"
+  	description="Compiles LSP compiler">
+    <javac srcdir="${src.dir}"
+    	   includes="nu/staldal/lsp/compiler/*,nu/staldal/lsp/compile/*,nu/staldal/lsp/expr/*,nu/staldal/lsp/compiledexpr/*,nu/staldal/syntax/**/*"
+           destdir="${build.classes}"
+           optimize="off" debug="on">
+       <classpath location="${Ant}" />
+       <classpath location="${BCEL}" />
+	</javac>
+
+    <copy todir="${build.classes}" includeEmptyDirs="no">
+      <fileset dir="${src.dir}">
+        <include name="nu/staldal/lsp/compiler/*" />
+        <include name="nu/staldal/lsp/compile/*" />
+        <include name="nu/staldal/lsp/expr/*" />
+        <include name="nu/staldal/lsp/compiledexpr/*" />
         <include name="nu/staldal/syntax/**/*" />
         <exclude name="**/*.java" />
         <exclude name="**/*.lex" />
@@ -166,10 +204,13 @@
       </fileset>
     </copy>
 
-    <jar jarfile="dist/lsp.jar"
-         manifest="src/lsp.mf">
+    <jar jarfile="dist/lspc.jar"
+         manifest="src/lspc.mf">
       <fileset dir="${build.classes}"> 
-         <include name="nu/staldal/lsp/**/*" />
+         <include name="nu/staldal/lsp/compiler/*" />
+         <include name="nu/staldal/lsp/compile/*" />
+         <include name="nu/staldal/lsp/expr/*" />
+         <include name="nu/staldal/lsp/compiledexpr/*" />
          <include name="nu/staldal/syntax/**/*" />
       </fileset>	 
     </jar>
@@ -187,7 +228,7 @@
     	  tofile="${basedir}/${src.dir}/nu/staldal/lsp/expr/LSPExprLexer.java"/>
   </target>
 
-  <target name="testsuite" depends="init,xmlutil,lsp,lagoon"
+  <target name="testsuite" depends="init,xmlutil,lspc,lagoon"
   	description="Compiles testsuite">
     <javac srcdir="${src.testsuite}"
     	   includes="nu/staldal/**/*"
@@ -199,7 +240,7 @@
         </classpath>
     </javac>
 
-    <copy todir="${build.testsuite}">
+    <copy todir="${build.testsuite}" includeEmptyDirs="no">
       <fileset dir="${src.testsuite}">
         <include name="nu/staldal/**/*" />
         <exclude name="**/*.java" />
@@ -277,7 +318,7 @@
   </target>
 
 
-  <target name="dist-lsp" depends="lsp,docs-lsp"
+  <target name="dist-lsp" depends="lsprt,lspc,docs-lsp"
   		  description="Builds the LSP distribution">
     <filter token="NAME" value="LSP" />
     <filter token="VERSION" value="${version.lsp}" />
@@ -291,7 +332,7 @@
       <fileset dir="bin" includes="lspc*"/>
     </copy>
     <copy todir="dist-lsp">
-      <fileset dir="dist" includes="lsp.jar xmlutil.jar"/>
+      <fileset dir="dist" includes="lsprt.jar lspc.jar xmlutil.jar"/>
     </copy>    
     <mkdir dir="dist-lsp/sample/servlet"/>
   	<copy todir="dist-lsp/sample/servlet">
