@@ -167,11 +167,13 @@
     <mkdir dir="${dist.dir}/docs/javadoc"/>
     <javadoc packagenames="nu.staldal.lagoon.core,nu.staldal.lagoon.util,nu.staldal.xtree,nu.staldal.lsp,nu.staldal.syntax,nu.staldal.xmlutil,nu.staldal.ftp"
     	     sourcepath="${src.dir}"
+             classpathref="lagoon.class.path"
+             classpath="${JAF}"
              destdir="${dist.dir}/docs/javadoc"
              author="true"
              version="true"
              windowtitle="${Name} API"
-             doctitle="${Name}" />
+             doctitle="${Name}"/>
   </target>
 
 
