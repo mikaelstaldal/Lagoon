@@ -44,3 +44,7 @@
 * Updated LSP.
 * Checks for broken FTP connection (timeout) and reconnect.
 * Fixed display bug in GUI for Java2 1.4.
+
+
+1.0 beta 15
+-----------
