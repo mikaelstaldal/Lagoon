@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001, Mikael Ståldal
+ * Copyright (c) 2001-2002, Mikael Ståldal
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -363,7 +363,7 @@ public class LagoonProcessor
      * @return  a new Producer
      *          or <code>null</code> if it cannot be found.
      */
-    public Producer createProducer(String cat, String type)
+    Producer createProducer(String cat, String type)
         throws LagoonException
     {
         Class cls = (Class)classDict.get(cat + ":" + type);
@@ -466,7 +466,7 @@ public class LagoonProcessor
      * @return  a new FileStorage
      *          or <code>null</code> if it cannot be found.
      */
-    public FileStorage createFileStorage(String url)
+    FileStorage createFileStorage(String url)
         throws LagoonException
     {
         Class cls = null;
