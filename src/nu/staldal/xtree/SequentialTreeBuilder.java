@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002, Mikael Ståldal
+ * Copyright (c) 2002-2003, Mikael Ståldal
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -97,6 +97,9 @@ public class SequentialTreeBuilder implements ContentHandler, ErrorHandler
 			SAXParserFactory parserFactory = SAXParserFactory.newInstance();
 			parserFactory.setNamespaceAware(true);
 			parserFactory.setValidating(validateDTD);
+			parserFactory.setFeature("http://xml.org/sax/features/namespaces", true);
+			parserFactory.setFeature("http://xml.org/sax/features/namespace-prefixes", false);
+			parserFactory.setFeature("http://xml.org/sax/features/validation", validateDTD);			
 	
 			XMLReader xmlReader = parserFactory.newSAXParser().getXMLReader();			
 			SequentialTreeBuilder tb = new SequentialTreeBuilder(handler);

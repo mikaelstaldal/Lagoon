@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001, Mikael Ståldal
+ * Copyright (c) 2001-2003, Mikael Ståldal
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without 
@@ -58,9 +58,23 @@ public class XMLParse extends Parse implements Runnable
 	
     public void init() throws LagoonException
     {
-		spf = SAXParserFactory.newInstance();
-		spf.setNamespaceAware(true);
-		spf.setValidating(false);
+		try {
+			spf = SAXParserFactory.newInstance();
+			spf.setNamespaceAware(true);
+			spf.setValidating(false);
+			spf.setFeature("http://xml.org/sax/features/namespaces", true);
+			spf.setFeature("http://xml.org/sax/features/namespace-prefixes", false);
+			spf.setFeature("http://xml.org/sax/features/validation", false);
+		}
+		catch (ParserConfigurationException e)
+		{
+			throw new Error("Unable to configure XML parser");	
+		}
+		catch (SAXException e)
+		{
+			throw new Error("Unable to configure XML parser");	
+		}
+
 		target = null;
     }
 
