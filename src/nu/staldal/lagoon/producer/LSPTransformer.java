@@ -118,8 +118,8 @@ public class LSPTransformer extends Transform
                     }
                     else
                     {
-    					InputStream fis = getSourceMan().openFile(url);
-                        return new InputSource(fis);
+                        return new InputSource(
+							getSourceMan().getFileURL(url).toExternalForm());
                     }
                 }
             });

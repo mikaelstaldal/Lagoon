@@ -333,8 +333,10 @@ class FileEntry implements SourceManager, FileTarget
 		if (e instanceof SAXParseException)
 		{
 			SAXParseException spe = (SAXParseException)e;
-			System.out.println("XML Parse error at " + spe.getLineNumber()
-				+ ":" + spe.getColumnNumber() + ":" + spe.getMessage());
+			String sysId = (spe.getSystemId() == null)
+				? "source": spe.getSystemId();
+			System.out.println(sysId + ":" + spe.getLineNumber()
+				+ ":" + spe.getColumnNumber() + ": " + spe.getMessage());
 		}
 		else if (e instanceof SAXException)
 		{
@@ -342,18 +344,18 @@ class FileEntry implements SourceManager, FileTarget
 			Exception ee = se.getException();
 			if (ee != null)
 			{
-				System.out.println(ee.getClass().getName() + ": " + ee.getMessage());
+				System.out.println(ee.toString());
 			    if (DEBUG) ee.printStackTrace(System.out);
 			}
 			else
 			{
-				System.out.println(se.getClass().getName() + ": " + se.getMessage());
+				System.out.println(se.getMessage());
     			if (DEBUG) se.printStackTrace(System.out);
 			}
 		}
 		else if (e instanceof IOException)
 		{
-			System.out.println(e.getClass().getName() + ": " + e.getMessage());
+			System.out.println(e.toString());
 			if (DEBUG) e.printStackTrace(System.out);
 		}
 		else
