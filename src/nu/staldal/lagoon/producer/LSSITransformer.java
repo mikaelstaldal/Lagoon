@@ -182,6 +182,31 @@ class LSSIHandler implements ContentHandler
                 String theDate = df.format(new Date());
                 sax.characters(theDate.toCharArray(), 0, theDate.length());
             }
+            else if (localName.equals("lastmod"))
+            {
+                String format = atts.getValue("format");                
+                if (format == null) format = "yyyy-MM-dd";
+                
+                DateFormat df = new SimpleDateFormat(format);
+                String tz = atts.getValue("tz");
+                if (tz != null) df.setTimeZone(TimeZone.getTimeZone(tz));
+                                
+                try {
+                    String url = atts.getValue("file");
+                    if (url == null) url = sourceMan.getSourceURL();
+                    File file = sourceMan.getFile(url);
+                    if (file == null)
+                    {
+                        throw new SAXParseException("No file to check timestamp on", locator);
+                    }
+                    String theDate = df.format(new Date(file.lastModified()));
+                    sax.characters(theDate.toCharArray(), 0, theDate.length());
+                }
+                catch (FileNotFoundException e)
+                {
+                    throw new SAXException(e);    
+                }
+            }
             else if (localName.equals("root"))
             {
                 // just ignore
@@ -189,7 +214,7 @@ class LSSIHandler implements ContentHandler
             else
             {
                 throw new SAXParseException(
-                    "Unknown LSSI directive: " + localName, locator);     
+                    "Unknown LSSI element: " + localName, locator);     
             }
         }
         else

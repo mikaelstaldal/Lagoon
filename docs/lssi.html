@@ -55,7 +55,7 @@ attribute name in <b>bold</b> means this attribute is required. </p>
 &#160;&#160;<b>file</b> = <var>URL</var> /&gt;
 </p>
 
-<p>The <code>lssi:include</code> includes a file when the page is
+<p>The <code>lssi:include</code> element includes a file when the page is
 executed. Any elements in the LSP namespace in the included file
 are processed, and an included file may include other files in arbitrary 
 nesting.</p>
@@ -83,7 +83,7 @@ nested.</p>
 &#160;&#160;tz = <var>timezone</var> /&gt;
 </p>
 
-<p>The <code>lssi:date</code> print the date/time when Lagoon processed 
+<p>The <code>lssi:date</code> element print the date/time when Lagoon processed 
 this page (<em>not</em> when the user displays the page!). The 
 <code>format</code> parameter specifies the date/time format to use, the same as
 <a href="http://java.sun.com/j2se/1.4.1/docs/api/java/text/SimpleDateFormat.html">Java SimpleDateFormat</a>, 
@@ -91,6 +91,22 @@ if not specified <code>yyyy-MM-dd</code> is used. The <code>tz</code> parameter
 specifies the time zone to use (e.g. "GMT"), is not specified the local time zone
 is used (of the machine where Lagoon runs, which may be different from the 
 web server and from the user displaying the page).</p>
+
+
+<h4>lssi:lastmod</h4>
+
+<p class="element-syntax">
+<a name="element-lastmod"></a>&lt;lssi:lastmod<br />
+&#160;&#160;file = <var>URL</var><br />
+&#160;&#160;format = <var>format</var><br />
+&#160;&#160;tz = <var>timezone</var> /&gt;
+</p>
+
+<p>The <code>lssi:lastmod</code> element print the date/time when a file was last
+modified. The <code>file</code> parameter specifies the file to check, 
+if not specified the main source file is used (not an included file). 
+The <code>format</code> and <code>tz</code> parameters are used as in 
+<code>lsp:date</code>.</p>
 
 
 </body>
