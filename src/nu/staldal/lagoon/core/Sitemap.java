@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001, Mikael Ståldal
+ * Copyright (c) 2001-2002, Mikael Ståldal
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -57,6 +57,7 @@ class Sitemap
 {
     // Associations
     private Hashtable entries;
+	private Vector entryVector;
     private Hashtable parts;
 
     // Attributes
@@ -111,6 +112,7 @@ class Sitemap
 
         this.sourceDir = sourceDir;
         entries = new Hashtable();
+		entryVector = new Vector();
 		parts = new Hashtable();
 
         currentFile = null;
@@ -156,6 +158,7 @@ class Sitemap
 				}
 
 	            entries.put(currentTargetName, currentFile);
+				entryVector.addElement(currentFile);
 	            currentTargetName = null;
 	            currentFile = null;
 			}
@@ -205,6 +208,7 @@ class Sitemap
 														 targetLocation);
 				
 	            entries.put(currentTargetName, currentEnt);
+				entryVector.addElement(currentEnt);
 	            currentTargetName = null;
 			}
 		}
@@ -234,7 +238,7 @@ class Sitemap
      */
     public Enumeration getEntries()
     {
-        return entries.elements();
+        return entryVector.elements();
     }
 
 
