@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 
-<sitemap name="LagoonSample">
+<sitemap>
 
 <property name="foo">bar</property>
 
 <delete target="/remove/me.txt"/>
 
-<file target="/xmlwithdtd.xml">
+<file target="/dtd/xmlwithdtd.xml">
 	<format type="xml">
 		<source/>
 	</format>

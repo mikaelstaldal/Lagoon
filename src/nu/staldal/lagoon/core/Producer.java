@@ -184,7 +184,8 @@ public abstract class Producer implements ProducerInterface
      *
      * @param key  the key to locate the file
      *
-     * @return  an OutputStream to write to the file
+     * @return  an OutputStream to write to the file, or <code>null</code>
+	 *          if the repository is unavailable.
      */
     public OutputStream storeFileInRepository(String key)
         throws IOException
@@ -216,11 +217,14 @@ public abstract class Producer implements ProducerInterface
      *
      * @param key  the key to locate the object
      * @param obj  the object to store, must be Serializable
+	 *
+	 * @return <code>true</code> if successful, 
+	 *		   <code>false</code> if the repository is unavailable. 
      */
-    public void putObjectIntoRepository(String key, Object obj)
+    public boolean putObjectIntoRepository(String key, Object obj)
         throws java.io.IOException
     {
-        processor.putObjectIntoRepository(
+        return processor.putObjectIntoRepository(
             LagoonUtil.encodePath(entryName),
             makeKey(key),
             obj);

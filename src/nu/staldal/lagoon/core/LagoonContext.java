@@ -44,6 +44,9 @@ import java.io.*;
 
 /**
  * Defines project-wide services for components.
+ *
+ * The repository may be unavailable. Then all attempts to use it
+ * will return <code>null</code> or <code>false</code>
  */
 public interface LagoonContext
 {
@@ -72,7 +75,8 @@ public interface LagoonContext
      *
      * @param key  the key to locate the file
      *
-     * @return  an OutputStream to write to the file
+     * @return  an OutputStream to write to the file, or <code>null</code>
+	 *          if the repository is unavailable.
      */
     public OutputStream storeFileInRepository(String key)
         throws IOException;
@@ -94,8 +98,11 @@ public interface LagoonContext
      *
      * @param key  the key to locate the object
      * @param obj  the object to store, must be Serializable
+	 *
+	 * @return <code>true</code> if successful, 
+	 *		   <code>false</code> if the repository is unavailable. 
      */
-    public void putObjectIntoRepository(String key, Object obj)
+    public boolean putObjectIntoRepository(String key, Object obj)
         throws IOException;
 		
 

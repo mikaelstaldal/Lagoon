@@ -7,7 +7,7 @@
 
 <start>
   <element name="sitemap">
-    <attribute name="name"/>
+    <optional><attribute name="name"/></optional>
     <zeroOrMore>
       <choice>
         <ref name="propertyEntry"/>

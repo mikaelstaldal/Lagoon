@@ -93,10 +93,6 @@ class Sitemap
 		}
 						
 		siteName = sitemapTree.getAttrValueOrNull("name");
-		if (siteName == null || siteName.length() < 1)
-		{
-			throw new LagoonException("no site name found in sitemap");
-		}
 
         this.processor = processor;
         this.sourceDir = sourceDir;
@@ -290,7 +286,7 @@ class Sitemap
 
 
     /**
-     * Get the site name.
+     * Get the site name. Or <code>null</code> if no name is defined.
      */
     public String getSiteName()
     {

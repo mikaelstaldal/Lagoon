@@ -56,9 +56,13 @@ public class DirSource extends Source
 {
     private String pattern = null;
 
-    public void init()
+	private Hashtable dirlist = null;
+	
+    public void init() throws IOException
     {
         pattern = getParam("pattern");
+		
+        dirlist = (Hashtable)getObjectFromRepository("dirlist");
     }
 
     public void start(ContentHandler sax, Target target)
@@ -70,13 +74,12 @@ public class DirSource extends Source
 
         String[] files = dir.list();
 
-        Hashtable ht = new Hashtable();
+        dirlist = new Hashtable();
         for (int i = 0; i<files.length; i++)
         {
-            ht.put(files[i], "washere");
+            dirlist.put(files[i], "washere");
         }
-
-        putObjectIntoRepository("dirlist", ht);
+        putObjectIntoRepository("dirlist", dirlist);
 
         sax.startDocument();
         sax.startElement("", "dirlist", "", new AttributesImpl());
@@ -135,29 +138,22 @@ public class DirSource extends Source
             return true;
 
         File dir = getSourceMan().getFile(getSourceMan().getSourceURL());
-        Hashtable ht = null;
-        try {
-            ht = (Hashtable)getObjectFromRepository("dirlist");
-        }
-        catch (ClassCastException e)
-        {
-            throw new LagoonException("repository data is corrupted");
-        }
-        if (ht == null) return true;
+        
+		if (dirlist == null) return true;
 
         String[] files = dir.list();
         for (int i = 0; i<files.length; i++)
         {
-            if (ht.put(files[i], "ishere") == null)
+            if (dirlist.put(files[i], "ishere") == null)
             {
                 return true; // file added
             }
         }
 
-        for (Enumeration enum = ht.keys(); enum.hasMoreElements(); )
+        for (Enumeration enum = dirlist.keys(); enum.hasMoreElements(); )
         {
             Object o = enum.nextElement();
-            if (ht.get(o) != "ishere")
+            if (dirlist.get(o) != "ishere")
             {
                 return true; // file removed
             }

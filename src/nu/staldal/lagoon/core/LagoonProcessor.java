@@ -141,24 +141,34 @@ public class LagoonProcessor implements LagoonContext
 			}
 		}
 		
-		repositoryDir = new File(workDir, sitemap.getSiteName());
-		if (!repositoryDir.exists())
+		if (sitemap.getSiteName() != null)
 		{
-			if (!repositoryDir.mkdir())
-				throw new IOException("Unable to create directory: "
-					+ repositoryDir);
+			repositoryDir = new File(workDir, sitemap.getSiteName());
+			if (!repositoryDir.exists())
+			{
+				if (!repositoryDir.mkdir())
+					throw new IOException("Unable to create directory: "
+						+ repositoryDir);
+			}
+			else
+			{
+				if (!repositoryDir.isDirectory())
+				{
+					throw new IOException(
+						"Unable to create directory (a file with that name exists): "
+						+ repositoryDir);
+				}
+			}
 		}
 		else
 		{
-			if (!repositoryDir.isDirectory())
-			{
-				throw new IOException(
-					"Unable to create directory (a file with that name exists): "
-					+ repositoryDir);
-			}
+			repositoryDir = null;	
 		}
 
-		tempDir = new File(repositoryDir, "temp");
+		if (repositoryDir != null)
+			tempDir = new File(repositoryDir, "temp");
+		else
+			tempDir = new File(workDir, "temp");
 		if (!tempDir.exists())
 		{
 			if (!tempDir.mkdir())
@@ -249,6 +259,8 @@ public class LagoonProcessor implements LagoonContext
 
     InputStream readFileFromRepository(String dir, String key)
     {
+		if (repositoryDir == null) return null;
+		
         File theDir = (dir == null)
                     ? repositoryDir
                     : new File(repositoryDir, dir);
@@ -275,6 +287,8 @@ public class LagoonProcessor implements LagoonContext
     OutputStream storeFileInRepository(String dir, String key)
         throws IOException
     {
+		if (repositoryDir == null) return null;
+
         File theDir = (dir == null)
                     ? repositoryDir
                     : new File(repositoryDir, dir);
@@ -329,20 +343,23 @@ public class LagoonProcessor implements LagoonContext
 		}
     }
 
-    public void putObjectIntoRepository(String key, Object obj)
+    public boolean putObjectIntoRepository(String key, Object obj)
         throws IOException
     {
-        putObjectIntoRepository(null, key, obj);
+        return putObjectIntoRepository(null, key, obj);
     }
 
-    void putObjectIntoRepository(String dir, String key, Object obj)
+    boolean putObjectIntoRepository(String dir, String key, Object obj)
         throws IOException
     {
         OutputStream os = storeFileInRepository(dir, key);
+		
+		if (os == null) return false;
 
         ObjectOutputStream oos = new ObjectOutputStream(os);
         try {
 			oos.writeObject(obj);
+			return true;
 		}
 		finally
 		{
