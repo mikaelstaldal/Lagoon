@@ -50,16 +50,31 @@ import org.xml.sax.*;
  */
 public abstract class Node implements java.io.Serializable
 {
-    String systemId;
-    int line;
-    int column;
-    NodeWithChildren parent = null;
-
+    private String systemId;
+    private int line;
+    private int column;
+    protected NodeWithChildren parent = null;
+	
+	
     void setParent(NodeWithChildren n)
     {
         parent = n;
     }
+	
+	public void setSystemId(String systemId)
+	{
+		this.systemId = systemId;	
+	}
 
+	public void setLine(int line)
+	{
+		this.line = line;	
+	}
+
+	public void setColumn(int column)
+	{
+		this.column = column;	
+	}
     
 	/**
 	 * Get the parent of this node.

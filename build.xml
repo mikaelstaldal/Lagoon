@@ -4,7 +4,7 @@
 <!-- You need Apache Ant, version 1.2 or later, to use it -->
 <!-- Get it from http://jakarta.apache.org/ant/ -->
 
-<project name="Lagoon" default="lagoon" basedir=".">
+<project name="Lagoon" default="lagoon">
 
   <!-- Change these to match your system, 
   	   or override with -D command line options -->
@@ -12,6 +12,7 @@
   <property name="JLex" value="C:\javaInstall\JLex"/>
   <property name="FOP" value="C:\javaInstall\fop\fop.jar"/>
   <property name="Batik" value="C:\home\mikes\projects\xml-batik\classes\"/>
+  <property name="Ant" value="C:\javaInstall\ant\lib\ant.jar"/>
 
   <property name="Name" value="Lagoon"/>
   <property name="name" value="lagoon"/>
@@ -27,7 +28,14 @@
   <property name="build.testsuite" value="${build.dir}/testsuite"/>
 
   <!-- <property name="manifest" value="src/manifest"/> -->
- 
+
+  <taskdef name="lagoon" classname="nu.staldal.lagoon.LagoonAntTask">
+    <classpath>
+      <pathelement location="${dist.jars}/lagoon.jar" />
+      <pathelement location="${dist.jars}/lsp.jar" />
+      <pathelement location="${dist.jars}/xtree.jar" />
+    </classpath>
+  </taskdef>  
 
   <target name="init">
     <tstamp/>
@@ -48,10 +56,11 @@
     <javac srcdir="${src.dir}"
     	   includes="nu/staldal/lagoon/**/*"
            destdir="${build.classes}"
-           optimize="off">
+           optimize="off" debug="on">
     	<classpath>
             <pathelement location="${FOP}" />
             <pathelement location="${Batik}" />
+            <pathelement location="${Ant}" />
         </classpath>
 	</javac>           
 
@@ -84,7 +93,7 @@
     <javac srcdir="${src.dir}"
     	   includes="nu/staldal/xtree/**/*"
            destdir="${build.classes}"
-           optimize="off" />
+           optimize="off" debug="on"/>
 
     <copy todir="${build.classes}">
       <fileset dir="${src.dir}">
@@ -106,7 +115,7 @@
     <javac srcdir="${src.dir}"
     	   includes="nu/staldal/syntax/**/*"
            destdir="${build.classes}"
-           optimize="off" />
+           optimize="off" debug="on"/>
 
     <copy todir="${build.classes}">
       <fileset dir="${src.dir}">
@@ -134,7 +143,7 @@
     <javac srcdir="${src.dir}"
     	   includes="nu/staldal/lsp/**/*"
            destdir="${build.classes}"
-           optimize="off">
+           optimize="off" debug="on">
     	<classpath>
             <pathelement location="${Batik}" />
         </classpath>
@@ -194,6 +203,10 @@
              doctitle="${Name}" />
   </target>
 
+  <target name="site" depends="docs"
+          description="Builds the Lagoon website">
+    <lagoon propertyFile="website.lagoon"/>
+  </target>
 
   <target name="dist" depends="lagoon,docs"
   		  description="Builds the distribution">

@@ -24,3 +24,4 @@
 -----------
 * Support for non-reentrant FileStorages: XML islands works together with FTP.
 * Documentation of the plugin API for FileStorages.
+* Apache Ant task for Lagoon.

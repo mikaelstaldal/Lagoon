@@ -187,9 +187,9 @@ public class TreeBuilder implements ContentHandler, ErrorHandler
         {
             Element parent = (Element)elementStack.peek();
 			Node node = new Text(textBuffer.toString());
-			node.systemId = textSystemId;
-			node.line = textLine;
-			node.column = textColumn;
+			node.setSystemId(textSystemId);
+			node.setLine(textLine);
+			node.setColumn(textColumn);
 	    	parent.addChild(node);
         }
 
@@ -228,9 +228,9 @@ public class TreeBuilder implements ContentHandler, ErrorHandler
 		Element el = new Element(namespaceURI, localName, atts.getLength());
 		if (locator != null)
 		{
-			el.systemId = locator.getSystemId();
-			el.line = locator.getLineNumber();
-			el.column = locator.getColumnNumber();
+			el.setSystemId(locator.getSystemId());
+			el.setLine(locator.getLineNumber());
+			el.setColumn(locator.getColumnNumber());
 		}
 		if (rootElement == null)
 		{
@@ -344,9 +344,9 @@ public class TreeBuilder implements ContentHandler, ErrorHandler
 		Node node = new ProcessingInstruction(target, data);
 		if (locator != null)
 		{
-			node.systemId = locator.getSystemId();
-			node.line = locator.getLineNumber();
-			node.column = locator.getColumnNumber();
+			node.setSystemId(locator.getSystemId());
+			node.setLine(locator.getLineNumber());
+			node.setColumn(locator.getColumnNumber());
 		}
 		parent.addChild(node);
     }

@@ -99,6 +99,10 @@ public class LagoonProcessor
 
         targetLocation = createFileStorage(targetURL);
 		
+		if (targetLocation == null)
+			throw new LagoonException("Cannot find FileStorage for URL "
+				+ targetURL);
+		
 		if (targetLocation.needPassword() && (password == null))
 		{
 			throw new AuthenticationMissingException();	

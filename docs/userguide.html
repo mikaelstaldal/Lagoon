@@ -710,6 +710,34 @@ However, removing the working directory may cause unnecessary rebuilds next time
 Lagoon is run, especially if you use a FTP or SSH target.</p>
 
 
+<h2>Using Lagoon from within Apache Ant</h2>
+
+<p>Lagoon comes with an Ant task. Define the Lagoon Ant task in the Ant
+build file like this:</p>
+<pre>
+&lt;taskdef name="lagoon" classname="nu.staldal.lagoon.LagoonAntTask"&gt;
+  &lt;classpath&gt;
+    &lt;pathelement location="<em>locationOfLagoonJars</em>/lagoon.jar" /&gt;
+    &lt;pathelement location="<em>locationOfLagoonJars</em>/lsp.jar" /&gt;
+    &lt;pathelement location="<em>locationOfLagoonJars</em>/xtree.jar" /&gt;
+  &lt;/classpath&gt;
+&lt;/taskdef&gt;  
+</pre>
+
+<p>and use one of the following syntaxes:</p>
+<pre>
+&lt;lagoon propertyFile="<em>propertyFile</em>"/&gt;
+    
+&lt;lagoon sitemapFile="<em>sitemapFile</em>"
+           sourceDir="<em>sourceDir</em>"
+           targetURL="<em>targetURL</em>"
+           password="<em>password</em>" /&gt;
+</pre>
+
+<p>The <em>password</em> attribute can be omitted if not needed. Use the
+optional attribute <code>force</code> to override dependency checking.</p>
+
+
 <h2>Adapting your web site for Lagoon</h2>
 
 <p>To make use of the features of Lagoon, you have to ensure that your
