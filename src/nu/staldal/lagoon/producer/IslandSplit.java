@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002, Mikael Ståldal
+ * Copyright (c) 2002-2004, Mikael Ståldal
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without 
@@ -195,6 +195,7 @@ public class IslandSplit extends Transform implements ContentHandler
 		}
 		prefixVector.clear();
 		uriVector.clear();
+        Thread.interrupted(); // clear interrupted status
 		sax.startElement(namespaceURI, localName, qName, atts);
     }
 
