@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<!-- pseudo-DTD for Lagoon sitemap -->
+
+<!--
+This DTD is pseudo since DTDs are not powerful enough to express the
+full structure of the Lagoon sitemap, it cannot be used for automatic
+validation.
+
+The <format>, <transform>, <process>, <parse>, <source> and <read>
+elements may take any attributes, they are used as parameters to
+the producer. Any non-whitespace character content of the <source> and
+<read> elements is used as a parameter with the name "name".
+
+Source and target must be specified as pseudo-absolute URL:s,
+i.e. a relative URL starting with '/'. For example "/foo/bar.html".
+Target URL:s is the request URL for the web server. Source URL:s
+are relative to the local source root directory.
+-->
+
+<!--
+format: xml-stream -> byte-stream
+transform: xml-stream -> xml-stream
+process: byte-stream -> byte-stream
+parse: byte-stream -> xml-stream
+source: ? -> xml-stream
+read: ? -> byte-stream
+-->
+
+<!ELEMENT sitemap (file)* >
+
+<!ELEMENT file (format|read|process) >
+<!ATTLIST file
+	target CDATA #REQUIRED  
+	source CDATA #IMPLIED > 
+<!-- Target must contain wildcard if and only if
+     source exists and contain wildcard -->
+<!-- Source may contain wildcard -->
+
+<!ELEMENT format (source|parse|transform) >
+<!ATTLIST format
+	type NMTOKEN #IMPLIED > <!-- Ommitting uses default -->
+	<!-- more attributes allowed -->
+
+<!ELEMENT transform (source|parse|transform) >
+<!ATTLIST transform
+	type NMTOKEN #IMPLIED > <!-- Ommitting uses default -->
+	<!-- more attributes allowed -->
+
+<!ELEMENT process (format|read|process) >
+<!ATTLIST process
+	type NMTOKEN #IMPLIED > <!-- Ommitting uses default -->
+	<!-- more attributes allowed -->
+
+<!ELEMENT parse (format|read|process) >
+<!ATTLIST parse
+	type NMTOKEN #IMPLIED > <!-- Ommitting uses default -->
+	<!-- more attributes allowed -->
+
+<!-- any non-whitespace #PCDATA is taken as a parameter with name "name" -->
+<!ELEMENT source (#PCDATA) > 
+<!ATTLIST source
+	type NMTOKEN #IMPLIED > <!-- Ommitting uses default -->
+	<!-- more attributes allowed -->
+
+<!-- any non-whitespace #PCDATA is taken as a parameter with name "name" -->
+<!ELEMENT read (#PCDATA) > 
+<!ATTLIST read
+	type NMTOKEN #IMPLIED > <!-- Ommitting uses default -->
+	<!-- more attributes allowed -->

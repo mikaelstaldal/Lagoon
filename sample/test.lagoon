@@ -1,0 +1,6 @@
+# Lagoon properties
+
+sitemapFile: sitemap.xml
+sourceDir: src 
+repositoryDir: repository 
+targetURL: webb

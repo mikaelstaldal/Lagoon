@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<root xmlns:ns="http://www.foo.com/ns">
+
+<foo>bar</foo>
+<split name="first_part">
+<first>The first part</first>
+</split>
+<foo>bar</foo>
+<split name="second_part">
+<second>The second part</second>
+</split>
+<foo>bar</foo>
+<split name="third_part">
+<third>The third part</third>
+</split>
+<foo>bar</foo>
+<ns:split name="fourth_part">
+<fourth>This will not be included</fourth>
+</ns:split>
+
+</root>

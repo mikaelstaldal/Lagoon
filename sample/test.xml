@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+
+<root xmlns:inc="http://foo.com/include">
+<foo>Hello, world!</foo>
+<inc:include file="test.inc"/>
+<foobar>Bla bla bla..</foobar>
+</root>

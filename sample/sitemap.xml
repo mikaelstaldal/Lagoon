@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<sitemap>
+
+<file target="/very_transformed.xml" source="/twoxsl.xml">
+	<format type="xml" indent="4">
+		<transform type="xslt" stylesheet="/style/second.xsl">
+			<transform type="xslt" stylesheet="/style/first.xsl">
+				<source/>
+			</transform>
+		</transform>
+	</format>
+</file>
+
+<file target="/split/split.sem" source="/split.xml">
+	<format type="xml" indent="4">
+		<transform type="split" namespace="" element="split" 
+				   outputname="[name].xml">
+			<source/>
+		</transform>
+	</format>
+</file>
+
+<file target="/dirlist.xml" source="/style/">
+	<format type="xml" indent="4">
+		<source type="dir"/>
+	</format>
+</file>
+
+<file target="/dirlist.html" source="/style/">
+	<format type="html" indent="4">
+		<transform type="xslt" stylesheet="/dir.xsl"> <!-- always="yes"-->
+			<source type="dir" pattern="*.xsl"/>
+		</transform>
+	</format>
+</file>
+
+<file target="/report.html" source="/work/report.xml">
+	<format type="html" html="strict" indent="yes">
+   		<transform type="xslt" stylesheet="/style/report_html.xsl"
+				   myparam="Orangejuice"
+				   theparam="Kalle">
+    	    <source/>
+    	</transform>
+	</format>
+</file>
+
+<file target="/report.pdf" source="/work/report.xml">
+	<format type="pdf">
+	   	<transform type="xslt" stylesheet="/style/report_print.xsl">
+    	    <source/>
+		</transform>
+    </format>
+</file>
+
+<file target="/pic.png" source="/img/pic.png">
+	<read/>
+</file>
+
+<file target="/test.lsp" source="/lsp/test.lsp">
+	<format type="xml">
+		<source/>
+	</format>
+</file>
+
+<file target="/test.lsp3" source="/lsp/test.lsp">
+	<format type="xml">
+		<parse>
+			<read/>
+		</parse>
+	</format>
+</file>
+
+<file target="/lsptest.xml" source="/lsp/test.lsp">
+	<format type="xml" indent="yes">
+		<transform type="lsp" hej="HEJSAN" pi="ACME"><source/></transform>
+	</format>
+</file>
+
+<!--
+<file target="/my_notes/*.html" source="/notes/*.xml">
+	<format type="html">
+		<transform type="xslt" stylesheet="/style/note_html.xsl">
+    	    <source/>
+		</transform>
+    </format>
+</file>
+-->
+
+</sitemap>

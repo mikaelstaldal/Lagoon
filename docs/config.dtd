@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<!-- DTD for Lagoon configuration -->
+
+<!--
+format: xml-stream -> byte-stream
+transform: xml-stream -> xml-stream
+process: byte-stream -> byte-stream
+parse: byte-stream -> xml-stream
+source: ? -> xml-stream
+read: ? -> byte-stream
+-->
+
+<!ELEMENT config (format|transform|process|parse|source|read)*> 
+
+<!-- Ommitting type defines a default -->
+<!ELEMENT format (param)* >
+<!ATTLIST format
+	type NMTOKEN #IMPLIED	
+    class CDATA #REQUIRED >
+
+<!ELEMENT transform (param)* >
+<!ATTLIST transform
+	type NMTOKEN #IMPLIED
+    class CDATA #REQUIRED >
+
+<!ELEMENT process (param)* >
+<!ATTLIST process
+	type NMTOKEN #IMPLIED
+    class CDATA #REQUIRED >
+
+<!ELEMENT parse (param)* >
+<!ATTLIST parse
+	type NMTOKEN #IMPLIED
+    class CDATA #REQUIRED >
+
+<!ELEMENT source (param)* >
+<!ATTLIST source
+	type NMTOKEN #IMPLIED 
+    class CDATA #REQUIRED >
+
+<!ELEMENT read (param)* >
+<!ATTLIST read
+	type NMTOKEN #IMPLIED 
+    class CDATA #REQUIRED >
+
+<!ELEMENT param (#PCDATA) >
+<!ATTLIST param
+	name NMTOKEN #REQUIRED >

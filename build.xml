@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<!-- Ant build file for Lagoon -->
+<!-- You need Apache Ant, version 1.2 or later, to use it -->
+<!-- Get it from http://jakarta.apache.org/ant/ -->
+
+<project name="Lagoon" default="lagoon" basedir=".">
+
+  <!-- Change these to match your system, 
+  	   or override with -D command line options -->
+  <property name="JUnit" value="D:\javaInstall\JUnit\junit.jar"/>
+  <property name="JLex" value="D:\javaInstall\JLex"/>
+  <property name="FOP" value="D:\javaInstall\fop\fop.jar"/>
+
+  <property name="Name" value="Lagoon"/>
+  <property name="name" value="lagoon"/>
+  <property name="version" value="1.0b4"/>
+  <property name="ver" value="10b4"/>
+
+  <property name="src.dir" value="src"/>
+  <property name="src.testsuite" value="testsuite"/>
+  <property name="docs.dir" value="docs"/>
+  <property name="build.dir" value="build"/>
+  <property name="dist.dir" value="dist"/>
+  <property name="dist.jars" value="${dist.dir}/lib"/>
+  <property name="build.classes" value="${build.dir}/classes"/>
+  <property name="build.testsuite" value="${build.dir}/testsuite"/>
+  <property name="build.javadocs" value="${build.dir}/javadocs"/>
+
+  <property name="packages" 
+  	value="nu.staldal.lagoon.*,nu.staldal.xtree.*,nu.staldal.lsp.*,nu.staldal.syntax.*"/>
+  <!-- <property name="manifest" value="src/manifest"/> -->
+ 
+
+  <target name="init">
+    <tstamp/>
+    <mkdir dir="${build.classes}"/>
+    <mkdir dir="${build.testsuite}"/>
+    <mkdir dir="${dist.dir}"/>
+    <mkdir dir="${dist.jars}"/>
+    <uptodate property="lexer.notRequired"
+    		  targetfile="${basedir}/${src.dir}/nu/staldal/lsp/expr/LSPExprLexer.java">
+		<srcfiles dir="${basedir}/${src.dir}"
+        		  includes="nu/staldal/lsp/expr/LSPExprLexer.lex"/>
+    </uptodate>
+  </target>
+
+  
+  <target name="lagoon" depends="init,xtree,lsp"
+  	description="Compiles Lagoon">
+    <javac srcdir="${src.dir}"
+    	   includes="nu/staldal/lagoon/**/*"
+           destdir="${build.classes}"
+           optimize="off">
+    	<classpath>
+            <pathelement location="${FOP}" />
+        </classpath>
+	</javac>           
+
+    <copy todir="${build.classes}">
+      <fileset dir="${src.dir}">
+        <include name="nu/staldal/lagoon/**/*" />
+        <exclude name="**/*.java" />
+      </fileset>
+    </copy>
+
+    <filter token="NAME" value="${Name}" />
+    <filter token="VERSION" value="${version}" />
+    <filter token="DATE" value="${DSTAMP}" />
+    <copy file="version.txt" todir="${build.classes}" 
+          overwrite="true"
+          filtering="on"/>
+    <jar jarfile="${dist.jars}/${name}.jar">
+         <!-- manifest="${manifest}" -->
+      <fileset dir="${build.classes}"> 
+    	 <include name="*"/>
+    	 <include name="nu/staldal/lagoon/**/*"/>
+      </fileset>	 
+    </jar>
+
+  </target>
+
+  <target name="xtree" depends="init"
+  	description="Compiles XTree">
+    <javac srcdir="${src.dir}"
+    	   includes="nu/staldal/xtree/**/*"
+           destdir="${build.classes}"
+           optimize="off" />
+
+    <copy todir="${build.classes}">
+      <fileset dir="${src.dir}">
+        <include name="nu/staldal/xtree/**/*" />
+        <exclude name="**/*.java" />
+      </fileset>
+    </copy>
+
+    <jar jarfile="${dist.jars}/xtree.jar">
+         <!-- manifest="${manifest}" -->
+      <fileset dir="${build.classes}"> 
+    	 <include name="nu/staldal/xtree/**/*"/>
+      </fileset>	 
+    </jar>
+  </target>
+
+  <target name="syntax" depends="init">
+    <javac srcdir="${src.dir}"
+    	   includes="nu/staldal/syntax/**/*"
+           destdir="${build.classes}"
+           optimize="off" />
+
+    <copy todir="${build.classes}">
+      <fileset dir="${src.dir}">
+        <include name="nu/staldal/syntax/**/*" />
+        <exclude name="**/*.java" />
+      </fileset>
+    </copy>
+  </target>
+
+  <target name="lexer" unless="lexer.notRequired">
+    <java classname="JLex.Main">
+    	<classpath>
+            <pathelement location="${JLex}" />
+        </classpath>
+      <arg value="${basedir}/${src.dir}/nu/staldal/lsp/expr/LSPExprLexer.lex"/>
+    </java>
+    <move file="${basedir}/${src.dir}/nu/staldal/lsp/expr/LSPExprLexer.lex.java"
+    	  tofile="${basedir}/${src.dir}/nu/staldal/lsp/expr/LSPExprLexer.java"/>
+  </target>
+
+  <target name="lsp" depends="init,xtree,lexer,syntax"
+  	description="Compiles LSP">
+    <javac srcdir="${src.dir}"
+    	   includes="nu/staldal/lsp/**/*"
+           destdir="${build.classes}"
+           optimize="off" />
+
+    <copy todir="${build.classes}">
+      <fileset dir="${src.dir}">
+        <include name="nu/staldal/lsp/**/*" />
+        <exclude name="**/*.java" />
+        <exclude name="**/*.lex" />
+      </fileset>
+    </copy>
+
+    <jar jarfile="${dist.jars}/lsp.jar">
+         <!-- manifest="${manifest}" -->
+      <fileset dir="${build.classes}"> 
+    	 <include name="nu/staldal/syntax/**/*"/>
+    	 <include name="nu/staldal/lsp/**/*"/>
+      </fileset>	 
+    </jar>
+  </target>
+
+
+  <target name="testsuite" depends="init,lsp,xtree,lagoon"
+  	description="Compiles testsuite">
+    <javac srcdir="${src.testsuite}"
+    	   includes="nu/staldal/**/*"
+           destdir="${build.testsuite}"
+           optimize="off">
+    	<classpath>
+            <pathelement location="${JUnit}" />
+            <pathelement location="${build.classes}" />
+        </classpath>
+    </javac>
+
+    <copy todir="${build.testsuite}">
+      <fileset dir="${src.testsuite}">
+        <include name="nu/staldal/**/*" />
+        <exclude name="**/*.java" />
+      </fileset>
+    </copy>
+  </target>
+
+
+  <target name="docs">
+  	<copy todir="${dist.dir}/docs">
+      <fileset dir="${docs.dir}"/>
+    </copy>
+  </target>
+
+  <target name="dist" depends="lagoon,docs"
+  		  description="Builds the distribution">
+    <filter token="NAME" value="${Name}" />
+    <filter token="VERSION" value="${version}" />
+    <filter token="DATE" value="${DSTAMP}" />
+    <copy file="README" todir="${dist.dir}" 
+          overwrite="true"
+          filtering="on"/>
+    <copy file="LICENSE" todir="${dist.dir}" />
+    <zip zipfile="${name}${ver}.zip"
+    	 basedir="${dist.dir}" />
+  </target>
+
+
+  <target name="javadocs" depends="init" 
+  	description="Creates the API documentation">
+    <mkdir dir="${build.javadocs}"/>
+    <javadoc packagenames="${packages}"
+    	     sourcepath="${src.dir}"
+             destdir="${build.javadocs}"
+             author="true"
+             version="true"
+             windowtitle="${Name} API"
+             doctitle="${Name}" />
+  </target>
+
+
+  <target name="clean" description="Remove built files">
+    <delete dir="${build.dir}"/>
+    <delete dir="${dist.dir}"/>
+  </target>
+
+</project>
