@@ -165,7 +165,7 @@ The pipeline must end with a byte producer.</p>
 entries, which defines a partial document, to be included by another document. 
 A <code>part</code> has a name, which is not an URL. The source URL must be 
 specified as an absolute or pseudo-absolute URL. The pipeline must end with an 
-XML producer.</p>
+XML producer. Wildcards may not be used.</p>
 
 <p>The sitemap may also contain <code>&lt;delete&gt;</code> entries, which are
 used to delete the target.</p>
@@ -213,8 +213,8 @@ for information about the included resources.
 E.g. <code>res:/style/imageindex.xsl</code></p>
 
 <p>The <code>part</code> scheme is used to point out &lt;part&gt; defined in the 
-sitemap. E.g. <code>part:thePart</code>. URL:s with this scheme can only be
-used in LSP documents.</p>
+sitemap. E.g. <code>part:thePart</code>. URL:s with this scheme can not be used 
+in all contexts.</p>
 
 <p>Dependency checking of sources works for relative, pesudo-absolute and 
 absolute URLs with <code>file</code>, <code>res</code> or <code>part</code> 
