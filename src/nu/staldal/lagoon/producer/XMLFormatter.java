@@ -187,12 +187,9 @@ public class XMLFormatter extends Format
         throws IOException, SAXException
     {
 		try {
-			TransformerHandler th = tfactory.newTransformerHandler();
-			th.setResult(new StreamResult(bytes));
-		
-			Transformer trans = th.getTransformer();
-			trans.setOutputProperties(outputProperties);
-				
+			TransformerHandler th = tfactory.newTransformerHandler();	
+			th.getTransformer().setOutputProperties(outputProperties);
+			th.setResult(new StreamResult(bytes));				
         	getNext().start(new ContentHandlerFixer(th, !isHTML, isHTML), target);
 		}
 		catch (TransformerConfigurationException e)
