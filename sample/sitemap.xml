@@ -46,6 +46,7 @@
 	</format>
 </file>
 
+<!--
 <file target="/db.php">
 	<format type="xhtml">
 		<transform type="lssi">
@@ -53,7 +54,7 @@
 		</transform>
 	</format>
 </file>
-
+-->
 <file target="/island.xml" source="/island.html">
 	<format type="xml">
 		<source/>
@@ -192,8 +193,9 @@
     </format>
 </file>
 
-<file target="/file/pic.png" source="file:C:\home\mikes\lagoon\sample\src\img\pic.png"/>
-
+<!--
+<file target="/file/pic.png" source="file:H:\lagoon\sample\src\img\pic.png"/>
+-->
 -->
 
 <!--

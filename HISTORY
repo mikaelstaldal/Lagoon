@@ -98,3 +98,10 @@
   Java 1.5 (also known as 5.0). However, you may experience some problems
   with the XML formatter in Java 1.5.
 * XML formatter supports omit-xml-declaration.
+
+
+1.0 beta 22
+-----------
+* New formatting code for XML, XHTML and Text. Should now work correctly
+  with both Java 1.4 and Java 1.5.
+

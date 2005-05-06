@@ -50,6 +50,7 @@ import org.xml.sax.*;
 
 import nu.staldal.lagoon.core.*;
 import nu.staldal.xmlutil.ContentHandlerFixer;
+import nu.staldal.xodus.*;
 
 
 public class XMLFormatter extends Format
@@ -186,16 +187,37 @@ public class XMLFormatter extends Format
     public void start(OutputStream bytes, Target target)
         throws IOException, SAXException
     {
-		try {
-			TransformerHandler th = tfactory.newTransformerHandler();	
-			th.getTransformer().setOutputProperties(outputProperties);
-			th.setResult(new StreamResult(bytes));				
-        	getNext().start(new ContentHandlerFixer(th, !isHTML, isHTML), target);
-		}
-		catch (TransformerConfigurationException e)
-		{
-			throw new LagoonException(e.getMessage());
-		}
+        if (isHTML)
+        {
+            TransformerHandler th;
+            
+            try {
+                th = tfactory.newTransformerHandler();	
+                th.getTransformer().setOutputProperties(outputProperties);
+                th.setResult(new StreamResult(bytes));
+            }
+            catch (TransformerConfigurationException e)
+            {
+                throw new LagoonException(e.getMessage());
+            }
+            
+            getNext().start(new ContentHandlerFixer(th, false, true), target);
+        }
+        else
+        {
+            Serializer ser;
+            
+            try {                   
+                ser = Serializer.createSerializer(
+                    new StreamResult(bytes), outputProperties);
+            }
+            catch (IllegalArgumentException e)
+            {
+                throw new LagoonException(e.getMessage());
+            }
+                
+            getNext().start(ser, target);
+        }                        
 	}
 
     public boolean hasBeenUpdated(long when)
