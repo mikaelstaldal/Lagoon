@@ -148,7 +148,7 @@ public class XMLFormatter extends Format
                 	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd");
                 break;
             }
-			outputProperties.setProperty(OutputKeys.ENCODING, "iso-8859-1");
+			outputProperties.setProperty(OutputKeys.ENCODING, "UTF-8");
         }
         else if (method.equals("TEXT"))
         {

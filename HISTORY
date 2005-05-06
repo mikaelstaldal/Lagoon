@@ -100,8 +100,9 @@
 * XML formatter supports omit-xml-declaration.
 
 
-1.0 beta 22
+1.0 beta 23
 -----------
 * New formatting code for XML, XHTML and Text. Should now work correctly
   with both Java 1.4 and Java 1.5.
+* UTF-8 encoding default for XHTML formatting.
 
