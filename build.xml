@@ -26,8 +26,8 @@
 
   <property name="Name" value="Lagoon"/>
   <property name="name" value="lagoon"/>
-  <property name="version" value="1.0b22"/>
-  <property name="ver" value="10b22"/>
+  <property name="version" value="1.0b23"/>
+  <property name="ver" value="10b23"/>
 
 
   <property name="res.dir" value="resource"/>
@@ -171,7 +171,7 @@
         <test name="nu.staldal.xtree.TestSequentialTreeBuilder"/>
         <test name="nu.staldal.xodus.TestXMLCharacterEncoder"/>
         <test name="nu.staldal.xodus.TestOutputConfig"/>
-        <test name="nu.staldal.xodus.TestXMLSerializer"/>
+   <!-- <test name="nu.staldal.xodus.TestXMLSerializer"/> -->
    <!-- <test name="nu.staldal.lagoon.filestorage.TestLocalFileStorage"/> -->
         <classpath>
             <pathelement location="${build.classes}" />
