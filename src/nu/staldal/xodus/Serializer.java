@@ -55,6 +55,28 @@ import javax.xml.transform.stream.StreamResult;
 
 /**
  * Serialize SAX2 events to its textual XML representation.
+ *<p>
+ * Support output to XML, XHTML and Text. Full support for XML namespaces.
+ *<p>
+ * The {@link #startDocument} and {@link #endDocument} method must be used.
+ *<p>
+ * Output properties controls the serialization process, it uses the keys in 
+ * <code>javax.xml.transform.OutputKeys</code>.
+ *<p>
+ * The METHOD output property must be specified. It can be 
+ * "xml", "xhtml", "text". "html" is currently not supported.
+ *<p>
+ * The CDATA_SECTION_ELEMENTS output property is not supported.
+ *<p>
+ * The ENCODING output property defaults to UTF-8 for XML and XHTML, 
+ * and to ISO-8859-1 for Text.
+ *<p>
+ * The MEDIA_TYPE output property is not used.
+ *<p>
+ * <code>javax.xml.transform.Result.PI_DISABLE_OUTPUT_ESCAPING</code> 
+ * and 
+ * <code>javax.xml.transform.Result.PI_ENABLE_OUTPUT_ESCAPING</code>
+ *  can be used as processingInstruction targets to disable output escaping. 
  */
 public abstract class Serializer implements ContentHandler, LexicalHandler, 
                                             DTDHandler, DeclHandler
@@ -67,7 +89,17 @@ public abstract class Serializer implements ContentHandler, LexicalHandler,
     
     
     /**
-     * Factory method.
+     * Factory method, create a new Serializer.
+     *
+     * @param result  specifies where to write the textual representation.
+     * @param outputProperties output properties, uses {@link javax.xml.transform.OutputKeys}
+     *
+     * @return a new Serializer
+     *
+     * @throws UnsupportedEncodingException if the ENCODING output property 
+     *         is invalid.
+     * @throws IllegalArgumentException if any other output property is invalid.
+     * @throws IOException if the result is invalid.
      */
     public static Serializer createSerializer(
             StreamResult result, Properties outputProperties)
