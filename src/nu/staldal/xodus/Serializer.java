@@ -64,14 +64,20 @@ import javax.xml.transform.stream.StreamResult;
  * <code>javax.xml.transform.OutputKeys</code>.
  *<p>
  * The METHOD output property must be specified. It can be 
- * "xml", "xhtml", "text". "html" is currently not supported.
+ * "xml", "xhtml", "text" or "html".
  *<p>
  * The CDATA_SECTION_ELEMENTS output property is not supported.
  *<p>
  * The ENCODING output property defaults to UTF-8 for XML and XHTML, 
- * and to ISO-8859-1 for Text.
+ * and to ISO-8859-1 for Text and HTML.
  *<p>
  * The MEDIA_TYPE output property is not used.
+ *<p>
+ * The "html" output method does <em>not</em> escape non-ASCII characters 
+ * in URI attribute values, as specified in the XSLT 1.0 specification.
+ *<p>
+ * The "html" output method does <em>not</em> not add any META element 
+ * with encoding, as specified in the XSLT 1.0 specification.
  *<p>
  * <code>javax.xml.transform.Result.PI_DISABLE_OUTPUT_ESCAPING</code> 
  * and 
@@ -110,7 +116,7 @@ public abstract class Serializer implements ContentHandler, LexicalHandler,
             OutputConfig.createOutputConfig(outputProperties); 
         
         if (outputConfig.isHtml)
-            throw new IllegalArgumentException("HTML output is not supported");
+            return new HTMLSerializer(result, outputConfig);
         else if (outputConfig.isXhtml)
             return new XMLSerializer(result, outputConfig);
         else if (outputConfig.isText)

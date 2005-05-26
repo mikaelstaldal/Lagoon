@@ -106,3 +106,7 @@
   with both Java 1.4 and Java 1.5.
 * UTF-8 encoding default for XHTML formatting.
 
+
+1.0 beta 24
+-----------
+* New formatting code for HTML.

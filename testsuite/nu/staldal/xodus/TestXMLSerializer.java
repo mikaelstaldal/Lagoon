@@ -266,6 +266,62 @@ public class TestXMLSerializer extends TestCase
         testOut.close();
     }
 
+    public void testSerializerHTML() throws Exception
+    {
+        Properties p = new Properties();
+        p.setProperty(OutputKeys.METHOD, "html");
+        p.setProperty(OutputKeys.INDENT, "yes");
+        OutputStream testOut = new FileOutputStream("html.html");
+        
+        Serializer th = Serializer.createSerializer(
+            new StreamResult(testOut), p);
+            
+        th.startDocument();
+                
+        th.startElement(XHTML_NS, "html", "", new AttributesImpl());
+        th.comment("this is a comment".toCharArray(),0,17);
+        AttributesImpl attrs = new AttributesImpl();           
+        attrs.addAttribute("", "class", "class", "CDATA", "normal");
+        attrs.addAttribute("", "style", "style", "CDATA", "font-size: 10pt;");
+        th.startElement(XHTML_NS, "p", "", attrs);
+        th.endElement(XHTML_NS, "p", "");
+        th.startElement(XHTML_NS, "div", "", new AttributesImpl());
+        th.startElement(XHTML_NS, "HR", "", new AttributesImpl());
+        th.endElement(XHTML_NS, "HR", "");        
+        attrs = new AttributesImpl();           
+        attrs.addAttribute("", "src", "", "CDATA", "&{picture.png}");
+        attrs.addAttribute("", "lowsrc", "", "CDATA", "&picture.png");
+        attrs.addAttribute("", "ismap", "", "CDATA", "ismap");
+        attrs.addAttribute("", "disabled", "", "CDATA", "<hey>");
+        th.startElement(XHTML_NS, "img", "", attrs);
+        th.endElement(XHTML_NS, "img", "");
+        th.endElement(XHTML_NS, "div", "");        
+        th.startElement(XHTML_NS, "pre", "", new AttributesImpl());
+        th.startElement(XHTML_NS, "hr", "", new AttributesImpl());
+        th.endElement(XHTML_NS, "hr", "");        
+        attrs = new AttributesImpl();           
+        attrs.addAttribute("", "src", "", "CDATA", "picture.png");
+        th.startElement("http://foo", "img", "", attrs);
+        th.endElement("http://foo", "img", "");
+        th.endElement(XHTML_NS, "pre", "");        
+        th.startElement(XHTML_NS, "p", "", new AttributesImpl());
+        th.characters("html \"≈ƒ÷Â‰ˆ\" <&>".toCharArray(),0,17);
+        th.startElement(XHTML_NS, "b", "", new AttributesImpl());
+        th.characters("boldface".toCharArray(),0,8);
+        th.endElement(XHTML_NS, "b", "");
+        th.characters("some text".toCharArray(),0,9);
+        th.endElement(XHTML_NS, "p", "");
+        th.startElement(XHTML_NS, "script", "", new AttributesImpl());
+        th.characters("if (a > b && b < c) d = e;".toCharArray(),0,26);
+        th.endElement(XHTML_NS, "script", "");                
+        th.endElement(XHTML_NS, "html", "");
+        th.processingInstruction("foo", "FOO BAR");
+        
+        th.endDocument();                
+
+        testOut.close();
+    }
+    
 
     /*
     private void setProps(Properties p)

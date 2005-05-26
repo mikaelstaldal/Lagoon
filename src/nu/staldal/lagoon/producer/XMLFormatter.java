@@ -55,22 +55,11 @@ import nu.staldal.xodus.*;
 
 public class XMLFormatter extends Format
 {
-	private SAXTransformerFactory tfactory;
 	private Properties outputProperties;
-	private boolean isHTML;
 	
+    
     public void init() throws LagoonException
     {
-		TransformerFactory tf = TransformerFactory.newInstance();
-        if (!(tf.getFeature(SAXTransformerFactory.FEATURE)
-              	&& tf.getFeature(StreamResult.FEATURE)))
-        {
-            throw new LagoonException("The transformer factory "
-                + tf.getClass().getName() + " doesn't support SAX");
-        }
-            
-		tfactory = (SAXTransformerFactory)tf;
-
         outputProperties = new Properties();
 
         String method = getParam("method");
@@ -90,8 +79,6 @@ public class XMLFormatter extends Format
         else
             throw new LagoonException("Unknown html variant");
 
-		isHTML = false;
-			
         if (method.equals("XML"))
         {
 			outputProperties.setProperty(OutputKeys.METHOD, "xml");
@@ -99,7 +86,6 @@ public class XMLFormatter extends Format
         }
         else if (method.equals("HTML"))			
         {
-			isHTML = true;
 			outputProperties.setProperty(OutputKeys.METHOD, "html");
             switch (_html)
             {
@@ -184,42 +170,25 @@ public class XMLFormatter extends Format
             
     }
 
+    
     public void start(OutputStream bytes, Target target)
         throws IOException, SAXException
     {
-        if (isHTML)
-        {
-            TransformerHandler th;
-            
-            try {
-                th = tfactory.newTransformerHandler();	
-                th.getTransformer().setOutputProperties(outputProperties);
-                th.setResult(new StreamResult(bytes));
-            }
-            catch (TransformerConfigurationException e)
-            {
-                throw new LagoonException(e.getMessage());
-            }
-            
-            getNext().start(new ContentHandlerFixer(th, false, true), target);
+        Serializer ser;
+        
+        try {                   
+            ser = Serializer.createSerializer(
+                new StreamResult(bytes), outputProperties);
         }
-        else
+        catch (IllegalArgumentException e)
         {
-            Serializer ser;
+            throw new LagoonException(e.getMessage());
+        }
             
-            try {                   
-                ser = Serializer.createSerializer(
-                    new StreamResult(bytes), outputProperties);
-            }
-            catch (IllegalArgumentException e)
-            {
-                throw new LagoonException(e.getMessage());
-            }
-                
-            getNext().start(ser, target);
-        }                        
+        getNext().start(ser, target);
 	}
 
+    
     public boolean hasBeenUpdated(long when)
         throws LagoonException, IOException
     {
