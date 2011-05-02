@@ -64,7 +64,7 @@ public class TestXMLSerializer extends TestCase
         attrs.addAttribute("", "class", "", "CDATA", "normal");
         attrs.addAttribute("", "style", "", "CDATA", "font-size: \"10pt\";");
         th.startElement("", "p", "", attrs);
-        th.characters("xml \"≈ƒ÷Â‰ˆ\" <&>".toCharArray(),0,16);
+        th.characters("xml \"√Ö√Ñ√ñ√•√§√∂\" <&>".toCharArray(),0,16);
         th.endElement("", "p", "");
         th.startElement("", "hr", "", new AttributesImpl());
         th.endElement("", "hr", "");        
@@ -73,14 +73,14 @@ public class TestXMLSerializer extends TestCase
         th.endElement("", "p", "");
         th.processingInstruction("EMPTY_PI", "");
         th.processingInstruction(Result.PI_DISABLE_OUTPUT_ESCAPING, null);
-        th.characters("xml \"≈ƒ÷Â‰ˆ\" <&>".toCharArray(),0,16);        
+        th.characters("xml \"√Ö√Ñ√ñ√•√§√∂\" <&>".toCharArray(),0,16);        
         th.processingInstruction(Result.PI_ENABLE_OUTPUT_ESCAPING, null);
-        th.characters("xml \"≈ƒ÷Â‰ˆ\" <&>".toCharArray(),0,16);        
+        th.characters("xml \"√Ö√Ñ√ñ√•√§√∂\" <&>".toCharArray(),0,16);        
         th.skippedEntity("intEntity");        
         th.skippedEntity("[dtd]");        
         th.skippedEntity("%foo");
         th.startCDATA();
-        th.characters("xml \"≈ƒ÷Â‰ˆ\" <&>".toCharArray(),0,16);
+        th.characters("xml \"√Ö√Ñ√ñ√•√§√∂\" <&>".toCharArray(),0,16);
         th.endCDATA();       
         th.endElement("", "html", "");
         th.endDocument();                
@@ -102,7 +102,7 @@ public class TestXMLSerializer extends TestCase
         th.startDocument();
                 
         th.startElement("", "html", "", new AttributesImpl());
-        th.characters("xml \"≈ƒ÷Â‰ˆ\" <&>".toCharArray(),0,16);
+        th.characters("xml \"√Ö√Ñ√ñ√•√§√∂\" <&>".toCharArray(),0,16);
         th.endElement("", "html", "");
         
         th.endDocument();                
@@ -176,7 +176,7 @@ public class TestXMLSerializer extends TestCase
         th.startDocument();
                 
         th.startElement("", "html", "html", new AttributesImpl());
-        th.characters("text \"≈ƒ÷Â‰ˆ\" <&>".toCharArray(),0,17);
+        th.characters("text \"√Ö√Ñ√ñ√•√§√∂\" <&>".toCharArray(),0,17);
         th.processingInstruction("foo", "FOO BAR");
         th.characters("Some more text".toCharArray(),0,14);
         th.endElement("", "html", "html");
@@ -201,7 +201,7 @@ public class TestXMLSerializer extends TestCase
             th.startDocument();
                     
             th.startElement("", "html", "html", new AttributesImpl());
-            th.characters("text \"≈ƒ÷Â‰ˆ\" <&>".toCharArray(),0,17);
+            th.characters("text \"√Ö√Ñ√ñ√•√§√∂\" <&>".toCharArray(),0,17);
             th.processingInstruction("foo", "FOO BAR");
             th.characters("Some more text".toCharArray(),0,14);
             th.endElement("", "html", "html");
@@ -253,7 +253,7 @@ public class TestXMLSerializer extends TestCase
         th.endElement("http://foo", "img", "");
         th.endElement(XHTML_NS, "pre", "");        
         th.startElement(XHTML_NS, "p", "", new AttributesImpl());
-        th.characters("xhtml \"≈ƒ÷Â‰ˆ\" <&>".toCharArray(),0,18);
+        th.characters("xhtml \"√Ö√Ñ√ñ√•√§√∂\" <&>".toCharArray(),0,18);
         th.startElement(XHTML_NS, "b", "", new AttributesImpl());
         th.characters("boldface".toCharArray(),0,8);
         th.endElement(XHTML_NS, "b", "");
@@ -305,7 +305,7 @@ public class TestXMLSerializer extends TestCase
         th.endElement("http://foo", "img", "");
         th.endElement(XHTML_NS, "pre", "");        
         th.startElement(XHTML_NS, "p", "", new AttributesImpl());
-        th.characters("html \"≈ƒ÷Â‰ˆ\" <&>".toCharArray(),0,17);
+        th.characters("html \"√Ö√Ñ√ñ√•√§√∂\" <&>".toCharArray(),0,17);
         th.startElement(XHTML_NS, "b", "", new AttributesImpl());
         th.characters("boldface".toCharArray(),0,8);
         th.endElement(XHTML_NS, "b", "");

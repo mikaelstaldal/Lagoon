@@ -30,13 +30,13 @@ public class TestXMLCharacterEncoder extends TestCase
         xce.write('a');
         xce.write(ca);
         xce.write(ca, 2, 3);
-        xce.write("Räksmörgås!");     
+        xce.write("RÃ¤ksmÃ¶rgÃ¥s!");     
         xce.write("abcdef", 2, 3);
         xce.finish();
         xce.flush();
         xce.close(); 
 
-        assertEquals("aABCDEFCDERäksmörgås!cde", buf.toString());
+        assertEquals("aABCDEFCDERÃ¤ksmÃ¶rgÃ¥s!cde", buf.toString());
 	}   
     
 
@@ -56,7 +56,7 @@ public class TestXMLCharacterEncoder extends TestCase
         xce.write('a');
         xce.write(ca);
         xce.write(ca, 2, 3);
-        xce.write("Räksmörgås!");     
+        xce.write("RÃ¤ksmÃ¶rgÃ¥s!");     
         xce.write("abcdef", 2, 3); 
         xce.finish();
         xce.flush();
@@ -74,7 +74,7 @@ public class TestXMLCharacterEncoder extends TestCase
         System.out.println(']');
         */
         
-        assertEquals("aABCDEFCDERäksmörgås!cde", new String(ba, encoding));
+        assertEquals("aABCDEFCDERÃ¤ksmÃ¶rgÃ¥s!cde", new String(ba, encoding));
 	}   
 
     
@@ -87,7 +87,7 @@ public class TestXMLCharacterEncoder extends TestCase
         xce.write(ca);
         xce.write(ca, 2, 3);
         try {
-            xce.write("Räksmörgås!");
+            xce.write("RÃ¤ksmÃ¶rgÃ¥s!");
             fail("Should throw java.io.CharConversionException");
         }
         catch (java.io.CharConversionException e)
@@ -105,7 +105,7 @@ public class TestXMLCharacterEncoder extends TestCase
         xce.write('a');
         xce.write(ca);
         xce.write(ca, 2, 3);
-        xce.write("Räksmörgås!");     
+        xce.write("RÃ¤ksmÃ¶rgÃ¥s!");     
         xce.write("abcdef", 2, 3); 
         xce.finish();
         xce.flush();

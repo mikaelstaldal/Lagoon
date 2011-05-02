@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2002, Mikael Ståldal
+ * Copyright (c) 2001-2002, Mikael StÃ¥ldal
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -58,7 +58,7 @@ import nu.staldal.xmlutil.ContentHandlerFixer;
  * Java Activation Framework DataContentHandler for XML, 
  * using the XTree representation.
  *
- * @author Mikael Ståldal
+ * @author Mikael StÃ¥ldal
  */
 public class XTreeXMLDataContentHandler implements DataContentHandler
 {
