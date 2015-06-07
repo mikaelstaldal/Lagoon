@@ -5,7 +5,6 @@
 
 <!-- To compile and run the testcases, you need JUnit 3.7 and 
      the Ant optional tasks installed -->
-<!-- Get Junit from http://sourceforge.net/projects/junit/ -->
 
 <!-- Assumes Java2 SDK 1.4 or later -->
 
